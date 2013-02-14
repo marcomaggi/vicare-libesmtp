@@ -46,11 +46,12 @@
 #define ika_integer_from_libesmtp_errcode(PCB,CODE)	IK_FIX(CODE)
                /* ika_integer_from_int((PCB),(CODE)) */
 
-/* Accessors for the fields of the Scheme structure "libesmtp3". */
-#define IK_LIBESMTP_LIBESMTP3_POINTER(CONN)		IK_FIELD((CONN),0)
-#define IK_LIBESMTP_LIBESMTP3_PATHNAME(CONN)		IK_FIELD((CONN),1)
-#define IK_LIBESMTP_CONNECTION(CONN)	\
-  IK_POINTER_DATA_VOIDP(IK_LIBESMTP_LIBESMTP3_POINTER(CONN))
+/* Accessors for the fields of the Scheme structure "session". */
+#define IK_LIBESMTP_SESSION_POINTER(SESSION)	IK_FIELD((SESSION),0)
+#define IK_LIBESMTP_SESSION_OWNER(SESSION)	IK_FIELD((SESSION),1)
+#define IK_LIBESMTP_SESSION_DESTRUCTOR(SESSION)	IK_FIELD((SESSION),2)
+#define IK_LIBESMTP_SESSION(SESSION)	\
+  IK_POINTER_DATA_VOIDP(IK_LIBESMTP_SESSION_POINTER(SESSION))
 
 
 /** --------------------------------------------------------------------

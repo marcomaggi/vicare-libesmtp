@@ -259,8 +259,135 @@ the very unlikely case that this function fails: @false{} is returned.
 @chapter Plain programming interface
 
 
-@defun smtp-create-session
+@menu
+* plain structs::               Data structures.
+* plain session::               Session management.
+* plain unimplemented::         Still to be implemented.
+@end menu
+
+@c page
+@node plain structs
+@section Data structures
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@deftp {Struct Type} smtp-session
+@cindex @var{session} argument
+@cindex Argument @var{session}
+An opaque Scheme structure holding an instance of the C language type
+@code{smtp_session_t}, it references a session.
+
+When instances of this type are used as arguments to functions: this
+documentation identifies them as @var{session}.
+
+There are two categories of @code{smtp-session} instances: those who own
+the underlying database connection and those who merely reference it.
+
+@itemize
+@item
+@code{smtp-session} instances returned by @func{smtp-create-session} do
+own the session.  When instances of this category are garbage collected
+or when @func{smtp-destroy-session} is applied to them: the session is
+closed, all the associated data is finalised; any error is ignored in
+this procedure.
+
+@c @item
+@c @code{smtp-session} instances returned by
+@c @func{smtp-session-context-db-handle} do @strong{not} own the database
+@c connection.  When instances of this category are garbage collected or
+@c when @func{smtp-session-close} is applied to them: the database
+@c connection left open, all the associated @code{smtp-session-stmt}
+@c instances are finalised and all the associated @code{smtp-session-blob}
+@c instances are closed; any error is ignored in this procedure.
+@end itemize
+@end deftp
+
+
+@defun smtp-session? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-session};
+otherwise return @false{}.
 @end defun
+
+
+@defun smtp-session?/alive @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-session} and
+the session it represents is open; otherwise return @false{}.
+@end defun
+
+
+@defun smtp-session-destructor @var{session}
+@defunx set-smtp-session-destructor! @var{session} @var{func}
+Retrieve or set a destructor function associated to the @var{session}.
+
+Whenever the @var{session} is closed, either explicitly with
+@func{smtp-destroy-session} or implicitly by the garbage collector,
+@var{func} is applied to @var{session} before the internal state of
+@var{session} is finalised.
+
+Notice that @var{func} can do anything, not only destroy some state
+associated to @var{session}; if we do:
+
+@example
+(define connection ...)
+(set-smtp-session-destructor! connection
+  (let ((state (make-some-data-struct)))
+    (case-lambda
+      ((conn)
+       (destroy state))
+      (()
+       state))))
+
+(let ((state ((smtp-session-destructor connection))))
+  (do-something-with connection state))
+@end example
+
+@noindent
+we can easily associate values to @var{session}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} smtp-session @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-session?}.
+@end deffn
+
+
+@deffn {Validation Clause} smtp-session/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-session?/alive}.
+@end deffn
+
+@c page
+@node plain session
+@section Session management
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-create-session
+Build and return a new instance of type @code{smtp-session}.  If an
+error occurs: return @false{}.
+@end defun
+
+
+@defun smtp-destroy-session @var{session}
+Finalise the @var{session} releasing all the associated resources.
+Return a boolean: @true{} is the @libesmtp{} operation succeeded.
+@end defun
+
+@c page
+@node plain unimplemented
+@section Still to be implemented
 
 
 @defun smtp-add-message

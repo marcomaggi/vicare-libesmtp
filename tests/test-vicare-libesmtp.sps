@@ -67,6 +67,42 @@
   #t)
 
 
+(parametrise ((check-test-name		'session)
+	      (struct-guardian-logger	#t))
+
+  (check
+      ;;This will be destroyed by the garbage collector.
+      (let ((sex (smtp-create-session)))
+	(smtp-session? sex))
+    => #t)
+
+  (check
+      ;;This will be destroyed by the garbage collector.
+      (let ((sex (smtp-create-session)))
+	(smtp-session?/alive sex))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-destroy-session sex))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-destroy-session sex)
+	(smtp-destroy-session sex)
+	(smtp-destroy-session sex))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-destroy-session sex)
+	(smtp-session?/alive sex))
+    => #f)
+
+  (collect))
+
+
 ;;;; done
 
 (check-report)

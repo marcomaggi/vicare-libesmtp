@@ -38,10 +38,18 @@
 
     smtp-version
 
+    ;; session management
+    smtp-session
+    smtp-session?			smtp-session?/alive
+    smtp-session.vicare-arguments-validation
+    smtp-session/alive.vicare-arguments-validation
+
+    smtp-create-session
+    smtp-destroy-session
+
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-create-session
     smtp-add-message
     smtp-enumerate-messages
     smtp-set-server
@@ -56,7 +64,6 @@
     smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
-    smtp-destroy-session
     smtp-message-transfer-status
     smtp-reverse-path-status
     smtp-message-reset-status
@@ -94,27 +101,62 @@
     (vicare mail libesmtp constants)
     (prefix (vicare mail libesmtp unsafe-capi) capi.)
     (vicare syntactic-extensions)
+    (vicare arguments validation)
     #;(prefix (vicare words) words.))
 
 
 ;;;; arguments validation
 
-#;(define-argument-validation (fixnum who obj)
-  (fixnum? obj)
-  (assertion-violation who "expected fixnum as argument" obj))
+(define-argument-validation (smtp-session who obj)
+  (smtp-session? obj)
+  (assertion-violation who "expected smtp-session structure as argument" obj))
 
-#;(define-argument-validation (pointer who obj)
-  (pointer? obj)
-  (assertion-violation who "expected pointer as argument" obj))
+(define-argument-validation (smtp-session/alive who obj)
+  (smtp-session?/alive obj)
+  (assertion-violation who "expected live smtp-session structure as argument" obj))
 
-#;(define-argument-validation (callback who obj)
-  (pointer? obj)
-  (assertion-violation who "expected callback as argument" obj))
+
+;;;; helpers
 
-#;(define-argument-validation (bytevector who obj)
-  (bytevector? obj)
-  (assertion-violation who "expected bytevector as argument" obj))
-
+(define-syntax %struct-destructor-application
+  ;;Data structures might have a field called DESTRUCTOR holding #f or a
+  ;;function  to be  applied to  the struct  instance upon  finalisation
+  ;;(either when the finaliser is  explicitly called by the application,
+  ;;or when  the garbage collector  performs the finalisation  through a
+  ;;guardian).
+  ;;
+  ;;This macro should  be used in the finalisation  function to properly
+  ;;apply the destructor to the structure.
+  ;;
+  ;;For example, given the definition:
+  ;;
+  ;;  (define-struct the-type (the-field destructor))
+  ;;
+  ;;the code:
+  ;;
+  ;;  (define (%unsafe.the-type-final struct)
+  ;;    (%struct-destructor-application struct
+  ;;      the-type-destructor set-the-type-destructor!))
+  ;;
+  ;;expands to:
+  ;;
+  ;;  (define (%unsafe.the-type-final struct)
+  ;;    (let ((destructor (the-type-destructor struct)))
+  ;;      (when destructor
+  ;;        (guard (E (else (void)))
+  ;;          (destructor struct))
+  ;;        (?mutator ?struct #f))))
+  ;;
+  (lambda (stx)
+    (syntax-case stx ()
+      ((_ ?struct ?accessor ?mutator)
+       (and (identifier? #'?struct)
+	    (identifier? #'?accessor))
+       #'(let ((destructor (?accessor ?struct)))
+	   (when destructor
+	     (guard (E (else (void)))
+	       (destructor ?struct))
+	     (?mutator ?struct #f)))))))
 
 
 ;;;; version functions
@@ -137,6 +179,127 @@
   (define who 'smtp-version)
   (let ((rv (capi.smtp-version)))
     (and rv (ascii->string rv))))
+
+
+;;;; data structures: session
+
+(define-struct smtp-session
+  (pointer
+		;Pointer  object  equivalent to  an  instance  of the  C
+		;language type "smtp_session_t".
+   owner?
+		;Boolean, true if this Scheme  structure is the owner of
+		;the data structure referenced by the "pointer" field.
+   destructor
+		;False or a user-supplied function to be called whenever
+		;this instance  is closed.  The function  must accept at
+		;least one argument being the data structure itself.
+   ))
+
+(define (%unsafe.smtp-destroy-session session)
+  (%struct-destructor-application session
+    $smtp-session-destructor $set-smtp-session-destructor!)
+  (when ($smtp-session-owner? session)
+    (capi.smtp-destroy-session session)))
+
+(define (smtp-session?/alive obj)
+  (and (smtp-session? obj)
+       (not (pointer-null? ($smtp-session-pointer obj)))))
+
+(define (%struct-smtp-session-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[smtp-session")
+  (%display " pointer=")	(%display ($smtp-session-pointer  S))
+  (%display " owner?=")		(%write   ($smtp-session-owner?   S))
+  (%display "]"))
+
+
+;;;; data structures: message
+
+(define-struct smtp-message
+  (pointer
+		;Pointer  object  equivalent to  an  instance  of the  C
+		;language type "smtp_message_t".
+   owner?
+		;Boolean, true if this Scheme  structure is the owner of
+		;the data structure referenced by the "pointer" field.
+   destructor
+		;False or a user-supplied function to be called whenever
+		;this instance  is closed.  The function  must accept at
+		;least one argument being the data structure itself.
+   ))
+
+(define (%unsafe.smtp-message-close message)
+  (%struct-destructor-application message
+    $smtp-message-destructor $set-smtp-message-destructor!)
+  #;(when ($smtp-message-owner? message)
+    (capi.smtp-destroy-message message)))
+
+(define (smtp-message?/open obj)
+  (and (smtp-message? obj)
+       (not (pointer-null? ($smtp-message-pointer obj)))))
+
+(define (%struct-smtp-message-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[smtp-message")
+  (%display " pointer=")	(%display ($smtp-message-pointer  S))
+  (%display " owner?=")		(%write   ($smtp-message-owner?   S))
+  (%display "]"))
+
+
+;;;; data structures: recipient
+
+(define-struct smtp-recipient
+  (pointer
+		;Pointer  object  equivalent to  an  instance  of the  C
+		;language type "smtp_recipient_t".
+   owner?
+		;Boolean, true if this Scheme  structure is the owner of
+		;the data structure referenced by the "pointer" field.
+   destructor
+		;False or a user-supplied function to be called whenever
+		;this instance  is closed.  The function  must accept at
+		;least one argument being the data structure itself.
+   ))
+
+(define (%unsafe.smtp-recipient-close recipient)
+  (%struct-destructor-application recipient
+    $smtp-recipient-destructor $set-smtp-recipient-destructor!)
+  #;(when ($smtp-recipient-owner? recipient)
+    (capi.smtp-destroy-recipient recipient)))
+
+(define (smtp-recipient?/open obj)
+  (and (smtp-recipient? obj)
+       (not (pointer-null? ($smtp-recipient-pointer obj)))))
+
+(define (%struct-smtp-recipient-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[smtp-recipient")
+  (%display " pointer=")	(%display ($smtp-recipient-pointer  S))
+  (%display " owner?=")		(%write   ($smtp-recipient-owner?   S))
+  (%display "]"))
+
+
+;;;; session management
+
+(define (smtp-create-session)
+  (let ((rv (capi.smtp-create-session)))
+    (and rv (make-smtp-session rv #t #f))))
+
+(define (smtp-destroy-session session)
+  (define who 'smtp-destroy-session)
+  (with-arguments-validation (who)
+      ((smtp-session	session))
+    (%unsafe.smtp-destroy-session session)))
 
 
 ;;;; callback makers
@@ -177,12 +340,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-create-session)
-  (define who 'smtp-create-session)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-create-session)))
 
 (define (smtp-add-message)
   (define who 'smtp-add-message)
@@ -267,12 +424,6 @@
   (with-arguments-validation (who)
       ()
     (capi.smtp-start-session)))
-
-(define (smtp-destroy-session)
-  (define who 'smtp-destroy-session)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-destroy-session)))
 
 (define (smtp-message-transfer-status)
   (define who 'smtp-message-transfer-status)
@@ -469,9 +620,14 @@
 
 ;;;; done
 
-#;(set-rtd-printer! (type-descriptor XML_ParsingStatus) %struct-XML_ParsingStatus-printer)
+(set-rtd-printer!	(type-descriptor smtp-session) %struct-smtp-session-printer)
+(set-rtd-destructor!	(type-descriptor smtp-session) %unsafe.smtp-destroy-session)
 
-#;(post-gc-hooks (cons %free-allocated-parser (post-gc-hooks)))
+(set-rtd-printer!	(type-descriptor smtp-message) %struct-smtp-message-printer)
+(set-rtd-destructor!	(type-descriptor smtp-message) %unsafe.smtp-message-close)
+
+(set-rtd-printer!	(type-descriptor smtp-recipient) %struct-smtp-recipient-printer)
+(set-rtd-destructor!	(type-descriptor smtp-recipient) %unsafe.smtp-recipient-close)
 
 )
 

@@ -30,22 +30,11 @@
 
 #include "vicare-libesmtp-internals.h"
 
+
 
 /** --------------------------------------------------------------------
- ** Still to be implemented.
+ ** Version functions.
  ** ----------------------------------------------------------------- */
-
-#if 0
-ikptr
-ikrt_libesmtp_template (ikpcb * pcb)
-{
-#ifdef HAVE_LIBESMTP_TEMPLATE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-#endif
 
 ikptr
 ikrt_smtp_version (ikpcb * pcb)
@@ -63,15 +52,67 @@ ikrt_smtp_version (ikpcb * pcb)
 #endif
 }
 
+
+/** --------------------------------------------------------------------
+ ** Session management.
+ ** ----------------------------------------------------------------- */
+
 ikptr
 ikrt_smtp_create_session (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_CREATE_SESSION
+  smtp_session_t	sex;
+  sex = smtp_create_session();
+  return (sex)? ika_pointer_alloc(pcb, (long)sex) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DESTROY_SESSION
+  ikptr			s_pointer	= IK_LIBESMTP_SESSION_POINTER(s_session);
+  smtp_session_t	sex		= IK_POINTER_DATA_VOIDP(s_pointer);
+  if (sex) {
+    int		rv;
+    ikptr	sk;
+    /* Hypothesis: at  some future time,  closing the session  may cause
+       invocation   of  Scheme   callbacks,  so   we  save   the  Scheme
+       continuation.  (Marco Maggi; Thu Feb 14, 2013) */
+    sk = ik_enter_c_function(pcb);
+    {
+      rv = smtp_destroy_session(sex);
+    }
+    ik_leave_c_function(pcb, sk);
+    if (1 == rv) {
+      IK_POINTER_SET_NULL(s_pointer);
+    }
+    return IK_BOOLEAN_FROM_INT(rv);
+  } else
+    return IK_TRUE;
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** Still to be implemented.
+ ** ----------------------------------------------------------------- */
+
+#if 0
+ikptr
+ikrt_libesmtp_template (ikpcb * pcb)
+{
+#ifdef HAVE_LIBESMTP_TEMPLATE
   return IK_VOID;
 #else
   feature_failure(__func__);
 #endif
 }
+#endif
+
 
 ikptr
 ikrt_smtp_add_message (ikpcb * pcb)
@@ -207,16 +248,6 @@ ikptr
 ikrt_smtp_start_session (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_START_SESSION
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_destroy_session (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DESTROY_SESSION
   return IK_VOID;
 #else
   feature_failure(__func__);

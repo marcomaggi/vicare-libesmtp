@@ -124,10 +124,16 @@
   (foreign-call "ikrt_smtp_version"))
 
 
-;;;; still to be implemented
+;;;; session management
 
 (define-inline (smtp-create-session)
   (foreign-call "ikrt_smtp_create_session"))
+
+(define-inline (smtp-destroy-session session)
+  (foreign-call "ikrt_smtp_destroy_session" session))
+
+
+;;;; still to be implemented
 
 (define-inline (smtp-add-message)
   (foreign-call "ikrt_smtp_add_message"))
@@ -170,9 +176,6 @@
 
 (define-inline (smtp-start-session)
   (foreign-call "ikrt_smtp_start_session"))
-
-(define-inline (smtp-destroy-session)
-  (foreign-call "ikrt_smtp_destroy_session"))
 
 (define-inline (smtp-message-transfer-status)
   (foreign-call "ikrt_smtp_message_transfer_status"))
