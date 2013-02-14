@@ -118,11 +118,13 @@
 (define-inline (vicare-libesmtp-version)
   (foreign-call "ikrt_libesmtp_version"))
 
-
-;;;; still to be implemented
+;;; --------------------------------------------------------------------
 
 (define-inline (smtp-version)
   (foreign-call "ikrt_smtp_version"))
+
+
+;;;; still to be implemented
 
 (define-inline (smtp-create-session)
   (foreign-call "ikrt_smtp_create_session"))

@@ -12,16 +12,20 @@
 @end macro
 
 
+@macro libesmtp{}
+libESMTP
+@end macro
+
 @c page
 @c ------------------------------------------------------------
 @c Values.
 @c ------------------------------------------------------------
 
-@set TITLE                      Libesmtp for Vicare
+@set TITLE                      @libesmtp{} for Vicare
 
 @c To be used as @value{PACKAGE} whenever we need to include the full
 @c name of this package.
-@set PACKAGE                    Vicare/Libesmtp
+@set PACKAGE                    Vicare/@libesmtp{}
 
 @c To be used as @value{PACKAGE} whenever we need to include the
 @c nickname of the project: the name that is used to compose the
@@ -49,8 +53,8 @@
 @copying
 This document describes version @version{} of @value{PACKAGE}, a
 distribution of C and Scheme libraries for Vicare Scheme, an @rnrs{6}
-compliant Scheme implementation; it provides bindings for the Libesmtp C
-language library.
+compliant Scheme implementation; it provides bindings for the
+@libesmtp{} C language library.
 
 The package is distributed under the terms of the @gnu{} General Public
 License (@gpl{}) and can be downloaded from:
@@ -63,7 +67,7 @@ development takes place at:
 @center @url{http://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
 
 @noindent
-Libesmtp is available at:
+@libesmtp{} is available at:
 
 @center @url{http://www.stafford.uklinux.net/libesmtp/}
 
@@ -148,19 +152,20 @@ Vicare Scheme is an @rnrs{6} compliant Scheme language implementation in
 the form of a native compiler for x86 architectures, officially
 supporting @gnu{}+Linux systems.  @value{PACKAGE} is a distribution of C
 language and Scheme language libraries for Vicare Scheme; it provides
-bindings for the Libesmtp C language library.
+bindings for the @libesmtp{} C language library.
 
 The last time the author bothered to update this paragraph, he had
-tested Libesmtp version 1.0.6; the Libesmtp library is available at:
+tested @libesmtp{} version 1.0.6; the @libesmtp{} library is available
+at:
 
 @center @url{http://www.stafford.uklinux.net/libesmtp/}
 
 The package installs a C language library implementing wrapper C
-functions for the C language Libesmtp library; on top of this, the
+functions for the C language @libesmtp{} library; on top of this, the
 Scheme library @library{vicare mail libesmtp} exports one binding for
-each Libesmtp public function; additionally the library @library{vicare
-mail libesmtp constants} exports one binding for each constant value
-defined in the C language header @file{libesmtp.h}.
+each @libesmtp{} public function; additionally the library
+@library{vicare mail libesmtp constants} exports one binding for each
+constant value defined in the C language header @file{libesmtp.h}.
 
 The following Scheme libraries are installed:
 
@@ -168,7 +173,7 @@ The following Scheme libraries are installed:
 @item vicare mail libesmtp
 @cindex Library @library{vicare mail libesmtp}
 @cindex @library{vicare mail libesmtp}, library
-It exports one binding for each Libesmtp public function.  All the
+It exports one binding for each @libesmtp{} public function.  All the
 Scheme function names are directly derived from the C function names by
 replacing underscore characters @samp{_} with dash characters @samp{-};
 so @cfunc{smtp_version} becomes @func{smtp_version}.
@@ -176,7 +181,7 @@ so @cfunc{smtp_version} becomes @func{smtp_version}.
 @item vicare mail libesmtp unsafe-capi
 @cindex Library @library{vicare mail libesmtp unsafe-capi}
 @cindex @library{vicare mail libesmtp unsafe-capi}, library
-It exports one syntax binding for each Libesmtp public function.  All
+It exports one syntax binding for each @libesmtp{} public function.  All
 the Scheme syntax names are directly derived from the C function names
 by replacing underscore characters @samp{_} with dash characters
 @samp{-}; so @cfunc{smtp_version} becomes @func{smtp-version}.
@@ -215,11 +220,11 @@ $ sudo vicare \
 @end example
 
 This document contains only a brief description of the functions: refer
-to the Libesmtp's documentation for details.
+to the @libesmtp{}'s documentation for details.
 
 @c page
 @node version
-@chapter Tamplate version informations
+@chapter @libesmtp{} version informations
 
 
 The installed C library follows version numbering as established by the
@@ -242,13 +247,16 @@ Return a fixnum representing a version number.
 Return a Scheme string representing the version number.
 @end defun
 
+@c ------------------------------------------------------------
+
+@defun smtp-version
+Return a Scheme string representing the version number of Libesmtp.  In
+the very unlikely case that this function fails: @false{} is returned.
+@end defun
+
 @c page
 @node plain
 @chapter Plain programming interface
-
-
-@defun smtp-version
-@end defun
 
 
 @defun smtp-create-session

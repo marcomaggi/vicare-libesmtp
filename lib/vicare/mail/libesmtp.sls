@@ -36,10 +36,11 @@
     vicare-libesmtp-version-interface-age
     vicare-libesmtp-version
 
+    smtp-version
+
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-version
     smtp-create-session
     smtp-add-message
     smtp-enumerate-messages
@@ -130,6 +131,13 @@
 (define (vicare-libesmtp-version)
   (ascii->string (capi.vicare-libesmtp-version)))
 
+;;; --------------------------------------------------------------------
+
+(define (smtp-version)
+  (define who 'smtp-version)
+  (let ((rv (capi.smtp-version)))
+    (and rv (ascii->string rv))))
+
 
 ;;;; callback makers
 
@@ -169,12 +177,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-version)
-  (define who 'smtp-version)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-version)))
 
 (define (smtp-create-session)
   (define who 'smtp-create-session)

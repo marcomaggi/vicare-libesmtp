@@ -51,7 +51,13 @@ ikptr
 ikrt_smtp_version (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_VERSION
-  return IK_VOID;
+  /* We expect a short string like "1.0.6". */
+#undef  VERSION_LEN
+#define VERSION_LEN	16
+  char	version[VERSION_LEN];
+  int	rv;
+  rv = smtp_version(version, VERSION_LEN, 0);
+  return (rv)? ika_bytevector_from_cstring(pcb, version) : IK_FALSE;
 #else
   feature_failure(__func__);
 #endif

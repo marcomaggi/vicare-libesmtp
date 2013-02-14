@@ -58,6 +58,12 @@
       (string? (vicare-libesmtp-version))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (string? (smtp-version))
+    => #t)
+
   #t)
 
 

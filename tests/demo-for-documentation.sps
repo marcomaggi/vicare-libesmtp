@@ -46,7 +46,8 @@
   (%pretty-print (list (vicare-libesmtp-version-interface-current)
 		       (vicare-libesmtp-version-interface-revision)
 		       (vicare-libesmtp-version-interface-age)
-		       (vicare-libesmtp-version)))
+		       (vicare-libesmtp-version)
+		       (smtp-version)))
 
   #t)
 

@@ -1,13 +1,13 @@
-Subject: [announce] Vicare/Libesmtp revision 0.1d0
+Subject: [announce] Vicare/libESMTP revision 0.1d0
 
-			    Vicare/Libesmtp
+			    Vicare/libESMTP
 			    ===============
 
 
 This package  is a  distribution of  C and  Scheme libraries  for Vicare
 Scheme, an R6RS compliant Scheme implementation  in the form of a native
 compiler for x86 architectures, officially supporting GNU+Linux systems;
-it provides bindings for the Libesmtp C language library.
+it provides bindings for the libESMTP C language library.
 
   This package makes use of the GNU Autotools.
 
@@ -24,7 +24,7 @@ development takes place at:
 	    <http://github.com/marcomaggi/vicare-libesmtp/>
 
   The last  time the author  bothered to  update this paragraph,  he had
-tested Libesmtp version 1.0.6; the Libesmtp library is available at:
+tested libESMTP version 1.0.6; the libESMTP library is available at:
 
 	      <http://www.stafford.uklinux.net/libesmtp/>
 
