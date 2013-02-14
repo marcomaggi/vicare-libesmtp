@@ -87,6 +87,390 @@ printf("(define-inline-constant HAVE_SMTP_VERSION %s)\n",
 #endif
   );
 
+printf("(define-inline-constant HAVE_SMTP_CREATE_SESSION %s)\n",
+#ifdef HAVE_SMTP_CREATE_SESSION
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ADD_MESSAGE %s)\n",
+#ifdef HAVE_SMTP_ADD_MESSAGE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ENUMERATE_MESSAGES %s)\n",
+#ifdef HAVE_SMTP_ENUMERATE_MESSAGES
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_SERVER %s)\n",
+#ifdef HAVE_SMTP_SET_SERVER
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_HOSTNAME %s)\n",
+#ifdef HAVE_SMTP_SET_HOSTNAME
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_REVERSE_PATH %s)\n",
+#ifdef HAVE_SMTP_SET_REVERSE_PATH
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ADD_RECIPIENT %s)\n",
+#ifdef HAVE_SMTP_ADD_RECIPIENT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ENUMERATE_RECIPIENTS %s)\n",
+#ifdef HAVE_SMTP_ENUMERATE_RECIPIENTS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_HEADER %s)\n",
+#ifdef HAVE_SMTP_SET_HEADER
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_HEADER_OPTION %s)\n",
+#ifdef HAVE_SMTP_SET_HEADER_OPTION
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_RESENT_HEADERS %s)\n",
+#ifdef HAVE_SMTP_SET_RESENT_HEADERS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_MESSAGECB %s)\n",
+#ifdef HAVE_SMTP_SET_MESSAGECB
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_EVENTCB %s)\n",
+#ifdef HAVE_SMTP_SET_EVENTCB
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_MONITORCB %s)\n",
+#ifdef HAVE_SMTP_SET_MONITORCB
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_START_SESSION %s)\n",
+#ifdef HAVE_SMTP_START_SESSION
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DESTROY_SESSION %s)\n",
+#ifdef HAVE_SMTP_DESTROY_SESSION
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_MESSAGE_TRANSFER_STATUS %s)\n",
+#ifdef HAVE_SMTP_MESSAGE_TRANSFER_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_REVERSE_PATH_STATUS %s)\n",
+#ifdef HAVE_SMTP_REVERSE_PATH_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_MESSAGE_RESET_STATUS %s)\n",
+#ifdef HAVE_SMTP_MESSAGE_RESET_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_RECIPIENT_STATUS %s)\n",
+#ifdef HAVE_SMTP_RECIPIENT_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_RECIPIENT_CHECK_COMPLETE %s)\n",
+#ifdef HAVE_SMTP_RECIPIENT_CHECK_COMPLETE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_RECIPIENT_RESET_STATUS %s)\n",
+#ifdef HAVE_SMTP_RECIPIENT_RESET_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ERRNO %s)\n",
+#ifdef HAVE_SMTP_ERRNO
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_STRERROR %s)\n",
+#ifdef HAVE_SMTP_STRERROR
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_SET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_GET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_GET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_MESSAGE_SET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_MESSAGE_SET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_MESSAGE_GET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_MESSAGE_GET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_RECIPIENT_SET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_RECIPIENT_SET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_RECIPIENT_GET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_RECIPIENT_GET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_OPTION_REQUIRE_ALL_RECIPIENTS %s)\n",
+#ifdef HAVE_SMTP_OPTION_REQUIRE_ALL_RECIPIENTS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_AUTH_SET_CONTEXT %s)\n",
+#ifdef HAVE_SMTP_AUTH_SET_CONTEXT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SET_TIMEOUT %s)\n",
+#ifdef HAVE_SMTP_SET_TIMEOUT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DSN_SET_RET %s)\n",
+#ifdef HAVE_SMTP_DSN_SET_RET
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DSN_SET_ENVID %s)\n",
+#ifdef HAVE_SMTP_DSN_SET_ENVID
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DSN_SET_NOTIFY %s)\n",
+#ifdef HAVE_SMTP_DSN_SET_NOTIFY
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DSN_SET_ORCPT %s)\n",
+#ifdef HAVE_SMTP_DSN_SET_ORCPT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_SIZE_SET_ESTIMATE %s)\n",
+#ifdef HAVE_SMTP_SIZE_SET_ESTIMATE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_8bitmime_set_body %s)\n",
+#ifdef HAVE_SMTP_8bitmime_set_body
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_DELIVERBY_SET_MODE %s)\n",
+#ifdef HAVE_SMTP_DELIVERBY_SET_MODE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_STARTTLS_ENABLE %s)\n",
+#ifdef HAVE_SMTP_STARTTLS_ENABLE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_STARTTLS_SET_CTX %s)\n",
+#ifdef HAVE_SMTP_STARTTLS_SET_CTX
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_STARTTLS_SET_PASSWORD_CB %s)\n",
+#ifdef HAVE_SMTP_STARTTLS_SET_PASSWORD_CB
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ETRN_ADD_NODE %s)\n",
+#ifdef HAVE_SMTP_ETRN_ADD_NODE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ETRN_ENUMERATE_NODES %s)\n",
+#ifdef HAVE_SMTP_ETRN_ENUMERATE_NODES
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ETRN_NODE_STATUS %s)\n",
+#ifdef HAVE_SMTP_ETRN_NODE_STATUS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ETRN_SET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_ETRN_SET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_SMTP_ETRN_GET_APPLICATION_DATA %s)\n",
+#ifdef HAVE_SMTP_ETRN_GET_APPLICATION_DATA
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
 
   printf("\n\
 ;;;; done\n\

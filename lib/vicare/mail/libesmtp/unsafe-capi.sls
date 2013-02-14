@@ -38,6 +38,57 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
+    smtp-version
+    smtp-create-session
+    smtp-add-message
+    smtp-enumerate-messages
+    smtp-set-server
+    smtp-set-hostname
+    smtp-set-reverse-path
+    smtp-add-recipient
+    smtp-enumerate-recipients
+    smtp-set-header
+    smtp-set-header-option
+    smtp-set-resent-headers
+    smtp-set-messagecb
+    smtp-set-eventcb
+    smtp-set-monitorcb
+    smtp-start-session
+    smtp-destroy-session
+    smtp-message-transfer-status
+    smtp-reverse-path-status
+    smtp-message-reset-status
+    smtp-recipient-status
+    smtp-recipient-check-complete
+    smtp-recipient-reset-status
+    smtp-errno
+    smtp-strerror
+    smtp-set-application-data
+    smtp-get-application-data
+    smtp-message-set-application-data
+    smtp-message-get-application-data
+    smtp-recipient-set-application-data
+    smtp-recipient-get-application-data
+    smtp-option-require-all-recipients
+    smtp-auth-set-context
+    smtp-set-timeout
+    smtp-dsn-set-ret
+    smtp-dsn-set-envid
+    smtp-dsn-set-notify
+    smtp-dsn-set-orcpt
+    smtp-size-set-estimate
+    smtp-8bitmime-set-body
+    smtp-deliverby-set-mode
+    smtp-starttls-enable
+    smtp-starttls-set-ctx
+    smtp-starttls-set-password-cb
+    smtp-etrn-add-node
+    smtp-etrn-enumerate-nodes
+    smtp-etrn-node-status
+    smtp-etrn-set-application-data
+    smtp-etrn-get-application-data
+
+
     )
   (import (vicare))
 
@@ -70,8 +121,152 @@
 
 ;;;; still to be implemented
 
-#;(define-inline (vicare-libesmtp)
-  (foreign-call "iktr_libesmtp"))
+(define-inline (smtp-version)
+  (foreign-call "ikrt_smtp_version"))
+
+(define-inline (smtp-create-session)
+  (foreign-call "ikrt_smtp_create_session"))
+
+(define-inline (smtp-add-message)
+  (foreign-call "ikrt_smtp_add_message"))
+
+(define-inline (smtp-enumerate-messages)
+  (foreign-call "ikrt_smtp_enumerate_messages"))
+
+(define-inline (smtp-set-server)
+  (foreign-call "ikrt_smtp_set_server"))
+
+(define-inline (smtp-set-hostname)
+  (foreign-call "ikrt_smtp_set_hostname"))
+
+(define-inline (smtp-set-reverse-path)
+  (foreign-call "ikrt_smtp_set_reverse_path"))
+
+(define-inline (smtp-add-recipient)
+  (foreign-call "ikrt_smtp_add_recipient"))
+
+(define-inline (smtp-enumerate-recipients)
+  (foreign-call "ikrt_smtp_enumerate_recipients"))
+
+(define-inline (smtp-set-header)
+  (foreign-call "ikrt_smtp_set_header"))
+
+(define-inline (smtp-set-header-option)
+  (foreign-call "ikrt_smtp_set_header_option"))
+
+(define-inline (smtp-set-resent-headers)
+  (foreign-call "ikrt_smtp_set_resent_headers"))
+
+(define-inline (smtp-set-messagecb)
+  (foreign-call "ikrt_smtp_set_messagecb"))
+
+(define-inline (smtp-set-eventcb)
+  (foreign-call "ikrt_smtp_set_eventcb"))
+
+(define-inline (smtp-set-monitorcb)
+  (foreign-call "ikrt_smtp_set_monitorcb"))
+
+(define-inline (smtp-start-session)
+  (foreign-call "ikrt_smtp_start_session"))
+
+(define-inline (smtp-destroy-session)
+  (foreign-call "ikrt_smtp_destroy_session"))
+
+(define-inline (smtp-message-transfer-status)
+  (foreign-call "ikrt_smtp_message_transfer_status"))
+
+(define-inline (smtp-reverse-path-status)
+  (foreign-call "ikrt_smtp_reverse_path_status"))
+
+(define-inline (smtp-message-reset-status)
+  (foreign-call "ikrt_smtp_message_reset_status"))
+
+(define-inline (smtp-recipient-status)
+  (foreign-call "ikrt_smtp_recipient_status"))
+
+(define-inline (smtp-recipient-check-complete)
+  (foreign-call "ikrt_smtp_recipient_check_complete"))
+
+(define-inline (smtp-recipient-reset-status)
+  (foreign-call "ikrt_smtp_recipient_reset_status"))
+
+(define-inline (smtp-errno)
+  (foreign-call "ikrt_smtp_errno"))
+
+(define-inline (smtp-strerror)
+  (foreign-call "ikrt_smtp_strerror"))
+
+(define-inline (smtp-set-application-data)
+  (foreign-call "ikrt_smtp_set_application_data"))
+
+(define-inline (smtp-get-application-data)
+  (foreign-call "ikrt_smtp_get_application_data"))
+
+(define-inline (smtp-message-set-application-data)
+  (foreign-call "ikrt_smtp_message_set_application_data"))
+
+(define-inline (smtp-message-get-application-data)
+  (foreign-call "ikrt_smtp_message_get_application_data"))
+
+(define-inline (smtp-recipient-set-application-data)
+  (foreign-call "ikrt_smtp_recipient_set_application_data"))
+
+(define-inline (smtp-recipient-get-application-data)
+  (foreign-call "ikrt_smtp_recipient_get_application_data"))
+
+(define-inline (smtp-option-require-all-recipients)
+  (foreign-call "ikrt_smtp_option_require_all_recipients"))
+
+(define-inline (smtp-auth-set-context)
+  (foreign-call "ikrt_smtp_auth_set_context"))
+
+(define-inline (smtp-set-timeout)
+  (foreign-call "ikrt_smtp_set_timeout"))
+
+(define-inline (smtp-dsn-set-ret)
+  (foreign-call "ikrt_smtp_dsn_set_ret"))
+
+(define-inline (smtp-dsn-set-envid)
+  (foreign-call "ikrt_smtp_dsn_set_envid"))
+
+(define-inline (smtp-dsn-set-notify)
+  (foreign-call "ikrt_smtp_dsn_set_notify"))
+
+(define-inline (smtp-dsn-set-orcpt)
+  (foreign-call "ikrt_smtp_dsn_set_orcpt"))
+
+(define-inline (smtp-size-set-estimate)
+  (foreign-call "ikrt_smtp_size_set_estimate"))
+
+(define-inline (smtp-8bitmime-set-body)
+  (foreign-call "ikrt_smtp_8bitmime_set_body"))
+
+(define-inline (smtp-deliverby-set-mode)
+  (foreign-call "ikrt_smtp_deliverby_set_mode"))
+
+(define-inline (smtp-starttls-enable)
+  (foreign-call "ikrt_smtp_starttls_enable"))
+
+(define-inline (smtp-starttls-set-ctx)
+  (foreign-call "ikrt_smtp_starttls_set_ctx"))
+
+(define-inline (smtp-starttls-set-password-cb)
+  (foreign-call "ikrt_smtp_starttls_set_password_cb"))
+
+(define-inline (smtp-etrn-add-node)
+  (foreign-call "ikrt_smtp_etrn_add_node"))
+
+(define-inline (smtp-etrn-enumerate-nodes)
+  (foreign-call "ikrt_smtp_etrn_enumerate_nodes"))
+
+(define-inline (smtp-etrn-node-status)
+  (foreign-call "ikrt_smtp_etrn_node_status"))
+
+(define-inline (smtp-etrn-set-application-data)
+  (foreign-call "ikrt_smtp_etrn_set_application_data"))
+
+(define-inline (smtp-etrn-get-application-data)
+  (foreign-call "ikrt_smtp_etrn_get_application_data"))
 
 
 ;;;; done

@@ -9,6 +9,7 @@ lib_LTLIBRARIES			= libvicare-libesmtp.la
 libvicare_libesmtp_la_LDFLAGS	= -version-info $(vicare_libesmtp_VERSION)
 libvicare_libesmtp_la_SOURCES	= \
 	vicare-libesmtp-version.c		\
+	vicare-libesmtp-core.c			\
 	vicare-libesmtp-internals.h
 
 ### end of file

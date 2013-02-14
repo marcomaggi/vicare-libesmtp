@@ -122,6 +122,7 @@ entitled ``@gnu{} Free Documentation License''.
 @menu
 * overview::                    Overview of the package.
 * version::                     Libesmtp version informations.
+* plain::                       Plain programming interface.
 
 Appendices
 
@@ -239,6 +240,206 @@ Return a fixnum representing a version number.
 
 @defun vicare-libesmtp-version
 Return a Scheme string representing the version number.
+@end defun
+
+@c page
+@node plain
+@chapter Plain programming interface
+
+
+@defun smtp-version
+@end defun
+
+
+@defun smtp-create-session
+@end defun
+
+
+@defun smtp-add-message
+@end defun
+
+
+@defun smtp-enumerate-messages
+@end defun
+
+
+@defun smtp-set-server
+@end defun
+
+
+@defun smtp-set-hostname
+@end defun
+
+
+@defun smtp-set-reverse-path
+@end defun
+
+
+@defun smtp-add-recipient
+@end defun
+
+
+@defun smtp-enumerate-recipients
+@end defun
+
+
+@defun smtp-set-header
+@end defun
+
+
+@defun smtp-set-header-option
+@end defun
+
+
+@defun smtp-set-resent-headers
+@end defun
+
+
+@defun smtp-set-messagecb
+@end defun
+
+
+@defun smtp-set-eventcb
+@end defun
+
+
+@defun smtp-set-monitorcb
+@end defun
+
+
+@defun smtp-start-session
+@end defun
+
+
+@defun smtp-destroy-session
+@end defun
+
+
+@defun smtp-message-transfer-status
+@end defun
+
+
+@defun smtp-reverse-path-status
+@end defun
+
+
+@defun smtp-message-reset-status
+@end defun
+
+
+@defun smtp-recipient-status
+@end defun
+
+
+@defun smtp-recipient-check-complete
+@end defun
+
+
+@defun smtp-recipient-reset-status
+@end defun
+
+
+@defun smtp-errno
+@end defun
+
+
+@defun smtp-strerror
+@end defun
+
+
+@defun smtp-set-application-data
+@end defun
+
+
+@defun smtp-get-application-data
+@end defun
+
+
+@defun smtp-message-set-application-data
+@end defun
+
+
+@defun smtp-message-get-application-data
+@end defun
+
+
+@defun smtp-recipient-set-application-data
+@end defun
+
+
+@defun smtp-recipient-get-application-data
+@end defun
+
+
+@defun smtp-option-require-all-recipients
+@end defun
+
+
+@defun smtp-auth-set-context
+@end defun
+
+
+@defun smtp-set-timeout
+@end defun
+
+
+@defun smtp-dsn-set-ret
+@end defun
+
+
+@defun smtp-dsn-set-envid
+@end defun
+
+
+@defun smtp-dsn-set-notify
+@end defun
+
+
+@defun smtp-dsn-set-orcpt
+@end defun
+
+
+@defun smtp-size-set-estimate
+@end defun
+
+
+@defun smtp-8bitmime-set-body
+@end defun
+
+
+@defun smtp-deliverby-set-mode
+@end defun
+
+
+@defun smtp-starttls-enable
+@end defun
+
+
+@defun smtp-starttls-set-ctx
+@end defun
+
+
+@defun smtp-starttls-set-password-cb
+@end defun
+
+
+@defun smtp-etrn-add-node
+@end defun
+
+
+@defun smtp-etrn-enumerate-nodes
+@end defun
+
+
+@defun smtp-etrn-node-status
+@end defun
+
+
+@defun smtp-etrn-set-application-data
+@end defun
+
+
+@defun smtp-etrn-get-application-data
 @end defun
 
 @c page

@@ -36,6 +36,58 @@
     vicare-libesmtp-version-interface-age
     vicare-libesmtp-version
 
+;;; --------------------------------------------------------------------
+;;; still to be implemented
+
+    smtp-version
+    smtp-create-session
+    smtp-add-message
+    smtp-enumerate-messages
+    smtp-set-server
+    smtp-set-hostname
+    smtp-set-reverse-path
+    smtp-add-recipient
+    smtp-enumerate-recipients
+    smtp-set-header
+    smtp-set-header-option
+    smtp-set-resent-headers
+    smtp-set-messagecb
+    smtp-set-eventcb
+    smtp-set-monitorcb
+    smtp-start-session
+    smtp-destroy-session
+    smtp-message-transfer-status
+    smtp-reverse-path-status
+    smtp-message-reset-status
+    smtp-recipient-status
+    smtp-recipient-check-complete
+    smtp-recipient-reset-status
+    smtp-errno
+    smtp-strerror
+    smtp-set-application-data
+    smtp-get-application-data
+    smtp-message-set-application-data
+    smtp-message-get-application-data
+    smtp-recipient-set-application-data
+    smtp-recipient-get-application-data
+    smtp-option-require-all-recipients
+    smtp-auth-set-context
+    smtp-set-timeout
+    smtp-dsn-set-ret
+    smtp-dsn-set-envid
+    smtp-dsn-set-notify
+    smtp-dsn-set-orcpt
+    smtp-size-set-estimate
+    smtp-8bitmime-set-body
+    smtp-deliverby-set-mode
+    smtp-starttls-enable
+    smtp-starttls-set-ctx
+    smtp-starttls-set-password-cb
+    smtp-etrn-add-node
+    smtp-etrn-enumerate-nodes
+    smtp-etrn-node-status
+    smtp-etrn-set-application-data
+    smtp-etrn-get-application-data
     )
   (import (vicare)
     (vicare mail libesmtp constants)
@@ -77,6 +129,340 @@
 
 (define (vicare-libesmtp-version)
   (ascii->string (capi.vicare-libesmtp-version)))
+
+
+;;;; callback makers
+
+;; void (*smtp_enumerate_recipientcb_t)
+;;		(smtp_recipient_t recipient,
+;;		 const char *mailbox,
+;;		 void *arg);
+
+;; const char *(*smtp_messagecb_t)
+;;		(void **ctx,
+;;		 int *len,
+;;		 void *arg);
+
+;; void (*smtp_eventcb_t)
+;;		(smtp_session_t session,
+;;		 int event_no,
+;;		 void *arg,
+;;		 ...);
+
+;; void (*smtp_monitorcb_t)
+;;		(const char *buf,
+;;		 int buflen,
+;;		 int writing,
+;;		 void *arg);
+
+;; int (*smtp_starttls_passwordcb_t)
+;;		(char *buf,
+;;		 int buflen,
+;;		 int rwflag,
+;;		 void *arg);
+
+;; void (*smtp_etrn_enumerate_nodecb_t)
+;;		(smtp_etrn_node_t node,
+;;		 int option,
+;;		 const char *domain,
+;;		 void *arg);
+
+
+;;;; still to be implemented
+
+(define (smtp-version)
+  (define who 'smtp-version)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-version)))
+
+(define (smtp-create-session)
+  (define who 'smtp-create-session)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-create-session)))
+
+(define (smtp-add-message)
+  (define who 'smtp-add-message)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-add-message)))
+
+(define (smtp-enumerate-messages)
+  (define who 'smtp-enumerate-messages)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-enumerate-messages)))
+
+(define (smtp-set-server)
+  (define who 'smtp-set-server)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-server)))
+
+(define (smtp-set-hostname)
+  (define who 'smtp-set-hostname)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-hostname)))
+
+(define (smtp-set-reverse-path)
+  (define who 'smtp-set-reverse-path)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-reverse-path)))
+
+(define (smtp-add-recipient)
+  (define who 'smtp-add-recipient)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-add-recipient)))
+
+(define (smtp-enumerate-recipients)
+  (define who 'smtp-enumerate-recipients)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-enumerate-recipients)))
+
+(define (smtp-set-header)
+  (define who 'smtp-set-header)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-header)))
+
+(define (smtp-set-header-option)
+  (define who 'smtp-set-header-option)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-header-option)))
+
+(define (smtp-set-resent-headers)
+  (define who 'smtp-set-resent-headers)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-resent-headers)))
+
+(define (smtp-set-messagecb)
+  (define who 'smtp-set-messagecb)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-messagecb)))
+
+(define (smtp-set-eventcb)
+  (define who 'smtp-set-eventcb)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-eventcb)))
+
+(define (smtp-set-monitorcb)
+  (define who 'smtp-set-monitorcb)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-monitorcb)))
+
+(define (smtp-start-session)
+  (define who 'smtp-start-session)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-start-session)))
+
+(define (smtp-destroy-session)
+  (define who 'smtp-destroy-session)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-destroy-session)))
+
+(define (smtp-message-transfer-status)
+  (define who 'smtp-message-transfer-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-message-transfer-status)))
+
+(define (smtp-reverse-path-status)
+  (define who 'smtp-reverse-path-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-reverse-path-status)))
+
+(define (smtp-message-reset-status)
+  (define who 'smtp-message-reset-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-message-reset-status)))
+
+(define (smtp-recipient-status)
+  (define who 'smtp-recipient-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-recipient-status)))
+
+(define (smtp-recipient-check-complete)
+  (define who 'smtp-recipient-check-complete)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-recipient-check-complete)))
+
+(define (smtp-recipient-reset-status)
+  (define who 'smtp-recipient-reset-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-recipient-reset-status)))
+
+(define (smtp-errno)
+  (define who 'smtp-errno)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-errno)))
+
+(define (smtp-strerror)
+  (define who 'smtp-strerror)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-strerror)))
+
+(define (smtp-set-application-data)
+  (define who 'smtp-set-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-application-data)))
+
+(define (smtp-get-application-data)
+  (define who 'smtp-get-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-get-application-data)))
+
+(define (smtp-message-set-application-data)
+  (define who 'smtp-message-set-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-message-set-application-data)))
+
+(define (smtp-message-get-application-data)
+  (define who 'smtp-message-get-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-message-get-application-data)))
+
+(define (smtp-recipient-set-application-data)
+  (define who 'smtp-recipient-set-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-recipient-set-application-data)))
+
+(define (smtp-recipient-get-application-data)
+  (define who 'smtp-recipient-get-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-recipient-get-application-data)))
+
+(define (smtp-option-require-all-recipients)
+  (define who 'smtp-option-require-all-recipients)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-option-require-all-recipients)))
+
+(define (smtp-auth-set-context)
+  (define who 'smtp-auth-set-context)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-auth-set-context)))
+
+(define (smtp-set-timeout)
+  (define who 'smtp-set-timeout)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-set-timeout)))
+
+(define (smtp-dsn-set-ret)
+  (define who 'smtp-dsn-set-ret)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-dsn-set-ret)))
+
+(define (smtp-dsn-set-envid)
+  (define who 'smtp-dsn-set-envid)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-dsn-set-envid)))
+
+(define (smtp-dsn-set-notify)
+  (define who 'smtp-dsn-set-notify)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-dsn-set-notify)))
+
+(define (smtp-dsn-set-orcpt)
+  (define who 'smtp-dsn-set-orcpt)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-dsn-set-orcpt)))
+
+(define (smtp-size-set-estimate)
+  (define who 'smtp-size-set-estimate)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-size-set-estimate)))
+
+(define (smtp-8bitmime-set-body)
+  (define who 'smtp-8bitmime-set-body)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-8bitmime-set-body)))
+
+(define (smtp-deliverby-set-mode)
+  (define who 'smtp-deliverby-set-mode)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-deliverby-set-mode)))
+
+(define (smtp-starttls-enable)
+  (define who 'smtp-starttls-enable)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-starttls-enable)))
+
+(define (smtp-starttls-set-ctx)
+  (define who 'smtp-starttls-set-ctx)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-starttls-set-ctx)))
+
+(define (smtp-starttls-set-password-cb)
+  (define who 'smtp-starttls-set-password-cb)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-starttls-set-password-cb)))
+
+(define (smtp-etrn-add-node)
+  (define who 'smtp-etrn-add-node)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-etrn-add-node)))
+
+(define (smtp-etrn-enumerate-nodes)
+  (define who 'smtp-etrn-enumerate-nodes)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-etrn-enumerate-nodes)))
+
+(define (smtp-etrn-node-status)
+  (define who 'smtp-etrn-node-status)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-etrn-node-status)))
+
+(define (smtp-etrn-set-application-data)
+  (define who 'smtp-etrn-set-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-etrn-set-application-data)))
+
+(define (smtp-etrn-get-application-data)
+  (define who 'smtp-etrn-get-application-data)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-etrn-get-application-data)))
 
 
 ;;;; done
