@@ -46,6 +46,7 @@
 
     smtp-create-session
     smtp-destroy-session
+    smtp-set-hostname
 
     ;; message management
     smtp-message
@@ -64,7 +65,6 @@
 ;;; still to be implemented
 
     smtp-set-server
-    smtp-set-hostname
     smtp-set-reverse-path
     smtp-add-recipient
     smtp-enumerate-recipients
@@ -113,6 +113,7 @@
     (prefix (vicare mail libesmtp unsafe-capi) capi.)
     (vicare syntactic-extensions)
     (vicare arguments validation)
+    (vicare arguments general-c-buffers)
     (prefix (vicare unsafe-operations) $)
     (prefix (vicare ffi) ffi.)
     #;(prefix (vicare words) words.))
@@ -400,7 +401,21 @@
 
 ;;; --------------------------------------------------------------------
 
-
+(define smtp-set-hostname
+  (case-lambda
+   ((session)
+    (smtp-set-hostname session #f))
+   ((session local-hostname)
+    ;;Set LOCAL-HOSTNAME  as local  hostname for SESSION;  if successful
+    ;;return #t, else return #f.
+    ;;
+    (define who 'smtp-set-hostname)
+    (with-arguments-validation (who)
+	((smtp-session/alive	session))
+      (with-general-c-strings/false
+	  ((hname		local-hostname))
+	(string-to-bytevector string->ascii)
+	(capi.smtp-set-hostname session hname))))))
 
 
 ;;;; message management
@@ -508,12 +523,6 @@
   (with-arguments-validation (who)
       ()
     (capi.smtp-set-server)))
-
-(define (smtp-set-hostname)
-  (define who 'smtp-set-hostname)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-hostname)))
 
 (define (smtp-set-reverse-path)
   (define who 'smtp-set-reverse-path)
@@ -784,4 +793,5 @@
 ;;; end of file
 ;; Local Variables:
 ;; eval: (put '%struct-destructor-application 'scheme-indent-function 1)
+;; eval: (put 'with-general-c-strings/false 'scheme-indent-function 1)
 ;; End:

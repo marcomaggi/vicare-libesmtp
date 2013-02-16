@@ -96,6 +96,23 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
 #endif
 }
 
+/* ------------------------------------------------------------------ */
+
+ikptr
+ikrt_smtp_set_hostname (ikptr s_session, ikptr s_hostname, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_HOSTNAME
+  smtp_session_t	sex   = IK_LIBESMTP_SESSION(s_session);
+  char *		hname =
+    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_hostname);
+  int			rv;
+  rv = smtp_set_hostname(sex, hname);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
 
 /** --------------------------------------------------------------------
  ** Message management.
@@ -153,16 +170,6 @@ ikptr
 ikrt_smtp_set_server (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_SERVER
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_set_hostname (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_HOSTNAME
   return IK_VOID;
 #else
   feature_failure(__func__);

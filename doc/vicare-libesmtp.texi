@@ -485,6 +485,18 @@ Finalise the @var{session} releasing all the associated resources;
 return unspecified values.
 @end defun
 
+@c ------------------------------------------------------------
+
+@defun smtp-set-hostname @var{session}
+@defunx smtp-set-hostname @var{session} @var{local-hostname}
+Set @var{local-hostname} as local hostname for @var{session}; if
+successful return @true{}, else return @false{}.
+
+The optional @var{local-hostname} must be @false{} or a general C buffer
+argument holding an @ascii{} string: a Scheme string, a Scheme
+bytevector, a @code{memory-block} instance, a pointer object.  When
+@false{} or not given: @cnull{} is handed to the @libesmtp{} function.
+@end defun
 
 @c page
 @node plain messages
@@ -561,15 +573,7 @@ argument: an instance of @code{smtp-message} registered in
 @section Still to be implemented
 
 
-@defun smtp-enumerate-messages
-@end defun
-
-
 @defun smtp-set-server
-@end defun
-
-
-@defun smtp-set-hostname
 @end defun
 
 

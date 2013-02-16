@@ -100,13 +100,27 @@
 	(smtp-session?/alive sex))
     => #f)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-set-hostname sex "localhost")
+	(smtp-session? sex))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-set-hostname sex)
+	(smtp-session? sex))
+    => #t)
+
   (collect))
 
 
 (parametrise ((check-test-name		'message)
 	      (struct-guardian-logger	#f))
 
-  #;(check
+  (check
       ;;This will be destroyed by the garbage collector.
       (let* ((sex (smtp-create-session))
 	     (msg (smtp-add-message sex)))
@@ -133,7 +147,7 @@
 
 ;;; --------------------------------------------------------------------
 
-  #;(check
+  (check
       (with-result
        (let* ((sex  (smtp-create-session))
 	      (msg1 (smtp-add-message sex))
