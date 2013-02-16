@@ -259,15 +259,30 @@ the very unlikely case that this function fails: @false{} is returned.
 @chapter Plain programming interface
 
 
+@cindex Library @library{vicare mail libesmtp}
+@cindex @library{vicare mail libesmtp}, library
+
+
 @menu
 * plain structs::               Data structures.
-* plain session::               Session management.
+* plain sessions::              Session management.
+* plain messages::              Message management.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
 @c page
 @node plain structs
 @section Data structures
+
+
+@menu
+* plain structs session::       Session data structures.
+* plain structs message::       Message data structures.
+@end menu
+
+@c page
+@node plain structs session
+@subsection Session data structures
 
 
 The following bindings are exported by the library @library{vicare mail
@@ -284,7 +299,7 @@ When instances of this type are used as arguments to functions: this
 documentation identifies them as @var{session}.
 
 There are two categories of @code{smtp-session} instances: those who own
-the underlying database connection and those who merely reference it.
+the underlying @smtp{} session and those who merely reference it.
 
 @itemize
 @item
@@ -331,17 +346,17 @@ Notice that @var{func} can do anything, not only destroy some state
 associated to @var{session}; if we do:
 
 @example
-(define connection ...)
-(set-smtp-session-destructor! connection
+(define session ...)
+(set-smtp-session-destructor! session
   (let ((state (make-some-data-struct)))
     (case-lambda
-      ((conn)
+      ((sex)
        (destroy state))
       (()
        state))))
 
-(let ((state ((smtp-session-destructor connection))))
-  (do-something-with connection state))
+(let ((state ((smtp-session-destructor session))))
+  (do-something-with session state))
 @end example
 
 @noindent
@@ -366,7 +381,92 @@ Succeed if @var{obj} satisfies the predicate @func{smtp-session?/alive}.
 @end deffn
 
 @c page
-@node plain session
+@node plain structs message
+@subsection Message data structures
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@deftp {Struct Type} smtp-message
+@cindex @var{message} argument
+@cindex Argument @var{message}
+An opaque Scheme structure holding an instance of the C language type
+@code{smtp_message_t}, it references a message.
+
+When instances of this type are used as arguments to functions: this
+documentation identifies them as @var{message}.
+
+Instances of type @code{smtp-message} never own the the underlying
+@smtp{} session; when these instances are garbage collected or when
+@func{smtp-destroy-session} is applied to the owning session: the
+message is closed, all the associated data is finalised; any error is
+ignored in this procedure.
+@end deftp
+
+
+@defun smtp-message? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-message};
+otherwise return @false{}.
+@end defun
+
+
+@defun smtp-message?/alive @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-message} and
+the message it represents is open; otherwise return @false{}.
+@end defun
+
+
+@defun smtp-message-destructor @var{message}
+@defunx set-smtp-message-destructor! @var{message} @var{func}
+Retrieve or set a destructor function associated to the @var{message}.
+
+Whenever the @var{message} is closed, either explicitly with
+@func{smtp-destroy-message} or implicitly by the garbage collector,
+@var{func} is applied to @var{message} before the internal state of
+@var{message} is finalised.
+
+Notice that @var{func} can do anything, not only destroy some state
+associated to @var{message}; if we do:
+
+@example
+(define connection ...)
+(set-smtp-message-destructor! connection
+  (let ((state (make-some-data-struct)))
+    (case-lambda
+      ((conn)
+       (destroy state))
+      (()
+       state))))
+
+(let ((state ((smtp-message-destructor connection))))
+  (do-something-with connection state))
+@end example
+
+@noindent
+we can easily associate values to @var{message}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} smtp-message @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-message?}.
+@end deffn
+
+
+@deffn {Validation Clause} smtp-message/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-message?/alive}.
+@end deffn
+
+@c page
+@node plain sessions
 @section Session management
 
 
@@ -381,17 +481,70 @@ error occurs: return @false{}.
 
 
 @defun smtp-destroy-session @var{session}
-Finalise the @var{session} releasing all the associated resources.
-Return a boolean: @true{} is the @libesmtp{} operation succeeded.
+Finalise the @var{session} releasing all the associated resources;
+return unspecified values.
+@end defun
+
+
+@c page
+@node plain messages
+@section Message management
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-add-message @var{session}
+Add a new message to @var{session} to be delivered to the remote server.
+If successful: return a new instance of @code{smtp-message}; else return
+@false{}.
+@end defun
+
+
+@defun smtp-enumerate-messages @var{session} @var{callback}
+For each @code{smtp_message_t} in the @code{smtp_session_t} referenced
+by @var{session}: call the @var{callback} function.  Return unspecified
+values.
+
+@var{callback} must be the return value of a call to
+@func{make-smtp-enumerate-messagecb}.
+@end defun
+
+
+@defun make-smtp-enumerate-messagecb @var{user-scheme-callback}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp_enumerate_messagecb_t} callback; the returned pointer must be
+released with a call to @func{free-c-callback} from @library{vicare
+ffi}.
+
+@var{user-scheme-callback} must accept @math{1} argument:
+
+@enumerate
+@item
+An instance of @code{curl-message} referencing a message in the invoking
+session.
+@end enumerate
+
+@var{user-scheme-callback} can return unspecified values.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns @code{(void)} to the caller.
+@var{user-scheme-callback} should take care of handling its own
+exceptions.
+@end itemize
 @end defun
 
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-add-message
-@end defun
 
 
 @defun smtp-enumerate-messages

@@ -34,14 +34,19 @@
     vicare-libesmtp-version-interface-revision
     vicare-libesmtp-version-interface-age
     vicare-libesmtp-version
+    smtp-version
+
+    ;; session management
+    smtp-create-session
+    smtp-destroy-session
+
+    ;; message management
+    smtp-add-message
+    smtp-enumerate-messages
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-version
-    smtp-create-session
-    smtp-add-message
-    smtp-enumerate-messages
     smtp-set-server
     smtp-set-hostname
     smtp-set-reverse-path
@@ -54,7 +59,6 @@
     smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
-    smtp-destroy-session
     smtp-message-transfer-status
     smtp-reverse-path-status
     smtp-message-reset-status
@@ -133,13 +137,17 @@
   (foreign-call "ikrt_smtp_destroy_session" session))
 
 
+;;;; message management
+
+(define-inline (smtp-add-message session)
+  (foreign-call "ikrt_smtp_add_message" session))
+
+(define-inline (smtp-enumerate-messages session callback)
+  (foreign-call "ikrt_smtp_enumerate_messages" session callback))
+
+
+
 ;;;; still to be implemented
-
-(define-inline (smtp-add-message)
-  (foreign-call "ikrt_smtp_add_message"))
-
-(define-inline (smtp-enumerate-messages)
-  (foreign-call "ikrt_smtp_enumerate_messages"))
 
 (define-inline (smtp-set-server)
   (foreign-call "ikrt_smtp_set_server"))

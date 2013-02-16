@@ -98,6 +98,41 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
 
 
 /** --------------------------------------------------------------------
+ ** Message management.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_add_message (ikptr s_session, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ADD_MESSAGE
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  smtp_message_t	mes;
+  mes = smtp_add_message(sex);
+  return (mes)? ika_pointer_alloc(pcb, (long)mes) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_enumerate_messages (ikptr s_session, ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ENUMERATE_MESSAGES
+  smtp_session_t		sex = IK_LIBESMTP_SESSION(s_session);
+  smtp_enumerate_messagecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  ikptr				sk;
+  sk = ik_enter_c_function(pcb);
+  {
+    smtp_enumerate_messages(sex, cb, NULL);
+  }
+  ik_leave_c_function(pcb, sk);
+  return IK_VOID;
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
  ** Still to be implemented.
  ** ----------------------------------------------------------------- */
 
@@ -113,26 +148,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_add_message (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ADD_MESSAGE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_enumerate_messages (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ENUMERATE_MESSAGES
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_server (ikpcb * pcb)

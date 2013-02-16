@@ -68,7 +68,7 @@
 
 
 (parametrise ((check-test-name		'session)
-	      (struct-guardian-logger	#t))
+	      (struct-guardian-logger	#f))
 
   (check
       ;;This will be destroyed by the garbage collector.
@@ -85,20 +85,49 @@
   (check
       (let ((sex (smtp-create-session)))
 	(smtp-destroy-session sex))
-    => #t)
+    => (void))
 
   (check
       (let ((sex (smtp-create-session)))
 	(smtp-destroy-session sex)
 	(smtp-destroy-session sex)
 	(smtp-destroy-session sex))
-    => #t)
+    => (void))
 
   (check
       (let ((sex (smtp-create-session)))
 	(smtp-destroy-session sex)
 	(smtp-session?/alive sex))
     => #f)
+
+  (collect))
+
+
+(parametrise ((check-test-name		'message)
+	      (struct-guardian-logger	#f))
+
+  (check
+      ;;This will be destroyed by the garbage collector.
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-session? sex))
+    => #t)
+
+  (check
+      (with-result
+       (let* ((sex  (smtp-create-session))
+	      (msg1 (smtp-add-message sex))
+	      (msg2 (smtp-add-message sex))
+	      (cb   (make-smtp-enumerate-messagecb
+		     (lambda (msg)
+		       (add-result msg)))))
+	 (smtp-enumerate-messages sex cb)))
+    (=> (lambda (result expected)
+	  (and (equal? (void) (car result))
+	       (let ((msgs (cadr result)))
+		 (and (= 2 (length msgs))
+		      (for-all smtp-message? msgs))))))
+    #t)
 
   (collect))
 

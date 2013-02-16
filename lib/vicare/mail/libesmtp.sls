@@ -47,11 +47,21 @@
     smtp-create-session
     smtp-destroy-session
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
+    ;; message management
+    smtp-message
+    smtp-message?			smtp-message?/alive
+    smtp-message.vicare-arguments-validation
+    smtp-message/alive.vicare-arguments-validation
 
     smtp-add-message
     smtp-enumerate-messages
+
+    ;; callback makers
+    make-smtp-enumerate-messagecb
+
+;;; --------------------------------------------------------------------
+;;; still to be implemented
+
     smtp-set-server
     smtp-set-hostname
     smtp-set-reverse-path
@@ -102,6 +112,8 @@
     (prefix (vicare mail libesmtp unsafe-capi) capi.)
     (vicare syntactic-extensions)
     (vicare arguments validation)
+    (prefix (vicare unsafe-operations) $)
+    (prefix (vicare ffi) ffi.)
     #;(prefix (vicare words) words.))
 
 
@@ -114,6 +126,16 @@
 (define-argument-validation (smtp-session/alive who obj)
   (smtp-session?/alive obj)
   (assertion-violation who "expected live smtp-session structure as argument" obj))
+
+;;; --------------------------------------------------------------------
+
+(define-argument-validation (smtp-message who obj)
+  (smtp-message? obj)
+  (assertion-violation who "expected smtp-message structure as argument" obj))
+
+(define-argument-validation (smtp-message/alive who obj)
+  (smtp-message?/alive obj)
+  (assertion-violation who "expected live smtp-message structure as argument" obj))
 
 
 ;;;; helpers
@@ -187,6 +209,10 @@
   (pointer
 		;Pointer  object  equivalent to  an  instance  of the  C
 		;language type "smtp_session_t".
+   messages
+		;Hashtable holding  the messages added to  this session.
+		;When  this   session  is   closed:  the   messages  are
+		;finalised.
    owner?
 		;Boolean, true if this Scheme  structure is the owner of
 		;the data structure referenced by the "pointer" field.
@@ -196,15 +222,54 @@
 		;least one argument being the data structure itself.
    ))
 
+(define (%make-smtp-session/owner pointer)
+  ;;Build and return a new instance of SMTP-SESSION owning the POINTER.
+  ;;
+  (make-smtp-session pointer
+		     (make-hashtable values =) ;table of SMTP-MESSAGE structures.
+		     #t #f))
+
+(define ($live-smtp-session? session)
+  ;;Evaluate to true if the SESSION argument contains a "smtp_session_t"
+  ;;not yet finalised.
+  ;;
+  (not (pointer-null? ($smtp-session-pointer session))))
+
 (define (%unsafe.smtp-destroy-session session)
-  (%struct-destructor-application session
-    $smtp-session-destructor $set-smtp-session-destructor!)
-  (when ($smtp-session-owner? session)
-    (capi.smtp-destroy-session session)))
+  ;;This function  is called by  SMTP-DESTROY-SESSION or by  the garbage
+  ;;collector  to finalise  a "smtp-session"  instance.  It  is safe  to
+  ;;apply this function multiple times to the same SESSION argument.
+  ;;
+  ;;The  referenced  "smtp_session_t"  instance is  finalised,  too,  if
+  ;;SESSION owns it, which is usually the case.
+  ;;
+  ;;NOTE  We  ignore  the   return  value  of  CAPI.SMTP-DESTROY-SESSION
+  ;;because, at least up to libESMTP version 1.0.6, the return value can
+  ;;signal an error only if the  argument of the function call is wrong;
+  ;;this should never happen here.  (Marco Maggi; Sat Feb 16, 2013)
+  ;;
+  (when ($live-smtp-session? session)
+    ;;Apply the destructor to SESSION.
+    (%struct-destructor-application session
+      $smtp-session-destructor $set-smtp-session-destructor!)
+    ;;Finalise the Scheme "smtp-message" data structures, if any.
+    (let-values (((dummy messages)
+		  (hashtable-entries ($smtp-session-messages session))))
+      (let ((len ($vector-length messages)))
+	(do ((i 0 (+ 1 i)))
+	    ((= i len)
+	     (hashtable-clear! ($smtp-session-messages session)))
+	  (%unsafe.smtp-destroy-message ($vector-ref messages i)))))
+    ;;Finalise the libESMTP data structure.
+    (when ($smtp-session-owner? session)
+      (capi.smtp-destroy-session session))
+    (set-pointer-null! ($smtp-session-pointer session))))
+
+;;; --------------------------------------------------------------------
 
 (define (smtp-session?/alive obj)
   (and (smtp-session? obj)
-       (not (pointer-null? ($smtp-session-pointer obj)))))
+       ($live-smtp-session? obj)))
 
 (define (%struct-smtp-session-printer S port sub-printer)
   (define-inline (%display thing)
@@ -232,15 +297,39 @@
 		;least one argument being the data structure itself.
    ))
 
-(define (%unsafe.smtp-message-close message)
-  (%struct-destructor-application message
-    $smtp-message-destructor $set-smtp-message-destructor!)
-  #;(when ($smtp-message-owner? message)
-    (capi.smtp-destroy-message message)))
+(define (%make-smtp-message pointer)
+  (make-smtp-message pointer #f #f))
 
-(define (smtp-message?/open obj)
+(define ($live-smtp-message? message)
+  ;;Evaluate to true if the SESSION argument contains a "smtp_message_t"
+  ;;not yet finalised.
+  ;;
+  (not (pointer-null? ($smtp-message-pointer message))))
+
+(define (%unsafe.smtp-destroy-message message)
+  ;;This  function is  called by  the  garbage collector  to finalise  a
+  ;;"smtp-message" instance.  It is safe to apply this function multiple
+  ;;times to the same MESSAGE argument.
+  ;;
+  ;;The referenced  "smtp_message_t" instance it NOT  finalised, because
+  ;;it is always owned by the parent "smtp_session_t" instance.
+  ;;
+  (when ($live-smtp-message? message)
+    ;;Apply the destructor to MESSAGE.
+    (%struct-destructor-application message
+      $smtp-message-destructor $set-smtp-message-destructor!)
+    (set-pointer-null! ($smtp-message-pointer message))))
+
+(define ($smtp-message-register! session message)
+  (hashtable-set! ($smtp-session-messages session)
+		  (pointer->integer ($smtp-message-pointer session))
+		  message))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-message?/alive obj)
   (and (smtp-message? obj)
-       (not (pointer-null? ($smtp-message-pointer obj)))))
+       ($live-smtp-message? obj)))
 
 (define (%struct-smtp-message-printer S port sub-printer)
   (define-inline (%display thing)
@@ -293,7 +382,7 @@
 
 (define (smtp-create-session)
   (let ((rv (capi.smtp-create-session)))
-    (and rv (make-smtp-session rv #t #f))))
+    (and rv (%make-smtp-session/owner rv))))
 
 (define (smtp-destroy-session session)
   (define who 'smtp-destroy-session)
@@ -301,8 +390,56 @@
       ((smtp-session	session))
     (%unsafe.smtp-destroy-session session)))
 
+;;; --------------------------------------------------------------------
+
+
+
+
+;;;; message management
+
+(define (smtp-add-message session)
+  ;;Build  and  return  a  new  "smtp-message"  instance  associated  to
+  ;;SESSION; if an error occurs return #f.
+  ;;
+  (define who 'smtp-add-message)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session))
+    (let ((rv (capi.smtp-add-message session)))
+      (and rv
+	   (let ((message (make-smtp-message rv #f #f)))
+	     ($smtp-message-register! session message)
+	     message)))))
+
+(define (smtp-enumerate-messages session callback)
+  ;;For  each "smtp_message_t"  in  the  "smtp_session_t" referenced  by
+  ;;SESSION:   call   the   CALLBACK   function.    Return   unspecified
+  ;;values.
+  ;;
+  ;;CALLBACK   must    be   the    return   value    of   a    call   to
+  ;;MAKE-SMTP-ENUMERATE-MESSAGECB.
+  ;;
+  (define who 'smtp-enumerate-messages)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			callback))
+    (capi.smtp-enumerate-messages session callback)))
+
 
 ;;;; callback makers
+
+(define make-smtp-enumerate-messagecb
+  ;; void (*smtp_enumerate_messagecb_t)
+  ;;		(smtp_message_t message,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (message-pointer custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback (%make-smtp-message message-pointer))
+		 (void)))))))
+
 
 ;; void (*smtp_enumerate_recipientcb_t)
 ;;		(smtp_recipient_t recipient,
@@ -340,18 +477,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-add-message)
-  (define who 'smtp-add-message)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-add-message)))
-
-(define (smtp-enumerate-messages)
-  (define who 'smtp-enumerate-messages)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-enumerate-messages)))
 
 (define (smtp-set-server)
   (define who 'smtp-set-server)
@@ -624,7 +749,7 @@
 (set-rtd-destructor!	(type-descriptor smtp-session) %unsafe.smtp-destroy-session)
 
 (set-rtd-printer!	(type-descriptor smtp-message) %struct-smtp-message-printer)
-(set-rtd-destructor!	(type-descriptor smtp-message) %unsafe.smtp-message-close)
+(set-rtd-destructor!	(type-descriptor smtp-message) %unsafe.smtp-destroy-message)
 
 (set-rtd-printer!	(type-descriptor smtp-recipient) %struct-smtp-recipient-printer)
 (set-rtd-destructor!	(type-descriptor smtp-recipient) %unsafe.smtp-recipient-close)
@@ -632,3 +757,6 @@
 )
 
 ;;; end of file
+;; Local Variables:
+;; eval: (put '%struct-destructor-application 'scheme-indent-function 1)
+;; End:
