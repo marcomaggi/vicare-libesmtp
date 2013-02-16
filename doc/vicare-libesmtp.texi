@@ -524,7 +524,8 @@ ffi}.
 @enumerate
 @item
 An instance of @code{curl-message} referencing a message in the invoking
-session.
+session.  This instance is @strong{not} an object returned by
+@func{smtp-add-message}.
 @end enumerate
 
 @var{user-scheme-callback} can return unspecified values.
@@ -541,6 +542,19 @@ callback returns @code{(void)} to the caller.
 exceptions.
 @end itemize
 @end defun
+
+
+@defun smtp-enumerate-messages* @var{session} @var{scheme-callback}
+Apply @var{scheme-callback} to each @code{smtp-message} registered in
+@var{session}; return unspecified values.  The order of application is
+undefined.
+
+@var{scheme-callback} must be a Scheme procedure accepting a single
+argument: an instance of @code{smtp-message} registered in
+@var{session}.  The @code{smtp-message} instances handed to
+@var{scheme-callback} are the same returned by @func{smtp-add-message}.
+@end defun
+
 
 @c page
 @node plain unimplemented

@@ -106,12 +106,14 @@
 (parametrise ((check-test-name		'message)
 	      (struct-guardian-logger	#f))
 
-  (check
+  #;(check
       ;;This will be destroyed by the garbage collector.
       (let* ((sex (smtp-create-session))
 	     (msg (smtp-add-message sex)))
 	(smtp-session? sex))
     => #t)
+
+;;; --------------------------------------------------------------------
 
   (check
       (with-result
@@ -122,6 +124,23 @@
 		     (lambda (msg)
 		       (add-result msg)))))
 	 (smtp-enumerate-messages sex cb)))
+    (=> (lambda (result expected)
+	  (and (equal? (void) (car result))
+	       (let ((msgs (cadr result)))
+		 (and (= 2 (length msgs))
+		      (for-all smtp-message? msgs))))))
+    #t)
+
+;;; --------------------------------------------------------------------
+
+  #;(check
+      (with-result
+       (let* ((sex  (smtp-create-session))
+	      (msg1 (smtp-add-message sex))
+	      (msg2 (smtp-add-message sex))
+	      (cb   (lambda (msg)
+		      (add-result msg))))
+	 (smtp-enumerate-messages* sex cb)))
     (=> (lambda (result expected)
 	  (and (equal? (void) (car result))
 	       (let ((msgs (cadr result)))

@@ -55,6 +55,7 @@
 
     smtp-add-message
     smtp-enumerate-messages
+    smtp-enumerate-messages*
 
     ;; callback makers
     make-smtp-enumerate-messagecb
@@ -209,7 +210,7 @@
   (pointer
 		;Pointer  object  equivalent to  an  instance  of the  C
 		;language type "smtp_session_t".
-   messages
+   messages-table
 		;Hashtable holding  the messages added to  this session.
 		;When  this   session  is   closed:  the   messages  are
 		;finalised.
@@ -253,17 +254,29 @@
     (%struct-destructor-application session
       $smtp-session-destructor $set-smtp-session-destructor!)
     ;;Finalise the Scheme "smtp-message" data structures, if any.
-    (let-values (((dummy messages)
-		  (hashtable-entries ($smtp-session-messages session))))
-      (let ((len ($vector-length messages)))
-	(do ((i 0 (+ 1 i)))
-	    ((= i len)
-	     (hashtable-clear! ($smtp-session-messages session)))
-	  (%unsafe.smtp-destroy-message ($vector-ref messages i)))))
+    (let* ((messages ($smtp-session-messages session))
+	   (len      ($vector-length messages)))
+      (do ((i 0 (+ 1 i)))
+	  ((= i len)
+	   (hashtable-clear! ($smtp-session-messages-table session)))
+	(%unsafe.smtp-destroy-message ($vector-ref messages i))))
     ;;Finalise the libESMTP data structure.
     (when ($smtp-session-owner? session)
       (capi.smtp-destroy-session session))
     (set-pointer-null! ($smtp-session-pointer session))))
+
+(define ($smtp-session-messages session)
+  ;;Return a  vector holding the "smtp-message"  instances registered in
+  ;;SESSION.
+  ;;
+  (receive (keys messages)
+      (hashtable-entries ($smtp-session-messages-table session))
+    messages))
+
+(define ($smtp-session-register-message! session message)
+  (hashtable-set! ($smtp-session-messages-table session)
+		  (pointer->integer ($smtp-message-pointer message))
+		  message))
 
 ;;; --------------------------------------------------------------------
 
@@ -319,11 +332,6 @@
     (%struct-destructor-application message
       $smtp-message-destructor $set-smtp-message-destructor!)
     (set-pointer-null! ($smtp-message-pointer message))))
-
-(define ($smtp-message-register! session message)
-  (hashtable-set! ($smtp-session-messages session)
-		  (pointer->integer ($smtp-message-pointer session))
-		  message))
 
 ;;; --------------------------------------------------------------------
 
@@ -407,22 +415,39 @@
     (let ((rv (capi.smtp-add-message session)))
       (and rv
 	   (let ((message (make-smtp-message rv #f #f)))
-	     ($smtp-message-register! session message)
+	     ($smtp-session-register-message! session message)
 	     message)))))
 
-(define (smtp-enumerate-messages session callback)
+;;; --------------------------------------------------------------------
+
+(define (smtp-enumerate-messages session c-callback)
   ;;For  each "smtp_message_t"  in  the  "smtp_session_t" referenced  by
-  ;;SESSION:   call   the   CALLBACK   function.    Return   unspecified
-  ;;values.
+  ;;SESSION: call the C-CALLBACK function.  Return unspecified values.
   ;;
-  ;;CALLBACK   must    be   the    return   value    of   a    call   to
+  ;;C-CALLBACK   must   be    the   return   value   of    a   call   to
   ;;MAKE-SMTP-ENUMERATE-MESSAGECB.
   ;;
   (define who 'smtp-enumerate-messages)
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
-       (pointer			callback))
-    (capi.smtp-enumerate-messages session callback)))
+       (pointer			c-callback))
+    (capi.smtp-enumerate-messages session c-callback)))
+
+(define (smtp-enumerate-messages* session scheme-callback)
+  ;;Apply SCHEME-CALLBACK to each  "smtp-message" registered in SESSION;
+  ;;return unspecified values.  The order of application is undefined.
+  ;;
+  ;;The "smtp-message" instances handed  to SCHEME-CALLBACK are the same
+  ;;returned by SMTP-ADD-MESSAGE.
+  ;;
+  (define who 'smtp-enumerate-messages*)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (procedure		scheme-callback))
+    (vector-for-each scheme-callback
+      ($smtp-session-messages session))))
+
+;;; --------------------------------------------------------------------
 
 
 ;;;; callback makers
