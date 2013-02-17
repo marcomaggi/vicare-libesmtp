@@ -301,6 +301,20 @@
 	(smtp-set-header msg "Sender:" "Marco Maggi" "marco@localhost"))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header-option msg "X-Loop:" Hdr_OVERRIDE))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header-option msg "X-Loop:" Hdr_PROHIBIT))
+    => #t)
+
   (collect))
 
 

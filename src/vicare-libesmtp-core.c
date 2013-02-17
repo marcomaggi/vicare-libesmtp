@@ -172,6 +172,49 @@ ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+
+
+/** --------------------------------------------------------------------
+ ** Recipient management.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_add_recipient (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ADD_RECIPIENT
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  char *		mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_mailbox);
+  smtp_recipient_t	rec;
+  rec = smtp_add_recipient(msg, mailbox);
+  return (rec)? ika_pointer_alloc(pcb, (long)rec) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_enumerate_recipients (ikptr s_message, ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ENUMERATE_RECIPIENTS
+  smtp_message_t		msg = IK_LIBESMTP_MESSAGE(s_message);
+  smtp_enumerate_recipientcb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  int				rv;
+  ikptr				sk;
+  sk = ik_enter_c_function(pcb);
+  {
+    rv = smtp_enumerate_recipients(msg, cb, NULL);
+  }
+  ik_leave_c_function(pcb, sk);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** Headers management.
+ ** ----------------------------------------------------------------- */
+
 ikptr
 ikrt_smtp_set_header (ikptr s_message,
 		      ikptr s_header_name, ikptr s_value_1, ikptr s_value_2,
@@ -219,43 +262,23 @@ ikrt_smtp_set_header (ikptr s_message,
   feature_failure(__func__);
 #endif
 }
-
-
-/** --------------------------------------------------------------------
- ** Recipient management.
- ** ----------------------------------------------------------------- */
-
 ikptr
-ikrt_smtp_add_recipient (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
+ikrt_smtp_set_header_option (ikptr s_message,
+			     ikptr s_header_name, ikptr s_option,
+			     ikpcb * pcb)
 {
-#ifdef HAVE_SMTP_ADD_RECIPIENT
+#ifdef HAVE_SMTP_SET_HEADER_OPTION
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *		mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_mailbox);
-  smtp_recipient_t	rec;
-  rec = smtp_add_recipient(msg, mailbox);
-  return (rec)? ika_pointer_alloc(pcb, (long)rec) : IK_FALSE;
-#else
-  feature_failure(__func__);
-#endif
-}
-ikptr
-ikrt_smtp_enumerate_recipients (ikptr s_message, ikptr s_callback, ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ENUMERATE_RECIPIENTS
-  smtp_message_t		msg = IK_LIBESMTP_MESSAGE(s_message);
-  smtp_enumerate_recipientcb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
-  int				rv;
-  ikptr				sk;
-  sk = ik_enter_c_function(pcb);
-  {
-    rv = smtp_enumerate_recipients(msg, cb, NULL);
-  }
-  ik_leave_c_function(pcb, sk);
+  char *	header_name = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_header_name);
+  enum header_option	option = ik_integer_to_int(s_option);
+  int			rv;
+  rv = smtp_set_header_option(msg, header_name, option);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
 #endif
 }
+
 
 
 /** --------------------------------------------------------------------
@@ -274,16 +297,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_set_header_option (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_HEADER_OPTION
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_resent_headers (ikpcb * pcb)

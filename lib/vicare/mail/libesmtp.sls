@@ -72,6 +72,7 @@
 
     ;; headers management
     smtp-set-header
+    smtp-set-header-option
 
     ;; callback makers
     make-smtp-enumerate-messagecb
@@ -80,7 +81,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-header-option
     smtp-set-resent-headers
     smtp-set-messagecb
     smtp-set-eventcb
@@ -584,6 +584,9 @@
 	(string-to-bytevector string->ascii)
 	(capi.smtp-set-reverse-path message mbox))))))
 
+
+;;;; headers management
+
 (define smtp-set-header
   (case-lambda
    ((message header value1)
@@ -625,6 +628,16 @@
 	     (string-to-bytevector string->ascii)
 	     (capi.smtp-set-header message header.bv value #f)))
 	  ))))))
+
+(define (smtp-set-header-option message header option)
+  (define who 'smtp-set-header-option)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (signed-int		option))
+    (with-general-c-strings
+	((header.c	header))
+      (string-to-bytevector string->ascii)
+      (capi.smtp-set-header-option message header.c option))))
 
 
 ;;;; recipient management
@@ -739,12 +752,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-header-option)
-  (define who 'smtp-set-header-option)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-header-option)))
 
 (define (smtp-set-resent-headers)
   (define who 'smtp-set-resent-headers)

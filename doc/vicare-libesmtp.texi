@@ -802,13 +802,23 @@ Scheme string, a Scheme bytevector, a @code{memory-block} instance, a
 pointer object; @varii{value} is ignored.
 @end defun
 
+
+@defun smtp-set-header-option @var{message} @var{header-name} @var{option}
+Select options for message header processing.  If successful return
+@true{}, else return @false{}.
+
+@var{header-name} must be a general C buffer holding an @asciiz{}
+string: a Scheme string, a Scheme bytevector, a @code{memory-block}
+instance, a pointer object.
+
+@var{option} must be one of the constants: @code{Hdr_OVERRIDE},
+@code{Hdr_PROHIBIT}.
+@end defun
+
+
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-header-option
-@end defun
 
 
 @defun smtp-set-resent-headers
