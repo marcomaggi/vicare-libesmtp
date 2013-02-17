@@ -49,11 +49,11 @@
 
     ;; recipient management
     smtp-add-recipient
+    smtp-enumerate-recipients
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-enumerate-recipients
     smtp-set-header
     smtp-set-header-option
     smtp-set-resent-headers
@@ -158,14 +158,17 @@
 (define-inline (smtp-set-reverse-path message mailbox)
   (foreign-call "ikrt_smtp_set_reverse_path" message mailbox))
 
+
+;;;; recipient management
+
 (define-inline (smtp-add-recipient message mailbox)
   (foreign-call "ikrt_smtp_add_recipient" message mailbox))
 
+(define-inline (smtp-enumerate-recipients message callback)
+  (foreign-call "ikrt_smtp_enumerate_recipients" message callback))
+
 
 ;;;; still to be implemented
-
-(define-inline (smtp-enumerate-recipients)
-  (foreign-call "ikrt_smtp_enumerate_recipients"))
 
 (define-inline (smtp-set-header)
   (foreign-call "ikrt_smtp_set_header"))

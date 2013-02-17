@@ -608,12 +608,12 @@ If successful: return a new instance of @code{smtp-message}; else return
 @end defun
 
 
-@defun smtp-enumerate-messages @var{session} @var{callback}
+@defun smtp-enumerate-messages @var{session} @var{c-callback}
 For each @code{smtp_message_t} in the @code{smtp_session_t} referenced
-by @var{session}: call the @var{callback} function.  Return unspecified
-values.
+by @var{session}: call the @var{c-callback} function.  Return
+unspecified values.
 
-@var{callback} must be the return value of a call to
+@var{c-callback} must be the return value of a call to
 @func{make-smtp-enumerate-messagecb}.
 @end defun
 
@@ -690,6 +690,65 @@ else return @false{}.
 The optional @var{mailbox} must be a general C buffer argument holding
 an @ascii{} string: a Scheme string, a Scheme bytevector, a
 @code{memory-block} instance, a pointer object.
+@end defun
+
+
+@defun smtp-enumerate-recipients @var{message} @var{c-callback}
+For each @code{smtp_recipient_t} in the @code{smtp_message_t} referenced
+by @var{message}: call the @var{c-callback} function.  If successrul
+return @true{}, else return @false{}.
+
+@var{c-callback} must be the return value of a call to
+@func{make-smtp-enumerate-recipientcb}.
+@end defun
+
+
+@defun make-smtp-enumerate-recipientcb @var{user-scheme-callback}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp_enumerate_recipientcb_t} callback; the returned pointer must
+be released with a call to @func{free-c-callback} from @library{vicare
+ffi}.
+
+@var{user-scheme-callback} must accept @math{2} arguments:
+
+@enumerate
+@item
+An instance of @code{curl-recipient} referencing a recipient in the invoking
+message.  This instance is @strong{not} an object returned by
+@func{smtp-add-recipient}.
+
+@item
+A pointer object referencing the mailbox of the recipient as @asciiz{}
+string.  Such string can be converted to Scheme with a call to
+@func{cstirng->string} from @library{vicare ffi}.
+@end enumerate
+
+@var{user-scheme-callback} can return unspecified values.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns @code{(void)} to the caller.
+@var{user-scheme-callback} should take care of handling its own
+exceptions.
+@end itemize
+@end defun
+
+
+@defun smtp-enumerate-recipients* @var{message} @var{scheme-callback}
+Apply @var{scheme-callback} to each @code{smtp-recipient} registered in
+@var{message}; return unspecified values.  The order of application is
+undefined.
+
+@var{scheme-callback} must be a Scheme procedure accepting a single
+argument: an instance of @code{smtp-recipient} registered in
+@var{message}.  The @code{smtp-recipient} instances handed to
+@var{scheme-callback} are the same returned by @func{smtp-add-recipient}.
 @end defun
 
 @c page

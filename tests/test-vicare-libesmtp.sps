@@ -29,7 +29,7 @@
 (import (vicare)
   (vicare mail libesmtp)
   (vicare mail libesmtp constants)
-;;;  (prefix (vicare ffi) ffi.)
+  (prefix (vicare ffi) ffi.)
   (vicare checks))
 
 (check-set-mode! 'report-failed)
@@ -196,6 +196,44 @@
     => #t)
 
 ;;; --------------------------------------------------------------------
+
+  (check
+      (with-result
+       (let* ((sex  (smtp-create-session))
+	      (msg  (smtp-add-message sex))
+	      (rec1 (smtp-add-recipient msg "marco@localhost"))
+	      (rec2 (smtp-add-recipient msg "root@localhost"))
+	      (cb   (make-smtp-enumerate-recipientcb
+		     (lambda (rec mbox)
+		       (add-result (cons rec (ffi.cstring->string mbox)))))))
+	 (smtp-enumerate-recipients msg cb)))
+    (=> (lambda (result expected)
+	  (and (equal? #t (car result))
+	       (let ((pairs (cadr result)))
+		 (and (= 2 (length pairs))
+		      (for-all (lambda (pair)
+				 (and (smtp-recipient? (car pair))
+				      (string? (cdr pair))))
+			pairs))))))
+    #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (with-result
+       (let* ((sex  (smtp-create-session))
+	      (msg  (smtp-add-message sex))
+	      (rec1 (smtp-add-recipient msg "marco@localhost"))
+	      (rec2 (smtp-add-recipient msg "root@localhost"))
+	      (cb   (lambda (rec)
+		      (add-result rec))))
+	 (smtp-enumerate-recipients* msg cb)))
+    (=> (lambda (result expected)
+	  (and (equal? (void) (car result))
+	       (let ((recs (cadr result)))
+		 (and (= 2 (length recs))
+		      (for-all smtp-recipient? recs))))))
+    #t)
 
   (collect))
 

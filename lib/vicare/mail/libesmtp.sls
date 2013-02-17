@@ -67,14 +67,16 @@
     smtp-recipient/alive.vicare-arguments-validation
 
     smtp-add-recipient
+    smtp-enumerate-recipients
+    smtp-enumerate-recipients*
 
     ;; callback makers
     make-smtp-enumerate-messagecb
+    make-smtp-enumerate-recipientcb
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-enumerate-recipients
     smtp-set-header
     smtp-set-header-option
     smtp-set-resent-headers
@@ -228,10 +230,6 @@
   (pointer
 		;Pointer  object  equivalent to  an  instance  of the  C
 		;language type "smtp_session_t".
-   messages-table
-		;Hashtable holding  the messages added to  this session.
-		;When  this   session  is   closed:  the   messages  are
-		;finalised.
    owner?
 		;Boolean, true if this Scheme  structure is the owner of
 		;the data structure referenced by the "pointer" field.
@@ -239,14 +237,17 @@
 		;False or a user-supplied function to be called whenever
 		;this instance  is closed.  The function  must accept at
 		;least one argument being the data structure itself.
+   messages-table
+		;Hashtable holding  the messages added to  this session.
+		;When  this   session  is   closed:  the   messages  are
+		;finalised.
    ))
 
 (define (%make-smtp-session/owner pointer)
   ;;Build and return a new instance of SMTP-SESSION owning the POINTER.
   ;;
-  (make-smtp-session pointer
-		     (make-hashtable values =) ;table of SMTP-MESSAGE structures.
-		     #t #f))
+  (make-smtp-session pointer #t #f
+		     (make-hashtable values =))) ;table of SMTP-MESSAGE structures.
 
 (define ($live-smtp-session? session)
   ;;Evaluate to true if the SESSION argument contains a "smtp_session_t"
@@ -319,10 +320,6 @@
   (pointer
 		;Pointer  object  equivalent to  an  instance  of the  C
 		;language type "smtp_message_t".
-   recipients-table
-		;Hashtable holding the recipients added to this message.
-		;When  this  message  is   closed:  the  recipients  are
-		;finalised.
    owner?
 		;Boolean, true if this Scheme  structure is the owner of
 		;the data structure referenced by the "pointer" field.
@@ -330,12 +327,15 @@
 		;False or a user-supplied function to be called whenever
 		;this instance  is closed.  The function  must accept at
 		;least one argument being the data structure itself.
+   recipients-table
+		;Hashtable holding the recipients added to this message.
+		;When  this  message  is   closed:  the  recipients  are
+		;finalised.
    ))
 
 (define (%make-smtp-message pointer)
-  (make-smtp-message pointer
-		     (make-hashtable values =) ;table of SMTP-RECIPIENT structures.
-		     #f #f))
+  (make-smtp-message pointer #f #f
+		     (make-hashtable values =))) ;table of SMTP-RECIPIENT structures.
 
 (define ($live-smtp-message? message)
   ;;Evaluate to true if the MESSAGE argument contains a "smtp_message_t"
@@ -573,6 +573,36 @@
 	       ($smtp-message-register-recipient! message recipient)
 	       recipient))))))
 
+;;; --------------------------------------------------------------------
+
+(define (smtp-enumerate-recipients message c-callback)
+  ;;For each  "smtp_recipient_t" in  the "smtp_message_t"  referenced by
+  ;;MESSAGE: call the C-CALLBACK function.  Return unspecified values.
+  ;;
+  ;;C-CALLBACK   must   be    the   return   value   of    a   call   to
+  ;;MAKE-SMTP-ENUMERATE-RECIPIENTCB.
+  ;;
+  (define who 'smtp-enumerate-recipients)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (pointer			c-callback))
+    (capi.smtp-enumerate-recipients message c-callback)))
+
+(define (smtp-enumerate-recipients* message scheme-callback)
+  ;;Apply  SCHEME-CALLBACK   to  each  "smtp-recipient"   registered  in
+  ;;MESSAGE;  return unspecified  values.  The  order of  application is
+  ;;undefined.
+  ;;
+  ;;The  "smtp-recipient" instances  handed to  SCHEME-CALLBACK are  the
+  ;;same returned by SMTP-ADD-RECIPIENT.
+  ;;
+  (define who 'smtp-enumerate-recipients*)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (procedure		scheme-callback))
+    (vector-for-each scheme-callback
+      ($smtp-message-recipients message))))
+
 
 ;;;; callback makers
 
@@ -589,11 +619,22 @@
 		 (user-scheme-callback (%make-smtp-message message-pointer))
 		 (void)))))))
 
+(define make-smtp-enumerate-recipientcb
+  ;; void (*smtp_enumerate_recipientcb_t)
+  ;;		(smtp_recipient_t recipient,
+  ;;		 const char *mailbox,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (recipient-pointer mailbox custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback (%make-smtp-recipient recipient-pointer)
+				       mailbox)
+		 (void)))))))
 
-;; void (*smtp_enumerate_recipientcb_t)
-;;		(smtp_recipient_t recipient,
-;;		 const char *mailbox,
-;;		 void *arg);
+;;; --------------------------------------------------------------------
 
 ;; const char *(*smtp_messagecb_t)
 ;;		(void **ctx,
@@ -626,12 +667,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-enumerate-recipients)
-  (define who 'smtp-enumerate-recipients)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-enumerate-recipients)))
 
 (define (smtp-set-header)
   (define who 'smtp-set-header)
