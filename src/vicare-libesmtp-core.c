@@ -172,6 +172,53 @@ ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_header (ikptr s_message,
+		      ikptr s_header_name, ikptr s_value_1, ikptr s_value_2,
+		      ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_HEADER
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  char *	header_name = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_header_name);
+  int		rv;
+  /* fprintf(stderr, "%s: header name: %s\n", __func__, header_name); */
+  if (0 == strcmp(header_name, "Date:"))
+    {
+      time_t	time = (time_t)ik_integer_to_long(s_value_1);
+      rv = smtp_set_header(msg, header_name, &time);
+    }
+  else if (0 == strcmp(header_name, "Message-Id:"))
+    {
+      char *	value = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      rv = smtp_set_header(msg, header_name, value);
+    }
+  else if ((0 == strcmp(header_name, "From:")) ||
+	   (0 == strcmp(header_name, "Disposition-Notification-To:")))
+    {
+      char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
+      rv = smtp_set_header(msg, header_name, phrase, mailbox);
+    }
+  else if ((0 == strcmp(header_name, "To:"))		||
+	   (0 == strcmp(header_name, "Cc:"))		||
+	   (0 == strcmp(header_name, "Bcc:"))		||
+	   (0 == strcmp(header_name, "Reply-To:"))	||
+	   (0 == strcmp(header_name, "Sender:")))
+    {
+      char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      char *	address = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
+      rv = smtp_set_header(msg, header_name, phrase, address);
+    }
+  else
+    {
+      char *	value = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      rv = smtp_set_header(msg, header_name, value);
+    }
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -227,16 +274,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_set_header (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_HEADER
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_header_option (ikpcb * pcb)

@@ -70,6 +70,9 @@
     smtp-enumerate-recipients
     smtp-enumerate-recipients*
 
+    ;; headers management
+    smtp-set-header
+
     ;; callback makers
     make-smtp-enumerate-messagecb
     make-smtp-enumerate-recipientcb
@@ -77,7 +80,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-header
     smtp-set-header-option
     smtp-set-resent-headers
     smtp-set-messagecb
@@ -200,6 +202,34 @@
 	     (guard (E (else (void)))
 	       (destructor ?struct))
 	     (?mutator ?struct #f)))))))
+
+(define-syntax case-strings
+  (syntax-rules (else)
+    ((_ ?expr
+	((?string0 ?string ...)
+	 ?sym-body0 ?sym-body ...)
+	...
+	(else
+	 ?else-body0 ?else-body ...))
+     (let ((sym ?expr))
+       (cond ((or (string=? (quote ?string0) sym)
+		  (string=? (quote ?string)  sym)
+		  ...)
+	      ?sym-body0 ?sym-body ...)
+	     ...
+	     (else
+	      ?else-body0 ?else-body ...))))
+    ((_ ?expr
+	((?string0 ?string ...)
+	 ?sym-body0 ?sym-body ...)
+	...)
+     (let ((sym ?expr))
+       (cond ((or (string=? (quote ?string0) sym)
+		  (string=? (quote ?string)  sym)
+		  ...)
+	      ?sym-body0 ?sym-body ...)
+	     ...)))
+    ))
 
 
 ;;;; version functions
@@ -554,6 +584,48 @@
 	(string-to-bytevector string->ascii)
 	(capi.smtp-set-reverse-path message mbox))))))
 
+(define smtp-set-header
+  (case-lambda
+   ((message header value1)
+    (smtp-set-header message header value1 #f))
+   ((message header value1 value2)
+    ;;Set a header in the message.  If successful return #t, else return
+    ;;#f.
+    ;;
+    (define who 'smtp-set-header)
+    (with-arguments-validation (who)
+	((smtp-message/alive	message)
+	 (string		header))
+      (let ((header.bv (string->ascii header)))
+	(case-strings header
+	  (("Date:")
+	   (with-arguments-validation (who)
+	       ((signed-long	value1))
+	     (capi.smtp-set-header message header.bv value1 #f)))
+	  (("Message-Id:")
+	   (with-general-c-strings
+	       ((value		value1))
+	     (string-to-bytevector string->ascii)
+	     (capi.smtp-set-header message header.bv value #f)))
+	  (("From:" "Disposition-Notification-To:")
+	   (with-general-c-strings
+	       ((phrase		value1)
+		(mailbox	value2))
+	     (string-to-bytevector string->ascii)
+	     (capi.smtp-set-header message header.bv phrase mailbox)))
+	  (("To:" "Cc:" "Bcc:" "Reply-To:" "Sender:")
+	   (with-general-c-strings
+	       ((phrase		value1)
+		(address	value2))
+	     (string-to-bytevector string->ascii)
+	     (capi.smtp-set-header message header.bv phrase address)))
+	  (else
+	   (with-general-c-strings
+	       ((value		value1))
+	     (string-to-bytevector string->ascii)
+	     (capi.smtp-set-header message header.bv value #f)))
+	  ))))))
+
 
 ;;;; recipient management
 
@@ -667,12 +739,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-header)
-  (define who 'smtp-set-header)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-header)))
 
 (define (smtp-set-header-option)
   (define who 'smtp-set-header-option)

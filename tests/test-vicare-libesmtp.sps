@@ -238,6 +238,72 @@
   (collect))
 
 
+(parametrise ((check-test-name		'headers)
+	      (struct-guardian-logger	#f))
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "X-Loop:" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Date:" 123000))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Message-Id:" "123"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "From:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Disposition-Notification-To:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "To:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Cc:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Bcc:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Reply-To:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-header msg "Sender:" "Marco Maggi" "marco@localhost"))
+    => #t)
+
+  (collect))
+
+
 ;;;; done
 
 (check-report)

@@ -268,6 +268,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain sessions::              Session management.
 * plain messages::              Message management.
 * plain recipients::            Recipient management.
+* plain headers::               Headers management.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
@@ -577,7 +578,7 @@ Set @var{local-hostname} as local hostname for @var{session}; if
 successful return @true{}, else return @false{}.
 
 The optional @var{local-hostname} must be @false{} or a general C buffer
-argument holding an @ascii{} string: a Scheme string, a Scheme
+argument holding an @asciiz{} string: a Scheme string, a Scheme
 bytevector, a @code{memory-block} instance, a pointer object.  When
 @false{} or not given: @cnull{} is handed to the @libesmtp{} function.
 @end defun
@@ -588,7 +589,7 @@ Set @var{remote-server} as remote server specification for
 @var{session}; if successful return @true{}, else return @false{}.
 
 @var{local-hostname} must be a general C buffer argument holding an
-@ascii{} string: a Scheme string, a Scheme bytevector, a
+@asciiz{} string: a Scheme string, a Scheme bytevector, a
 @code{memory-block} instance, a pointer object.
 @end defun
 
@@ -668,7 +669,7 @@ Set the reverse path mailbox for @var{message}; this mailbox is the
 sender address.  If successful return @true{}, else return @false{}.
 
 The optional @var{mailbox} must be @false{} or a general C buffer
-argument holding an @ascii{} string: a Scheme string, a Scheme
+argument holding an @asciiz{} string: a Scheme string, a Scheme
 bytevector, a @code{memory-block} instance, a pointer object.  When
 @false{} or not given: @cnull{} is handed to the @libesmtp{} function.
 @end defun
@@ -688,7 +689,7 @@ server.  If successful: return a new instance of @code{smtp-recipient};
 else return @false{}.
 
 The optional @var{mailbox} must be a general C buffer argument holding
-an @ascii{} string: a Scheme string, a Scheme bytevector, a
+an @asciiz{} string: a Scheme string, a Scheme bytevector, a
 @code{memory-block} instance, a pointer object.
 @end defun
 
@@ -752,16 +753,58 @@ argument: an instance of @code{smtp-recipient} registered in
 @end defun
 
 @c page
+@node plain headers
+@section Headers management
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-set-header @var{message} @var{header-name} @vari{value}
+@defunx smtp-set-header @var{message} @var{header-name} @vari{value} @varii{value}
+Set a header in the @var{message}.  If successful return @true{}, else
+return @false{}.
+
+@var{header-name} must be a Scheme string representing a header name.
+Some headers are specially recognised by @libesmtp{}:
+
+@table @code
+@item Date:
+Requires @vari{value} to be an exact integer in the range of the C
+language type @code{signed long}; internally this value is converted to
+@code{time_t}.  @varii{value} is ignored.
+
+@item Message-Id:
+Requires @vari{value} to be a general C buffer holding an @asciiz{}
+string: a Scheme string, a Scheme bytevector, a @code{memory-block}
+instance, a pointer object.  @varii{value} is ignored.
+
+@item From:
+@itemx Disposition-Notification-To:
+Require both @vari{value} and @varii{value} to be a general C buffer
+holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
+
+@item To:
+@itemx Cc:
+@itemx Bcc:
+@itemx Reply-To:
+@itemx Sender:
+Require both @vari{value} and @varii{value} to be a general C buffer
+holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
+@end table
+
+If @var{header-name} is not specially recognised by @libesmtp{},
+@vari{value} must be a general C buffer holding an @asciiz{} string: a
+Scheme string, a Scheme bytevector, a @code{memory-block} instance, a
+pointer object; @varii{value} is ignored.
+@end defun
+
+@c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-enumerate-recipients
-@end defun
-
-
-@defun smtp-set-header
-@end defun
 
 
 @defun smtp-set-header-option
