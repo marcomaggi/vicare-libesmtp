@@ -498,6 +498,16 @@ bytevector, a @code{memory-block} instance, a pointer object.  When
 @false{} or not given: @cnull{} is handed to the @libesmtp{} function.
 @end defun
 
+
+@defun smtp-set-hostname @var{session} @var{remote-server}
+Set @var{remote-server} as remote server specification for
+@var{session}; if successful return @true{}, else return @false{}.
+
+@var{local-hostname} must be a general C buffer argument holding an
+@ascii{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
+@end defun
+
 @c page
 @node plain messages
 @section Message management
@@ -568,17 +578,21 @@ argument: an instance of @code{smtp-message} registered in
 @end defun
 
 
+@defun smtp-set-reverse-path @var{message}
+@defunx smtp-set-reverse-path @var{message} @var{mailbox}
+Set the reverse path mailbox for @var{message}; this mailbox is the
+sender address.  If successful return @true{}, else return @false{}.
+
+The optional @var{mailbox} must be @false{} or a general C buffer
+argument holding an @ascii{} string: a Scheme string, a Scheme
+bytevector, a @code{memory-block} instance, a pointer object.  When
+@false{} or not given: @cnull{} is handed to the @libesmtp{} function.
+@end defun
+
+
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-server
-@end defun
-
-
-@defun smtp-set-reverse-path
-@end defun
 
 
 @defun smtp-add-recipient

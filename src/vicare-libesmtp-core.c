@@ -99,14 +99,26 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
 /* ------------------------------------------------------------------ */
 
 ikptr
-ikrt_smtp_set_hostname (ikptr s_session, ikptr s_hostname, ikpcb * pcb)
+ikrt_smtp_set_hostname (ikptr s_session, ikptr s_local_hostname, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_HOSTNAME
   smtp_session_t	sex   = IK_LIBESMTP_SESSION(s_session);
-  char *		hname =
-    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_hostname);
-  int			rv;
+  char *	hname = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_local_hostname);
+  int		rv;
   rv = smtp_set_hostname(sex, hname);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_set_server (ikptr s_session, ikptr s_remote_server, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_SERVER
+  smtp_session_t	sex   = IK_LIBESMTP_SESSION(s_session);
+  char *	server = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_remote_server);
+  int		rv;
+  rv = smtp_set_server(sex, server);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
@@ -147,6 +159,20 @@ ikrt_smtp_enumerate_messages (ikptr s_session, ikptr s_callback, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_REVERSE_PATH
+  smtp_message_t	msg = IK_LIBESMTP_SESSION(s_message);
+  char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_mailbox);
+  int		rv;
+  rv = smtp_set_reverse_path(msg, mailbox);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
 
 
 /** --------------------------------------------------------------------
@@ -165,26 +191,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_set_server (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_SERVER
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_set_reverse_path (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_REVERSE_PATH
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_add_recipient (ikpcb * pcb)

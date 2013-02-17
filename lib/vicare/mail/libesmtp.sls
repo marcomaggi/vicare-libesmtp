@@ -47,6 +47,7 @@
     smtp-create-session
     smtp-destroy-session
     smtp-set-hostname
+    smtp-set-server
 
     ;; message management
     smtp-message
@@ -57,6 +58,7 @@
     smtp-add-message
     smtp-enumerate-messages
     smtp-enumerate-messages*
+    smtp-set-reverse-path
 
     ;; callback makers
     make-smtp-enumerate-messagecb
@@ -64,8 +66,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-server
-    smtp-set-reverse-path
     smtp-add-recipient
     smtp-enumerate-recipients
     smtp-set-header
@@ -417,6 +417,15 @@
 	(string-to-bytevector string->ascii)
 	(capi.smtp-set-hostname session hname))))))
 
+(define (smtp-set-server session remote-server)
+  (define who 'smtp-set-server)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session))
+    (with-general-c-strings
+	((rserver	remote-server))
+      (string-to-bytevector string->ascii)
+      (capi.smtp-set-server session rserver))))
+
 
 ;;;; message management
 
@@ -463,6 +472,22 @@
       ($smtp-session-messages session))))
 
 ;;; --------------------------------------------------------------------
+
+(define smtp-set-reverse-path
+  (case-lambda
+   ((message)
+    (smtp-set-reverse-path message #f))
+   ((message mailbox)
+    ;;Set  the reverse  path mailbox  for MESSAGE;  this mailbox  is the
+    ;;sender address.  If successful return #t, else return #f.
+    ;;
+    (define who 'smtp-set-reverse-path)
+    (with-arguments-validation (who)
+	((smtp-message/alive	message))
+      (with-general-c-strings/false
+	  ((mbox		mailbox))
+	(string-to-bytevector string->ascii)
+	(capi.smtp-set-reverse-path message mbox))))))
 
 
 ;;;; callback makers
@@ -517,18 +542,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-server)
-  (define who 'smtp-set-server)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-server)))
-
-(define (smtp-set-reverse-path)
-  (define who 'smtp-set-reverse-path)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-reverse-path)))
 
 (define (smtp-add-recipient)
   (define who 'smtp-add-recipient)
@@ -793,5 +806,4 @@
 ;;; end of file
 ;; Local Variables:
 ;; eval: (put '%struct-destructor-application 'scheme-indent-function 1)
-;; eval: (put 'with-general-c-strings/false 'scheme-indent-function 1)
 ;; End:

@@ -104,14 +104,19 @@
 
   (check
       (let ((sex (smtp-create-session)))
-	(smtp-set-hostname sex "localhost")
-	(smtp-session? sex))
+	(smtp-set-hostname sex "localhost"))
     => #t)
 
   (check
       (let ((sex (smtp-create-session)))
-	(smtp-set-hostname sex)
-	(smtp-session? sex))
+	(smtp-set-hostname sex))
+    => #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-set-server sex "localhost:25"))
     => #t)
 
   (collect))
@@ -161,6 +166,20 @@
 		 (and (= 2 (length msgs))
 		      (for-all smtp-message? msgs))))))
     #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-reverse-path msg "marco@localhost"))
+    => #t)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-reverse-path msg))
+    => #t)
 
   (collect))
 

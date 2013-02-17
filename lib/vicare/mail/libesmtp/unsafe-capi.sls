@@ -40,16 +40,16 @@
     smtp-create-session
     smtp-destroy-session
     smtp-set-hostname
+    smtp-set-server
 
     ;; message management
     smtp-add-message
     smtp-enumerate-messages
+    smtp-set-reverse-path
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-server
-    smtp-set-reverse-path
     smtp-add-recipient
     smtp-enumerate-recipients
     smtp-set-header
@@ -141,6 +141,9 @@
 (define-inline (smtp-set-hostname session local-hostname)
   (foreign-call "ikrt_smtp_set_hostname" session local-hostname))
 
+(define-inline (smtp-set-server session remote-server)
+  (foreign-call "ikrt_smtp_set_server" session remote-server))
+
 
 ;;;; message management
 
@@ -150,15 +153,12 @@
 (define-inline (smtp-enumerate-messages session callback)
   (foreign-call "ikrt_smtp_enumerate_messages" session callback))
 
+(define-inline (smtp-set-reverse-path message mailbox)
+  (foreign-call "ikrt_smtp_set_reverse_path" message mailbox))
+
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-set-server)
-  (foreign-call "ikrt_smtp_set_server"))
-
-(define-inline (smtp-set-reverse-path)
-  (foreign-call "ikrt_smtp_set_reverse_path"))
 
 (define-inline (smtp-add-recipient)
   (foreign-call "ikrt_smtp_add_recipient"))
