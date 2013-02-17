@@ -43,15 +43,28 @@
  ** Handling of Scheme objects.
  ** ----------------------------------------------------------------- */
 
-#define ika_integer_from_libesmtp_errcode(PCB,CODE)	IK_FIX(CODE)
-               /* ika_integer_from_int((PCB),(CODE)) */
-
-/* Accessors for the fields of the Scheme structure "session". */
-#define IK_LIBESMTP_SESSION_POINTER(SESSION)	IK_FIELD((SESSION),0)
-#define IK_LIBESMTP_SESSION_OWNER(SESSION)	IK_FIELD((SESSION),1)
-#define IK_LIBESMTP_SESSION_DESTRUCTOR(SESSION)	IK_FIELD((SESSION),2)
+/* Accessors for the fields of the Scheme structure "smtp_session_t". */
+#define IK_LIBESMTP_SESSION_POINTER(SESSION)		IK_FIELD((SESSION),0)
+#define IK_LIBESMTP_SESSION_MESSAGES_TABLE(SESSION)	IK_FIELD((SESSION),1)
+#define IK_LIBESMTP_SESSION_OWNER(SESSION)		IK_FIELD((SESSION),2)
+#define IK_LIBESMTP_SESSION_DESTRUCTOR(SESSION)		IK_FIELD((SESSION),3)
 #define IK_LIBESMTP_SESSION(SESSION)	\
-  IK_POINTER_DATA_VOIDP(IK_LIBESMTP_SESSION_POINTER(SESSION))
+  ((smtp_session_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_SESSION_POINTER(SESSION)))
+
+/* Accessors for the fields of the Scheme structure "smtp_message_t". */
+#define IK_LIBESMTP_MESSAGE_POINTER(MESSAGE)		IK_FIELD((MESSAGE),0)
+#define IK_LIBESMTP_MESSAGE_RECIPIENTS_TABLE(MESSAGE)	IK_FIELD((MESSAGE),1)
+#define IK_LIBESMTP_MESSAGE_OWNER(MESSAGE)		IK_FIELD((MESSAGE),2)
+#define IK_LIBESMTP_MESSAGE_DESTRUCTOR(MESSAGE)		IK_FIELD((MESSAGE),3)
+#define IK_LIBESMTP_MESSAGE(MESSAGE)	\
+  ((smtp_message_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_MESSAGE_POINTER(MESSAGE)))
+
+/* Accessors for the fields of the Scheme structure "smtp_recipient_t". */
+#define IK_LIBESMTP_RECIPIENT_POINTER(RECIPIENT)	IK_FIELD((RECIPIENT),0)
+#define IK_LIBESMTP_RECIPIENT_OWNER(RECIPIENT)		IK_FIELD((RECIPIENT),1)
+#define IK_LIBESMTP_RECIPIENT_DESTRUCTOR(RECIPIENT)	IK_FIELD((RECIPIENT),2)
+#define IK_LIBESMTP_RECIPIENT(RECIPIENT)	\
+  ((smtp_recipient_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_RECIPIENT_POINTER(RECIPIENT)))
 
 
 /** --------------------------------------------------------------------

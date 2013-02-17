@@ -184,6 +184,22 @@
   (collect))
 
 
+(parametrise ((check-test-name		'recipient)
+	      (struct-guardian-logger	#f))
+
+  (check
+      ;;This will be destroyed by the garbage collector.
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex))
+	     (rec (smtp-add-recipient msg "marco@localhost")))
+	(smtp-recipient? rec))
+    => #t)
+
+;;; --------------------------------------------------------------------
+
+  (collect))
+
+
 ;;;; done
 
 (check-report)

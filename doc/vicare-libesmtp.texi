@@ -267,6 +267,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain structs::               Data structures.
 * plain sessions::              Session management.
 * plain messages::              Message management.
+* plain recipients::            Recipient management.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
@@ -278,6 +279,7 @@ the very unlikely case that this function fails: @false{} is returned.
 @menu
 * plain structs session::       Session data structures.
 * plain structs message::       Message data structures.
+* plain structs recipient::     Recipient data structures.
 @end menu
 
 @c page
@@ -399,7 +401,7 @@ When instances of this type are used as arguments to functions: this
 documentation identifies them as @var{message}.
 
 Instances of type @code{smtp-message} never own the the underlying
-@smtp{} session; when these instances are garbage collected or when
+message; when these instances are garbage collected or when
 @func{smtp-destroy-session} is applied to the owning session: the
 message is closed, all the associated data is finalised; any error is
 ignored in this procedure.
@@ -422,10 +424,8 @@ the message it represents is open; otherwise return @false{}.
 @defunx set-smtp-message-destructor! @var{message} @var{func}
 Retrieve or set a destructor function associated to the @var{message}.
 
-Whenever the @var{message} is closed, either explicitly with
-@func{smtp-destroy-message} or implicitly by the garbage collector,
-@var{func} is applied to @var{message} before the internal state of
-@var{message} is finalised.
+Whenever the @var{message} is finalised: @var{func} is applied to
+@var{message} before the internal state of @var{message} is finalised.
 
 Notice that @var{func} can do anything, not only destroy some state
 associated to @var{message}; if we do:
@@ -466,6 +466,90 @@ Succeed if @var{obj} satisfies the predicate @func{smtp-message?/alive}.
 @end deffn
 
 @c page
+@node plain structs recipient
+@subsection Recipient data structures
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@deftp {Struct Type} smtp-recipient
+@cindex @var{recipient} argument
+@cindex Argument @var{recipient}
+An opaque Scheme structure holding an instance of the C language type
+@code{smtp_recipient_t}, it references a message recipient.
+
+When instances of this type are used as arguments to functions: this
+documentation identifies them as @var{recipient}.
+
+Instances of type @code{smtp-recipient} never own the the underlying
+recipient; when these instances are garbage collected or when
+@func{smtp-destroy-session} is applied to the session owning the
+associated message: the recipient is closed, all the associated data is
+finalised; any error is ignored in this procedure.
+@end deftp
+
+
+@defun smtp-recipient? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-recipient};
+otherwise return @false{}.
+@end defun
+
+
+@defun smtp-recipient?/alive @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-recipient} and
+the recipient it represents is open; otherwise return @false{}.
+@end defun
+
+
+@defun smtp-recipient-destructor @var{recipient}
+@defunx set-smtp-recipient-destructor! @var{recipient} @var{func}
+Retrieve or set a destructor function associated to the @var{recipient}.
+
+Whenever the @var{recipient} is finalised: @var{func} is applied to
+@var{recipient} before the internal state of @var{recipient} is
+finalised.
+
+Notice that @var{func} can do anything, not only destroy some state
+associated to @var{recipient}; if we do:
+
+@example
+(define connection ...)
+(set-smtp-recipient-destructor! connection
+  (let ((state (make-some-data-struct)))
+    (case-lambda
+      ((conn)
+       (destroy state))
+      (()
+       state))))
+
+(let ((state ((smtp-recipient-destructor connection))))
+  (do-something-with connection state))
+@end example
+
+@noindent
+we can easily associate values to @var{recipient}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} smtp-recipient @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?}.
+@end deffn
+
+
+@deffn {Validation Clause} smtp-recipient/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?/alive}.
+@end deffn
+
+@c page
 @node plain sessions
 @section Session management
 
@@ -499,7 +583,7 @@ bytevector, a @code{memory-block} instance, a pointer object.  When
 @end defun
 
 
-@defun smtp-set-hostname @var{session} @var{remote-server}
+@defun smtp-set-server @var{session} @var{remote-server}
 Set @var{remote-server} as remote server specification for
 @var{session}; if successful return @true{}, else return @false{}.
 
@@ -589,14 +673,28 @@ bytevector, a @code{memory-block} instance, a pointer object.  When
 @false{} or not given: @cnull{} is handed to the @libesmtp{} function.
 @end defun
 
+@c page
+@node plain recipients
+@section Recipient management
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-add-recipient @var{message} @var{mailbox}
+Add a new recipient to @var{message} to be delivered to the remote
+server.  If successful: return a new instance of @code{smtp-recipient};
+else return @false{}.
+
+The optional @var{mailbox} must be a general C buffer argument holding
+an @ascii{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
+@end defun
 
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-add-recipient
-@end defun
 
 
 @defun smtp-enumerate-recipients

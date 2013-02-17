@@ -163,7 +163,7 @@ ikptr
 ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_REVERSE_PATH
-  smtp_message_t	msg = IK_LIBESMTP_SESSION(s_message);
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
   char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_mailbox);
   int		rv;
   rv = smtp_set_reverse_path(msg, mailbox);
@@ -173,6 +173,24 @@ ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
 #endif
 }
 
+
+/** --------------------------------------------------------------------
+ ** Recipient management.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_add_recipient (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ADD_RECIPIENT
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  char *		mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_mailbox);
+  smtp_recipient_t	rec;
+  rec = smtp_add_recipient(msg, mailbox);
+  return (rec)? ika_pointer_alloc(pcb, (long)rec) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -191,16 +209,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_add_recipient (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ADD_RECIPIENT
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_enumerate_recipients (ikpcb * pcb)

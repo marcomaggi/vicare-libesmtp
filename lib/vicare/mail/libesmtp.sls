@@ -60,13 +60,20 @@
     smtp-enumerate-messages*
     smtp-set-reverse-path
 
+    ;; recipient management
+    smtp-recipient
+    smtp-recipient?			smtp-recipient?/alive
+    smtp-recipient.vicare-arguments-validation
+    smtp-recipient/alive.vicare-arguments-validation
+
+    smtp-add-recipient
+
     ;; callback makers
     make-smtp-enumerate-messagecb
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-add-recipient
     smtp-enumerate-recipients
     smtp-set-header
     smtp-set-header-option
@@ -138,6 +145,16 @@
 (define-argument-validation (smtp-message/alive who obj)
   (smtp-message?/alive obj)
   (assertion-violation who "expected live smtp-message structure as argument" obj))
+
+;;; --------------------------------------------------------------------
+
+(define-argument-validation (smtp-recipient who obj)
+  (smtp-recipient? obj)
+  (assertion-violation who "expected smtp-recipient structure as argument" obj))
+
+(define-argument-validation (smtp-recipient/alive who obj)
+  (smtp-recipient?/alive obj)
+  (assertion-violation who "expected live smtp-recipient structure as argument" obj))
 
 
 ;;;; helpers
@@ -302,6 +319,10 @@
   (pointer
 		;Pointer  object  equivalent to  an  instance  of the  C
 		;language type "smtp_message_t".
+   recipients-table
+		;Hashtable holding the recipients added to this message.
+		;When  this  message  is   closed:  the  recipients  are
+		;finalised.
    owner?
 		;Boolean, true if this Scheme  structure is the owner of
 		;the data structure referenced by the "pointer" field.
@@ -312,10 +333,12 @@
    ))
 
 (define (%make-smtp-message pointer)
-  (make-smtp-message pointer #f #f))
+  (make-smtp-message pointer
+		     (make-hashtable values =) ;table of SMTP-RECIPIENT structures.
+		     #f #f))
 
 (define ($live-smtp-message? message)
-  ;;Evaluate to true if the SESSION argument contains a "smtp_message_t"
+  ;;Evaluate to true if the MESSAGE argument contains a "smtp_message_t"
   ;;not yet finalised.
   ;;
   (not (pointer-null? ($smtp-message-pointer message))))
@@ -332,7 +355,27 @@
     ;;Apply the destructor to MESSAGE.
     (%struct-destructor-application message
       $smtp-message-destructor $set-smtp-message-destructor!)
+    ;;Finalise the Scheme "smtp-message" data structures, if any.
+    (let* ((recipients ($smtp-message-recipients message))
+	   (len        ($vector-length recipients)))
+      (do ((i 0 (+ 1 i)))
+	  ((= i len)
+	   (hashtable-clear! ($smtp-message-recipients-table message)))
+	(%unsafe.smtp-destroy-recipient ($vector-ref recipients i))))
     (set-pointer-null! ($smtp-message-pointer message))))
+
+(define ($smtp-message-recipients message)
+  ;;Return a vector holding the "smtp-recipient" instances registered in
+  ;;MESSAGE.
+  ;;
+  (receive (keys recipients)
+      (hashtable-entries ($smtp-message-recipients-table message))
+    recipients))
+
+(define ($smtp-message-register-recipient! message recipient)
+  (hashtable-set! ($smtp-message-recipients-table message)
+		  (pointer->integer ($smtp-recipient-pointer recipient))
+		  recipient))
 
 ;;; --------------------------------------------------------------------
 
@@ -366,15 +409,34 @@
 		;least one argument being the data structure itself.
    ))
 
-(define (%unsafe.smtp-recipient-close recipient)
-  (%struct-destructor-application recipient
-    $smtp-recipient-destructor $set-smtp-recipient-destructor!)
-  #;(when ($smtp-recipient-owner? recipient)
-    (capi.smtp-destroy-recipient recipient)))
+(define (%make-smtp-recipient pointer)
+  (make-smtp-recipient pointer #f #f))
 
-(define (smtp-recipient?/open obj)
+(define ($live-smtp-recipient? recipient)
+  ;;Evaluate   to   true   if   the  RECIPIENT   argument   contains   a
+  ;;"smtp_recipient_t" not yet finalised.
+  ;;
+  (not (pointer-null? ($smtp-message-pointer recipient))))
+
+(define (%unsafe.smtp-destroy-recipient recipient)
+  ;;This  function is  called by  the  garbage collector  to finalise  a
+  ;;"smtp-recipient"  instance.   It  is  safe to  apply  this  function
+  ;;multiple times to the same RECIPIENT argument.
+  ;;
+  ;;The referenced "smtp_recipient_t" instance it NOT finalised, because
+  ;;it is always owned by the parent "smtp_message_t" instance.
+  ;;
+  (when ($live-smtp-recipient? recipient)
+    ;;Apply the destructor to RECIPIENT.
+    (%struct-destructor-application recipient
+      $smtp-recipient-destructor $set-smtp-recipient-destructor!)
+    (set-pointer-null! ($smtp-message-pointer recipient))))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-recipient?/alive obj)
   (and (smtp-recipient? obj)
-       (not (pointer-null? ($smtp-recipient-pointer obj)))))
+       ($live-smtp-recipient? obj)))
 
 (define (%struct-smtp-recipient-printer S port sub-printer)
   (define-inline (%display thing)
@@ -418,6 +480,9 @@
 	(capi.smtp-set-hostname session hname))))))
 
 (define (smtp-set-server session remote-server)
+  ;;Set  REMOTE-SERVER as  remote server  specification for  SESSION; if
+  ;;successful return #t, else return #f.
+  ;;
   (define who 'smtp-set-server)
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
@@ -438,7 +503,7 @@
       ((smtp-session/alive	session))
     (let ((rv (capi.smtp-add-message session)))
       (and rv
-	   (let ((message (make-smtp-message rv #f #f)))
+	   (let ((message (%make-smtp-message rv)))
 	     ($smtp-session-register-message! session message)
 	     message)))))
 
@@ -488,6 +553,25 @@
 	  ((mbox		mailbox))
 	(string-to-bytevector string->ascii)
 	(capi.smtp-set-reverse-path message mbox))))))
+
+
+;;;; recipient management
+
+(define (smtp-add-recipient message mailbox)
+  ;;Build  and  return a  new  "smtp-recipient"  instance associated  to
+  ;;MESSAGE; if an error occurs return #f.
+  ;;
+  (define who 'smtp-add-recipient)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (with-general-c-strings
+	((mbox		mailbox))
+      (string-to-bytevector string->ascii)
+      (let ((rv (capi.smtp-add-recipient message mbox)))
+	(and rv
+	     (let ((recipient (%make-smtp-recipient rv)))
+	       ($smtp-message-register-recipient! message recipient)
+	       recipient))))))
 
 
 ;;;; callback makers
@@ -542,12 +626,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-add-recipient)
-  (define who 'smtp-add-recipient)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-add-recipient)))
 
 (define (smtp-enumerate-recipients)
   (define who 'smtp-enumerate-recipients)
@@ -799,7 +877,7 @@
 (set-rtd-destructor!	(type-descriptor smtp-message) %unsafe.smtp-destroy-message)
 
 (set-rtd-printer!	(type-descriptor smtp-recipient) %struct-smtp-recipient-printer)
-(set-rtd-destructor!	(type-descriptor smtp-recipient) %unsafe.smtp-recipient-close)
+(set-rtd-destructor!	(type-descriptor smtp-recipient) %unsafe.smtp-destroy-recipient)
 
 )
 
