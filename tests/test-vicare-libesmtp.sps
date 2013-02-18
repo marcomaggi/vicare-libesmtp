@@ -136,6 +136,24 @@
 	(smtp-set-eventcb sex cb))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (smtp-create-session))
+	    (cb  (make-smtp-monitorcb
+		  (lambda (buf.ptr buf.len writing)
+		    (void)))))
+	(smtp-set-monitorcb sex cb #f))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session))
+	    (cb  (make-smtp-monitorcb
+		  (lambda (buf.ptr buf.len writing)
+		    (void)))))
+	(smtp-set-monitorcb sex cb 123))
+    => #t)
+
 
   (collect))
 

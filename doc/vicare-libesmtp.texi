@@ -618,6 +618,9 @@ the constant @code{Timeout_OVERRIDE_RFC2822_MINIMUM}.
 
 @c ------------------------------------------------------------
 
+@subsubheading The event callback
+
+
 @defun smtp-set-eventcb @var{session} @var{c-callback}
 Register a callback to notify the application about events.  If
 successful return @true{}, else return @false{}.
@@ -642,6 +645,64 @@ This instance does @strong{not} own the underlying session.
 
 @item
 An exact integer representing the event.
+@end enumerate
+
+@var{user-scheme-callback} can return unspecified values.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns @code{(void)} to the caller.
+@var{user-scheme-callback} should take care of handling its own
+exceptions.
+@end itemize
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading The monitor callback
+
+
+@defun smtp-set-monitorcb @var{session} @var{c-callback} @var{headers}
+Set a callback for tracing the @smtp{} protocol session.  If successful
+return @true{}, otherwise return @false{}.
+
+@var{c-callback} must be the return value of a call to
+@func{make-smtp-monitorcb}.
+
+@var{headers} can be any object: when true the callback is used to
+display the message headers.
+@end defun
+
+
+@defun make-smtp-monitorcb @var{user-scheme-function}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp_monitorcb_t} callback; the returned pointer must be released
+with a call to @func{free-c-callback} from @library{vicare ffi}.
+
+@var{user-scheme-callback} must accept @math{3} argument:
+
+@enumerate
+@item
+A pointer object referencing a C string buffer.
+
+@item
+An exact integer, in the range of the C language type @code{signed int},
+representing the number of characters in the buffer.
+
+@item
+An exact integer representing one of the constants:
+
+@example
+SMTP_CB_READING
+SMTP_CB_WRITING
+SMTP_CB_HEADERS
+@end example
 @end enumerate
 
 @var{user-scheme-callback} can return unspecified values.
@@ -964,10 +1025,6 @@ variation.  If successful return @true{}, else return @false{}.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-monitorcb
-@end defun
 
 
 @defun smtp-start-session

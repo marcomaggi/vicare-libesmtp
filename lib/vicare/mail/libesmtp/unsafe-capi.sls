@@ -156,6 +156,9 @@
 (define-inline (smtp-set-eventcb session c-callback)
   (foreign-call "ikrt_smtp_set_eventcb" session c-callback))
 
+(define-inline (smtp-set-monitorcb session c-callback headers)
+  (foreign-call "ikrt_smtp_set_monitorcb" session c-callback headers))
+
 
 ;;;; message management
 
@@ -203,9 +206,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-set-monitorcb)
-  (foreign-call "ikrt_smtp_set_monitorcb"))
 
 (define-inline (smtp-start-session)
   (foreign-call "ikrt_smtp_start_session"))

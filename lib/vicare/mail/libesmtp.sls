@@ -50,6 +50,7 @@
     smtp-set-server
     smtp-set-timeout
     smtp-set-eventcb
+    smtp-set-monitorcb
 
     ;; message management
     smtp-message
@@ -93,7 +94,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-monitorcb
     smtp-start-session
     smtp-message-transfer-status
     smtp-reverse-path-status
@@ -556,6 +556,15 @@
        (pointer			c-callback))
     (capi.smtp-set-eventcb session c-callback)))
 
+(define (smtp-set-monitorcb session c-callback headers)
+  ;;Set a callback for tracing the SMTP protocol session.
+  ;;
+  (define who 'smtp-set-monitorcb)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			c-callback))
+    (capi.smtp-set-monitorcb session c-callback headers)))
+
 
 ;;;; message management
 
@@ -873,12 +882,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-monitorcb)
-  (define who 'smtp-set-monitorcb)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-monitorcb)))
 
 (define (smtp-start-session)
   (define who 'smtp-start-session)
