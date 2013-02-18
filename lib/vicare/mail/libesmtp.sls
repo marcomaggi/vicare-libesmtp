@@ -62,6 +62,7 @@
     smtp-set-reverse-path
     smtp-set-messagecb
     smtp-set-message-fp
+    smtp-set-message-str
 
     ;; recipient management
     smtp-recipient
@@ -628,6 +629,17 @@
       ((smtp-message/alive	message)
        (pointer			file-pointer))
     (capi.smtp-set-message-fp message file-pointer)))
+
+(define (smtp-set-message-str message string)
+  ;;Set the message from a general C buffer.
+  ;;
+  (define who 'smtp-set-message-str)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (with-general-c-strings/false
+	((string.ascii		string))
+      (string-to-bytevector string->ascii)
+      (capi.smtp-set-message-str message string.ascii))))
 
 
 ;;;; headers management

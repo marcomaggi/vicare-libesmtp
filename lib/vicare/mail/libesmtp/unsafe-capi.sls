@@ -49,6 +49,7 @@
     smtp-set-reverse-path
     smtp-set-messagecb
     smtp-set-message-fp
+    smtp-set-message-str
 
     ;; recipient management
     smtp-add-recipient
@@ -169,6 +170,9 @@
 
 (define-inline (smtp-set-message-fp message file-pointer)
   (foreign-call "ikrt_smtp_set_message_fp" message file-pointer))
+
+(define-inline (smtp-set-message-str message string)
+  (foreign-call "ikrt_smtp_set_message_str" message string))
 
 
 ;;;; headers management

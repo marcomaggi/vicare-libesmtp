@@ -204,6 +204,15 @@
 	(smtp-set-message-fp msg (null-pointer)))
     => #t)
 
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-message-str msg "From: marco@localhost\n\r\
+                                   To: marco@localhost\n\r\
+
+                                   ciao\n\r"))
+    => #t)
+
 
   (collect))
 

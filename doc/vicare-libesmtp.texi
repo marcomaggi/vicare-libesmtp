@@ -750,6 +750,17 @@ successful return @true{}, otherwise return @false{}.
 
 @var{file-pointer} must be a pointer to @code{FILE *}.
 @end defun
+
+
+@defun smtp-set-message-str @var{message} @var{string}
+Set the message from a general C buffer.  If successful return @true{},
+otherwise return @false{}.
+
+@var{string} must be a general C buffer argument holding an @asciiz{}
+string: a Scheme string, a Scheme bytevector, a @code{memory-block}
+instance, a pointer object.
+@end defun
+
 @c page
 @node plain recipients
 @section Recipient management
