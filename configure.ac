@@ -172,15 +172,6 @@ VICARE_CONSTANT_TESTS([SMTP_CB_READING
 #page
 #### C language functions from the header file "libesmtp.h"
 
-dnl const char *_smtp_message_fp_cb (void **ctx, int *len, void *arg);
-dnl #define smtp_set_message_fp(message,fp)	\
-dnl 		smtp_set_messagecb ((message), _smtp_message_fp_cb, (fp))
-
-dnl const char *_smtp_message_str_cb (void **ctx, int *len, void *arg);
-dnl #define smtp_set_message_str(message,str)	\
-dnl 		smtp_set_messagecb ((message), _smtp_message_str_cb, (str))
-
-
 AC_CHECK_FUNCS([smtp_version smtp_create_session smtp_add_message smtp_enumerate_messages smtp_set_server smtp_set_hostname smtp_set_reverse_path smtp_add_recipient smtp_enumerate_recipients smtp_set_header smtp_set_header_option smtp_set_resent_headers smtp_set_messagecb smtp_set_eventcb smtp_set_monitorcb smtp_start_session smtp_destroy_session smtp_message_transfer_status smtp_reverse_path_status smtp_message_reset_status smtp_recipient_status smtp_recipient_check_complete smtp_recipient_reset_status smtp_errno smtp_strerror smtp_set_application_data smtp_get_application_data smtp_message_set_application_data smtp_message_get_application_data smtp_recipient_set_application_data smtp_recipient_get_application_data smtp_option_require_all_recipients smtp_auth_set_context smtp_set_timeout smtp_dsn_set_ret smtp_dsn_set_envid smtp_dsn_set_notify smtp_dsn_set_orcpt smtp_size_set_estimate smtp_8bitmime_set_body smtp_deliverby_set_mode smtp_starttls_enable smtp_starttls_set_ctx smtp_starttls_set_password_cb smtp_etrn_add_node smtp_etrn_enumerate_nodes smtp_etrn_node_status smtp_etrn_set_application_data smtp_etrn_get_application_data])
 
 #page
