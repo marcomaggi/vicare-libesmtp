@@ -697,6 +697,53 @@ bytevector, a @code{memory-block} instance, a pointer object.  When
 @false{} or not given: @cnull{} is handed to the @libesmtp{} function.
 @end defun
 
+@c ------------------------------------------------------------
+
+@defun smtp-set-messagecb @var{message} @var{c-callback}
+Set the callback to read the message from an application.  If successful
+return @true{}, otherwise return @false{}.
+
+@var{c-callback} must be the return value of a call to
+@func{make-smtp-messagecb}.
+@end defun
+
+
+@defun make-smtp-messagecb @var{user-scheme-callback}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp__messagecb_t} callback; the returned pointer must be released
+with a call to @func{free-c-callback} from @library{vicare ffi}.
+
+@var{user-scheme-callback} must accept @math{2} arguments:
+
+@enumerate
+@item
+A pointer object referencing a location of type @code{void *}; to be
+used by the callback function for its optional buffer.
+
+@item
+A pointer object representing @cnull{} or referencing a location of type
+@code{signed int}; the referenced integer is the number of bytes
+available in the message.
+@end enumerate
+
+@var{user-scheme-callback} must return a pointer object representing
+@cnull{} of the next byte of the message.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns a pointer object representing @cnull{} to the caller.
+@var{user-scheme-callback} should take care of handling its own
+exceptions.
+@end itemize
+@end defun
+
+
 @c page
 @node plain recipients
 @section Recipient management
@@ -857,10 +904,6 @@ variation.  If successful return @true{}, else return @false{}.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-messagecb
-@end defun
 
 
 @defun smtp-set-eventcb

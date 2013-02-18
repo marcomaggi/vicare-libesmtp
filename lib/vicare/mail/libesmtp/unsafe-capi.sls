@@ -47,6 +47,7 @@
     smtp-add-message
     smtp-enumerate-messages
     smtp-set-reverse-path
+    smtp-set-messagecb
 
     ;; recipient management
     smtp-add-recipient
@@ -61,7 +62,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-messagecb
     smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
@@ -163,6 +163,9 @@
 (define-inline (smtp-set-reverse-path message mailbox)
   (foreign-call "ikrt_smtp_set_reverse_path" message mailbox))
 
+(define-inline (smtp-set-messagecb message c-callback)
+  (foreign-call "ikrt_smtp_set_messagecb" message c-callback))
+
 
 ;;;; headers management
 
@@ -189,9 +192,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-set-messagecb)
-  (foreign-call "ikrt_smtp_set_messagecb"))
 
 (define-inline (smtp-set-eventcb)
   (foreign-call "ikrt_smtp_set_eventcb"))

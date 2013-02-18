@@ -186,6 +186,19 @@ ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_messagecb (ikptr s_message, ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_MESSAGECB
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  smtp_messagecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  int			rv;
+  rv = smtp_set_messagecb(msg, cb, NULL);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -337,15 +350,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 #endif
 
 
-ikptr
-ikrt_smtp_set_messagecb (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_MESSAGECB
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_eventcb (ikpcb * pcb)

@@ -60,6 +60,7 @@
     smtp-enumerate-messages
     smtp-enumerate-messages*
     smtp-set-reverse-path
+    smtp-set-messagecb
 
     ;; recipient management
     smtp-recipient
@@ -75,16 +76,16 @@
     ;; headers management
     smtp-set-header
     smtp-set-header-option
+    smtp-set-resent-headers
 
     ;; callback makers
     make-smtp-enumerate-messagecb
     make-smtp-enumerate-recipientcb
+    make-smtp-messagecb
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-resent-headers
-    smtp-set-messagecb
     smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
@@ -596,6 +597,17 @@
 	(string-to-bytevector string->ascii)
 	(capi.smtp-set-reverse-path message mbox))))))
 
+;;; --------------------------------------------------------------------
+
+(define (smtp-set-messagecb message c-callback)
+  ;;Set the callback to read the message from an application.
+  ;;
+  (define who 'smtp-set-messagecb)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (pointer			c-callback))
+    (capi.smtp-set-messagecb message c-callback)))
+
 
 ;;;; headers management
 
@@ -743,12 +755,20 @@
 				       mailbox)
 		 (void)))))))
 
-;;; --------------------------------------------------------------------
+(define make-smtp-messagecb
+  ;; const char *(*smtp_messagecb_t)
+  ;;		(void **ctx,
+  ;;		 int *len,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (optional-buffer-pointer len-pointer unused-custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (null-pointer)))
+		 (user-scheme-callback optional-buffer-pointer len-pointer)))))))
 
-;; const char *(*smtp_messagecb_t)
-;;		(void **ctx,
-;;		 int *len,
-;;		 void *arg);
+;;; --------------------------------------------------------------------
 
 ;; void (*smtp_eventcb_t)
 ;;		(smtp_session_t session,
@@ -776,12 +796,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-messagecb)
-  (define who 'smtp-set-messagecb)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-messagecb)))
 
 (define (smtp-set-eventcb)
   (define who 'smtp-set-eventcb)

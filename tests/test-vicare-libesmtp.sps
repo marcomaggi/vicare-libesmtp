@@ -188,6 +188,16 @@
 	(smtp-set-reverse-path msg))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex))
+	     (cb  (make-smtp-messagecb (lambda (dummy len-pointer)
+					 (null-pointer)))))
+	(smtp-set-messagecb msg cb))
+    => #t)
+
   (collect))
 
 
