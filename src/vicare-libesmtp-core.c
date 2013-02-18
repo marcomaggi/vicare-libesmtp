@@ -278,7 +278,19 @@ ikrt_smtp_set_header_option (ikptr s_message,
   feature_failure(__func__);
 #endif
 }
-
+ikptr
+ikrt_smtp_set_resent_headers (ikptr s_message, ikptr s_onoff, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_RESENT_HEADERS
+  smtp_message_t	msg   = IK_LIBESMTP_MESSAGE(s_message);
+  int			onoff = IK_BOOLEAN_TO_INT(s_onoff);
+  int			rv;
+  rv = smtp_set_resent_headers(msg, onoff);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -297,16 +309,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_set_resent_headers (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_RESENT_HEADERS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_messagecb (ikpcb * pcb)

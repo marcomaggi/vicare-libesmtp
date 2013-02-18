@@ -315,6 +315,20 @@
 	(smtp-set-header-option msg "X-Loop:" Hdr_PROHIBIT))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-resent-headers msg #t))
+    => #f)
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-resent-headers msg #f))
+    => #t)
+
   (collect))
 
 

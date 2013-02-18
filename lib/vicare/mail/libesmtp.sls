@@ -639,6 +639,12 @@
       (string-to-bytevector string->ascii)
       (capi.smtp-set-header-option message header.c option))))
 
+(define (smtp-set-resent-headers message onoff)
+  (define who 'smtp-set-resent-headers)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (capi.smtp-set-resent-headers message onoff)))
+
 
 ;;;; recipient management
 
@@ -752,12 +758,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-resent-headers)
-  (define who 'smtp-set-resent-headers)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-resent-headers)))
 
 (define (smtp-set-messagecb)
   (define who 'smtp-set-messagecb)

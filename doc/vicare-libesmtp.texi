@@ -816,13 +816,14 @@ instance, a pointer object.
 @end defun
 
 
+@defun smtp-set-resent-headers @var{message} @var{obj}
+Set or unset special processing for headers which have a @code{Resent-}
+variation.  If successful return @true{}, else return @false{}.
+@end defun
+
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-resent-headers
-@end defun
 
 
 @defun smtp-set-messagecb

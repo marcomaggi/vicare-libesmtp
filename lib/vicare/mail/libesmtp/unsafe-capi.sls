@@ -54,11 +54,11 @@
     ;; headers management
     smtp-set-header
     smtp-set-header-option
+    smtp-set-resent-headers
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-resent-headers
     smtp-set-messagecb
     smtp-set-eventcb
     smtp-set-monitorcb
@@ -169,6 +169,9 @@
 (define-inline (smtp-set-header-option message header option)
   (foreign-call "ikrt_smtp_set_header_option" message header option))
 
+(define-inline (smtp-set-resent-headers message onoff)
+  (foreign-call "ikrt_smtp_set_resent_headers" message onoff))
+
 
 ;;;; recipient management
 
@@ -180,9 +183,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-set-resent-headers)
-  (foreign-call "ikrt_smtp_set_resent_headers"))
 
 (define-inline (smtp-set-messagecb)
   (foreign-call "ikrt_smtp_set_messagecb"))
