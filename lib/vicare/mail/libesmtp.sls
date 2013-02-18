@@ -48,6 +48,7 @@
     smtp-destroy-session
     smtp-set-hostname
     smtp-set-server
+    smtp-set-timeout
 
     ;; message management
     smtp-message
@@ -102,7 +103,6 @@
     smtp-recipient-get-application-data
     smtp-option-require-all-recipients
     smtp-auth-set-context
-    smtp-set-timeout
     smtp-dsn-set-ret
     smtp-dsn-set-envid
     smtp-dsn-set-notify
@@ -122,7 +122,11 @@
   (import (vicare)
     (vicare mail libesmtp constants)
     (prefix (vicare mail libesmtp unsafe-capi) capi.)
-    (vicare syntactic-extensions)
+    (except (vicare syntactic-extensions)
+	    ;;FIXME To be  removed whenever a version  of Vicare exports
+	    ;;it and  this package is  changed to support  such version.
+	    ;;(Marco Maggi; Mon Feb 18, 2013)
+	    case-strings)
     (vicare arguments validation)
     (vicare arguments general-c-buffers)
     (prefix (vicare unsafe-operations) $)
@@ -521,6 +525,14 @@
       (string-to-bytevector string->ascii)
       (capi.smtp-set-server session rserver))))
 
+(define (smtp-set-timeout session which value)
+  (define who 'smtp-set-timeout)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (signed-int		which)
+       (signed-long		value))
+    (capi.smtp-set-timeout session which value)))
+
 
 ;;;; message management
 
@@ -878,12 +890,6 @@
   (with-arguments-validation (who)
       ()
     (capi.smtp-auth-set-context)))
-
-(define (smtp-set-timeout)
-  (define who 'smtp-set-timeout)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-timeout)))
 
 (define (smtp-dsn-set-ret)
   (define who 'smtp-dsn-set-ret)

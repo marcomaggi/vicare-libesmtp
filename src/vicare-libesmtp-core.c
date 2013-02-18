@@ -124,6 +124,21 @@ ikrt_smtp_set_server (ikptr s_session, ikptr s_remote_server, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_timeout (ikptr s_session, ikptr s_which, ikptr s_value, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_TIMEOUT
+  smtp_session_t	sex	= IK_LIBESMTP_SESSION(s_session);
+  int			which	= ik_integer_to_int(s_which);
+  long			value	= ik_integer_to_long(s_value);
+  int			rv;
+  rv = smtp_set_timeout(sex, which, value);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
 
 
 /** --------------------------------------------------------------------
@@ -504,16 +519,6 @@ ikptr
 ikrt_smtp_auth_set_context (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_AUTH_SET_CONTEXT
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_set_timeout (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_TIMEOUT
   return IK_VOID;
 #else
   feature_failure(__func__);

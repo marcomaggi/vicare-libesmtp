@@ -593,6 +593,29 @@ Set @var{remote-server} as remote server specification for
 @code{memory-block} instance, a pointer object.
 @end defun
 
+
+@defun smtp-set-timeout @var{session} @var{which} @var{value}
+Set the timeouts for @var{session}.  If successful return @true{}, else
+return @false{}.
+
+@var{which} must be an exact integer in the range of the C language type
+@code{signed int}, selecting the timeout to set; the integer must
+represent a constant among:
+
+@example
+Timeout_GREETING        Timeout_ENVELOPE
+Timeout_DATA            Timeout_TRANSFER
+Timeout_DATA2
+@end example
+
+@noindent
+the constant can be optionally combined with a bitwise inclusive OR with
+the constant @code{Timeout_OVERRIDE_RFC2822_MINIMUM}.
+
+@var{value} must be an exact integer in the range of the C language type
+@code{signed long} representing a number of milliseconds.
+@end defun
+
 @c page
 @node plain messages
 @section Message management
@@ -907,10 +930,6 @@ variation.  If successful return @true{}, else return @false{}.
 
 
 @defun smtp-auth-set-context
-@end defun
-
-
-@defun smtp-set-timeout
 @end defun
 
 

@@ -119,6 +119,13 @@
 	(smtp-set-server sex "localhost:25"))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-set-timeout sex Timeout_GREETING 123))
+    => #t)
+
   (collect))
 
 

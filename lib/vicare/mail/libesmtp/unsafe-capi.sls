@@ -41,6 +41,7 @@
     smtp-destroy-session
     smtp-set-hostname
     smtp-set-server
+    smtp-set-timeout
 
     ;; message management
     smtp-add-message
@@ -79,7 +80,6 @@
     smtp-recipient-get-application-data
     smtp-option-require-all-recipients
     smtp-auth-set-context
-    smtp-set-timeout
     smtp-dsn-set-ret
     smtp-dsn-set-envid
     smtp-dsn-set-notify
@@ -147,6 +147,9 @@
 
 (define-inline (smtp-set-server session remote-server)
   (foreign-call "ikrt_smtp_set_server" session remote-server))
+
+(define-inline (smtp-set-timeout session which value)
+  (foreign-call "ikrt_smtp_set_timeout" session which value))
 
 
 ;;;; message management
@@ -243,9 +246,6 @@
 
 (define-inline (smtp-auth-set-context)
   (foreign-call "ikrt_smtp_auth_set_context"))
-
-(define-inline (smtp-set-timeout)
-  (foreign-call "ikrt_smtp_set_timeout"))
 
 (define-inline (smtp-dsn-set-ret)
   (foreign-call "ikrt_smtp_dsn_set_ret"))
