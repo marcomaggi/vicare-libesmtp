@@ -138,6 +138,19 @@ ikrt_smtp_set_timeout (ikptr s_session, ikptr s_which, ikptr s_value, ikpcb * pc
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_eventcb (ikptr s_session, ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_EVENTCB
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  smtp_eventcb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  int			rv;
+  rv = smtp_set_eventcb(sex, cb, NULL);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -378,16 +391,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 #endif
 
 
-
-ikptr
-ikrt_smtp_set_eventcb (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_EVENTCB
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_monitorcb (ikpcb * pcb)

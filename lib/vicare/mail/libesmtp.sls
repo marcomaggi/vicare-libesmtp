@@ -49,6 +49,7 @@
     smtp-set-hostname
     smtp-set-server
     smtp-set-timeout
+    smtp-set-eventcb
 
     ;; message management
     smtp-message
@@ -92,7 +93,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
     smtp-message-transfer-status
@@ -547,6 +547,15 @@
        (signed-long		value))
     (capi.smtp-set-timeout session which value)))
 
+(define (smtp-set-eventcb session c-callback)
+  ;;Register a callback to notify the application about events.
+  ;;
+  (define who 'smtp-set-eventcb)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			c-callback))
+    (capi.smtp-set-eventcb session c-callback)))
+
 
 ;;;; message management
 
@@ -864,12 +873,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-eventcb)
-  (define who 'smtp-set-eventcb)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-eventcb)))
 
 (define (smtp-set-monitorcb)
   (define who 'smtp-set-monitorcb)

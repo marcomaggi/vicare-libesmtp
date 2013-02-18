@@ -42,6 +42,7 @@
     smtp-set-hostname
     smtp-set-server
     smtp-set-timeout
+    smtp-set-eventcb
 
     ;; message management
     smtp-add-message
@@ -64,7 +65,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-eventcb
     smtp-set-monitorcb
     smtp-start-session
     smtp-message-transfer-status
@@ -153,6 +153,9 @@
 (define-inline (smtp-set-timeout session which value)
   (foreign-call "ikrt_smtp_set_timeout" session which value))
 
+(define-inline (smtp-set-eventcb session c-callback)
+  (foreign-call "ikrt_smtp_set_eventcb" session c-callback))
+
 
 ;;;; message management
 
@@ -200,9 +203,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-set-eventcb)
-  (foreign-call "ikrt_smtp_set_eventcb"))
 
 (define-inline (smtp-set-monitorcb)
   (foreign-call "ikrt_smtp_set_monitorcb"))
