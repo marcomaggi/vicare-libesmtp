@@ -51,6 +51,7 @@
     ;; recipient management
     smtp-add-recipient
     smtp-enumerate-recipients
+    smtp-option-require-all-recipients
 
     ;; headers management
     smtp-set-header
@@ -78,7 +79,6 @@
     smtp-message-get-application-data
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
-    smtp-option-require-all-recipients
     smtp-auth-set-context
     smtp-dsn-set-ret
     smtp-dsn-set-envid
@@ -184,6 +184,9 @@
 (define-inline (smtp-enumerate-recipients message callback)
   (foreign-call "ikrt_smtp_enumerate_recipients" message callback))
 
+(define-inline (smtp-option-require-all-recipients session state)
+  (foreign-call "ikrt_smtp_option_require_all_recipients" session state))
+
 
 ;;;; still to be implemented
 
@@ -240,9 +243,6 @@
 
 (define-inline (smtp-recipient-get-application-data)
   (foreign-call "ikrt_smtp_recipient_get_application_data"))
-
-(define-inline (smtp-option-require-all-recipients)
-  (foreign-call "ikrt_smtp_option_require_all_recipients"))
 
 (define-inline (smtp-auth-set-context)
   (foreign-call "ikrt_smtp_auth_set_context"))

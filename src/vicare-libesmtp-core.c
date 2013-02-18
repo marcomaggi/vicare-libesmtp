@@ -139,7 +139,6 @@ ikrt_smtp_set_timeout (ikptr s_session, ikptr s_which, ikptr s_value, ikpcb * pc
 #endif
 }
 
-
 
 /** --------------------------------------------------------------------
  ** Message management.
@@ -219,6 +218,19 @@ ikrt_smtp_enumerate_recipients (ikptr s_message, ikptr s_callback, ikpcb * pcb)
     rv = smtp_enumerate_recipients(msg, cb, NULL);
   }
   ik_leave_c_function(pcb, sk);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_option_require_all_recipients (ikptr s_session, ikptr s_onoff, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_OPTION_REQUIRE_ALL_RECIPIENTS
+  smtp_session_t	sex	= IK_LIBESMTP_SESSION(s_session);
+  int			onoff	= IK_BOOLEAN_TO_INT(s_onoff);
+  int			rv;
+  rv = smtp_option_require_all_recipients(sex, onoff);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
@@ -499,16 +511,6 @@ ikptr
 ikrt_smtp_recipient_get_application_data (ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_RECIPIENT_GET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_option_require_all_recipients (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_OPTION_REQUIRE_ALL_RECIPIENTS
   return IK_VOID;
 #else
   feature_failure(__func__);

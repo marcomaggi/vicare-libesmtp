@@ -242,6 +242,18 @@
 		      (for-all smtp-recipient? recs))))))
     #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-option-require-all-recipients sex #t))
+    => #t)
+
+  (check
+      (let ((sex (smtp-create-session)))
+	(smtp-option-require-all-recipients sex #f))
+    => #t)
+
   (collect))
 
 

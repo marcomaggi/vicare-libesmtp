@@ -775,6 +775,16 @@ argument: an instance of @code{smtp-recipient} registered in
 @var{scheme-callback} are the same returned by @func{smtp-add-recipient}.
 @end defun
 
+
+@defun smtp-option-require-all-recipients @var{session} @var{obj}
+Set or unset failing of message delivery if one recipient cannot be
+served.  If successful return @true{}, otherwise return @false{}.
+
+If @var{obj} is true: message delivery will fail if at least one
+recipient cannot be served; if @var{obj} is @false{} message delivery
+will not fail.
+@end defun
+
 @c page
 @node plain headers
 @section Headers management
@@ -922,10 +932,6 @@ variation.  If successful return @true{}, else return @false{}.
 
 
 @defun smtp-recipient-get-application-data
-@end defun
-
-
-@defun smtp-option-require-all-recipients
 @end defun
 
 

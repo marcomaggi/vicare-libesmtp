@@ -70,6 +70,7 @@
     smtp-add-recipient
     smtp-enumerate-recipients
     smtp-enumerate-recipients*
+    smtp-option-require-all-recipients
 
     ;; headers management
     smtp-set-header
@@ -101,7 +102,6 @@
     smtp-message-get-application-data
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
-    smtp-option-require-all-recipients
     smtp-auth-set-context
     smtp-dsn-set-ret
     smtp-dsn-set-envid
@@ -706,6 +706,12 @@
     (vector-for-each scheme-callback
       ($smtp-message-recipients message))))
 
+(define (smtp-option-require-all-recipients session onoff)
+  (define who 'smtp-option-require-all-recipients)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session))
+    (capi.smtp-option-require-all-recipients session onoff)))
+
 
 ;;;; callback makers
 
@@ -878,12 +884,6 @@
   (with-arguments-validation (who)
       ()
     (capi.smtp-recipient-get-application-data)))
-
-(define (smtp-option-require-all-recipients)
-  (define who 'smtp-option-require-all-recipients)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-option-require-all-recipients)))
 
 (define (smtp-auth-set-context)
   (define who 'smtp-auth-set-context)
