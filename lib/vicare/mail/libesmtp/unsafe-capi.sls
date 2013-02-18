@@ -43,6 +43,8 @@
     smtp-set-server
     smtp-set-timeout
     smtp-set-eventcb
+    smtp-set-monitorcb
+    smtp-start-session
 
     ;; message management
     smtp-add-message
@@ -65,8 +67,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-set-monitorcb
-    smtp-start-session
     smtp-message-transfer-status
     smtp-reverse-path-status
     smtp-message-reset-status
@@ -142,6 +142,9 @@
 (define-inline (smtp-destroy-session session)
   (foreign-call "ikrt_smtp_destroy_session" session))
 
+(define-inline (smtp-start-session session)
+  (foreign-call "ikrt_smtp_start_session" session))
+
 ;;; --------------------------------------------------------------------
 
 (define-inline (smtp-set-hostname session local-hostname)
@@ -206,9 +209,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-start-session)
-  (foreign-call "ikrt_smtp_start_session"))
 
 (define-inline (smtp-message-transfer-status)
   (foreign-call "ikrt_smtp_message_transfer_status"))

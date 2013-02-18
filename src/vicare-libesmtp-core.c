@@ -165,6 +165,18 @@ ikrt_smtp_set_monitorcb (ikptr s_session, ikptr s_callback, ikptr s_headers, ikp
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_start_session (ikptr s_session, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_START_SESSION
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  int			rv;
+  rv = smtp_start_session(sex);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -404,17 +416,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-
-ikptr
-ikrt_smtp_start_session (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_START_SESSION
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_message_transfer_status (ikpcb * pcb)

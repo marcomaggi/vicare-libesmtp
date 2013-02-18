@@ -269,6 +269,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain messages::              Message management.
 * plain recipients::            Recipient management.
 * plain headers::               Headers management.
+* plain constants::             Converting constants to symbols.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
@@ -568,6 +569,12 @@ error occurs: return @false{}.
 @defun smtp-destroy-session @var{session}
 Finalise the @var{session} releasing all the associated resources;
 return unspecified values.
+@end defun
+
+
+@defun smtp-start-session @var{session}
+Run an @smtp{} protocol session.  If successful return @true{},
+otherwise return @false{}.
 @end defun
 
 @c ------------------------------------------------------------
@@ -1023,16 +1030,23 @@ variation.  If successful return @true{}, else return @false{}.
 @end defun
 
 @c page
+@node plain constants
+@section Converting constants to symbols
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-event->symbol @var{constant}
+Given an exact integer representing one of the @code{SMTP_EV_}
+constants, return the corresponding symbol.
+@end defun
+
+
+@c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-start-session
-@end defun
-
-
-@defun smtp-destroy-session
-@end defun
 
 
 @defun smtp-message-transfer-status

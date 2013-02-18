@@ -29,7 +29,7 @@
 (import (vicare)
   (vicare mail libesmtp)
   (vicare mail libesmtp constants)
-;;;  (prefix (vicare ffi) ffi.)
+  (prefix (vicare ffi) ffi.)
   (vicare syntactic-extensions))
 
 
@@ -50,6 +50,43 @@
 		       (smtp-version)))
 
   #t)
+
+
+;;;; send a message
+
+(let ()
+
+  (define message-text
+    "From: marco@localhost\r\n\
+     To: root@localhost\r\n\
+     Subject: demo of vicare/libesmtp\r\n\
+     \r\n\
+     This is the text.\r\n")
+
+  (define monitor-cb
+    (make-smtp-monitorcb
+     (lambda (buf.ptr buf.len writing)
+       (printf (current-error-port)
+	       "monitor: ~a\n" (ffi.cstring->string buf.ptr buf.len)))))
+
+  (define event-cb
+    (make-smtp-eventcb
+     (lambda (session event-no)
+       (printf (current-error-port)
+	       "event: ~a\n" (smtp-event->symbol event-no)))))
+
+  (let* ((sex (smtp-create-session))
+	 (msg (smtp-add-message sex)))
+    (assert (smtp-set-hostname sex "localhost"))
+    (assert (smtp-set-server sex "localhost"))
+    (assert (smtp-add-recipient msg "marco@localhost"))
+    (assert (smtp-set-monitorcb sex monitor-cb #f))
+    (assert (smtp-set-eventcb sex event-cb))
+    (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
+    (assert (smtp-start-session sex))
+    (assert (smtp-destroy-session sex)))
+
+  #f)
 
 
 ;;;; done

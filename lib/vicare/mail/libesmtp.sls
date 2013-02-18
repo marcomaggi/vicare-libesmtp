@@ -51,6 +51,7 @@
     smtp-set-timeout
     smtp-set-eventcb
     smtp-set-monitorcb
+    smtp-start-session
 
     ;; message management
     smtp-message
@@ -91,10 +92,12 @@
     make-smtp-starttls-passwordcb
     make-smtp-etrn-enumerate-nodecb
 
+    ;; constant to symbol conversion
+    smtp-event->symbol
+
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-start-session
     smtp-message-transfer-status
     smtp-reverse-path-status
     smtp-message-reset-status
@@ -511,6 +514,14 @@
 
 ;;; --------------------------------------------------------------------
 
+(define (smtp-start-session session)
+  (define who 'smtp-start-session)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session))
+    (capi.smtp-start-session session)))
+
+;;; --------------------------------------------------------------------
+
 (define smtp-set-hostname
   (case-lambda
    ((session)
@@ -827,7 +838,7 @@
   ;;		 ...);
   (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
     (lambda (user-scheme-callback)
-      (maker (lambda (session-pointer event-no)
+      (maker (lambda (session-pointer event-no custom-data)
 	       (guard (E (else
 			  #;(pretty-print E (current-error-port))
 			  (void)))
@@ -881,13 +892,41 @@
 		 (void)))))))
 
 
-;;;; still to be implemented
+;;;; constant to symbol conversion
 
-(define (smtp-start-session)
-  (define who 'smtp-start-session)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-start-session)))
+(define-exact-integer->symbol-function smtp-event->symbol
+  (SMTP_EV_CONNECT
+   SMTP_EV_MAILSTATUS
+   SMTP_EV_RCPTSTATUS
+   SMTP_EV_MESSAGEDATA
+   SMTP_EV_MESSAGESENT
+   SMTP_EV_DISCONNECT
+   SMTP_EV_SYNTAXWARNING
+
+   SMTP_EV_ETRNSTATUS
+
+   SMTP_EV_EXTNA_DSN
+   SMTP_EV_EXTNA_8BITMIME
+   SMTP_EV_EXTNA_STARTTLS
+   SMTP_EV_EXTNA_ETRN
+   SMTP_EV_EXTNA_CHUNKING
+   SMTP_EV_EXTNA_BINARYMIME
+
+   SMTP_EV_DELIVERBY_EXPIRED
+
+   SMTP_EV_WEAK_CIPHER
+   SMTP_EV_STARTTLS_OK
+   SMTP_EV_INVALID_PEER_CERTIFICATE
+   SMTP_EV_NO_PEER_CERTIFICATE
+   SMTP_EV_WRONG_PEER_CERTIFICATE
+   SMTP_EV_NO_CLIENT_CERTIFICATE
+   SMTP_EV_UNUSABLE_CLIENT_CERTIFICATE
+   SMTP_EV_UNUSABLE_CA_LIST
+   ))
+
+
+
+;;;; still to be implemented
 
 (define (smtp-message-transfer-status)
   (define who 'smtp-message-transfer-status)
