@@ -744,6 +744,12 @@ exceptions.
 @end defun
 
 
+@defun smtp-set-message-fp @var{message} @var{file-pointer}
+Select a @code{FILE *} from which the message will be read.  If
+successful return @true{}, otherwise return @false{}.
+
+@var{file-pointer} must be a pointer to @code{FILE *}.
+@end defun
 @c page
 @node plain recipients
 @section Recipient management

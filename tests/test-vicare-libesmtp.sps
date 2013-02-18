@@ -198,6 +198,13 @@
 	(smtp-set-messagecb msg cb))
     => #t)
 
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-set-message-fp msg (null-pointer)))
+    => #t)
+
+
   (collect))
 
 

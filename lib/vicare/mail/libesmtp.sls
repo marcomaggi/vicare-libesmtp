@@ -61,6 +61,7 @@
     smtp-enumerate-messages*
     smtp-set-reverse-path
     smtp-set-messagecb
+    smtp-set-message-fp
 
     ;; recipient management
     smtp-recipient
@@ -618,6 +619,15 @@
       ((smtp-message/alive	message)
        (pointer			c-callback))
     (capi.smtp-set-messagecb message c-callback)))
+
+(define (smtp-set-message-fp message file-pointer)
+  ;;Select a "FILE *" from which the message will be read.
+  ;;
+  (define who 'smtp-set-message-fp)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (pointer			file-pointer))
+    (capi.smtp-set-message-fp message file-pointer)))
 
 
 ;;;; headers management

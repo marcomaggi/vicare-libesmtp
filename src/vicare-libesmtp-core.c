@@ -199,6 +199,20 @@ ikrt_smtp_set_messagecb (ikptr s_message, ikptr s_callback, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_set_message_fp (ikptr s_message, ikptr s_file_pointer, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_MESSAGECB
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  FILE *		fp  = IK_POINTER_DATA_VOIDP(s_file_pointer);
+  int			rv;
+  /* "smtp_set_message_fp()" is a C preprocessor macro!!! */
+  rv = smtp_set_message_fp(msg, fp);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
