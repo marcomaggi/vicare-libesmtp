@@ -82,6 +82,10 @@
     make-smtp-enumerate-messagecb
     make-smtp-enumerate-recipientcb
     make-smtp-messagecb
+    make-smtp-eventcb
+    make-smtp-monitorcb
+    make-smtp-starttls-passwordcb
+    make-smtp-etrn-enumerate-nodecb
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
@@ -282,6 +286,13 @@
   ;;Build and return a new instance of SMTP-SESSION owning the POINTER.
   ;;
   (make-smtp-session pointer #t #f
+		     (make-hashtable values =))) ;table of SMTP-MESSAGE structures.
+
+(define (%make-smtp-session/not-owner pointer)
+  ;;Build  and return  a new  instance  of SMTP-SESSION  not owning  the
+  ;;POINTER.
+  ;;
+  (make-smtp-session pointer #f #f
 		     (make-hashtable values =))) ;table of SMTP-MESSAGE structures.
 
 (define ($live-smtp-session? session)
@@ -768,31 +779,66 @@
 			  (null-pointer)))
 		 (user-scheme-callback optional-buffer-pointer len-pointer)))))))
 
-;;; --------------------------------------------------------------------
+(define make-smtp-eventcb
+  ;; void (*smtp_eventcb_t)
+  ;;		(smtp_session_t session,
+  ;;		 int event_no,
+  ;;		 void *arg,
+  ;;		 ...);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (session-pointer event-no)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback (%make-smtp-session/not-owner session-pointer)
+				       event-no)
+		 (void)))))))
 
-;; void (*smtp_eventcb_t)
-;;		(smtp_session_t session,
-;;		 int event_no,
-;;		 void *arg,
-;;		 ...);
+(define make-smtp-monitorcb
+  ;; void (*smtp_monitorcb_t)
+  ;;		(const char *buf,
+  ;;		 int buflen,
+  ;;		 int writing,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int signed-int pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (buf.ptr buf.len writing custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback buf.ptr buf.len writing)
+		 (void)))))))
 
-;; void (*smtp_monitorcb_t)
-;;		(const char *buf,
-;;		 int buflen,
-;;		 int writing,
-;;		 void *arg);
+(define make-smtp-starttls-passwordcb
+  ;; int (*smtp_starttls_passwordcb_t)
+  ;;		(char *buf,
+  ;;		 int buflen,
+  ;;		 int rwflag,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int signed-int pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (buf.ptr buf.len rwflag custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback buf.ptr buf.len (if rwflag #t #f))
+		 (void)))))))
 
-;; int (*smtp_starttls_passwordcb_t)
-;;		(char *buf,
-;;		 int buflen,
-;;		 int rwflag,
-;;		 void *arg);
-
-;; void (*smtp_etrn_enumerate_nodecb_t)
-;;		(smtp_etrn_node_t node,
-;;		 int option,
-;;		 const char *domain,
-;;		 void *arg);
+(define make-smtp-etrn-enumerate-nodecb
+  ;; void (*smtp_etrn_enumerate_nodecb_t)
+  ;;		(smtp_etrn_node_t node,
+  ;;		 int option,
+  ;;		 const char *domain,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (node option domain custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback node option domain)
+		 (void)))))))
 
 
 ;;;; still to be implemented
