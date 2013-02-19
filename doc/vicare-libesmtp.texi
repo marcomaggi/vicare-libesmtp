@@ -628,9 +628,11 @@ Return an exact integer representing the error code for the most recent
 @end defun
 
 
-@defun smtp-strerror
+@defun smtp-strerror @var{errno}
+Given the return value of a call to @var{errno}: return a Scheme string
+representing the error descriptiron.  If an error occurs: return
+@false{}.
 @end defun
-
 
 @c page
 @node plain sessions

@@ -43,7 +43,8 @@
 
 (let ()
 
-  (%pretty-print (list (vicare-libesmtp-version-interface-current)
+  (%pretty-print (list 'version-informations
+		       (vicare-libesmtp-version-interface-current)
 		       (vicare-libesmtp-version-interface-revision)
 		       (vicare-libesmtp-version-interface-age)
 		       (vicare-libesmtp-version)
@@ -85,8 +86,10 @@
     (assert (smtp-set-eventcb sex event-cb))
     (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
     (assert (smtp-start-session sex))
-    (fprintf (current-error-port)
-	     "API errno: ~a (~a)\n" (smtp-errno) (smtp-errno->symbol (smtp-errno)))
+    (let ((errno (smtp-errno)))
+      (fprintf (current-error-port)
+	       "API errno: ~a (~a), \"~a\"\n"
+	       errno (smtp-errno->symbol errno) (smtp-strerror errno)))
     (fprintf (current-error-port)
 	     "message transfer status: ~a\n" (smtp-message-transfer-status msg))
     (fprintf (current-error-port)

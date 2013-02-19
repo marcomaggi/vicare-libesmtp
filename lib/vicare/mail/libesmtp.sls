@@ -285,11 +285,12 @@
 (define (smtp-errno)
   (capi.smtp-errno))
 
-(define (smtp-strerror)
+(define (smtp-strerror code)
   (define who 'smtp-strerror)
   (with-arguments-validation (who)
-      ()
-    (capi.smtp-strerror)))
+      ((signed-int	code))
+    (let ((rv (capi.smtp-strerror code)))
+      (and rv (ascii->string rv)))))
 
 
 ;;;; data structures: session

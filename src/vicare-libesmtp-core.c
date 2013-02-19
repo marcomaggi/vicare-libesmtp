@@ -98,18 +98,21 @@ ikrt_smtp_errno (ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
-
 ikptr
-ikrt_smtp_strerror (ikpcb * pcb)
+ikrt_smtp_strerror (ikptr s_errno, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_STRERROR
-  return IK_VOID;
+  int		err = ik_integer_to_int(s_errno);
+#undef  BUFFER_SIZE
+#define BUFFER_SIZE	256
+  char		ptr[BUFFER_SIZE];
+  const char *	rv;
+  rv = smtp_strerror(err, ptr, BUFFER_SIZE);
+  return (rv)? ika_bytevector_from_cstring(pcb, ptr) : IK_FALSE;
 #else
   feature_failure(__func__);
 #endif
 }
-
-
 
 
 /** --------------------------------------------------------------------

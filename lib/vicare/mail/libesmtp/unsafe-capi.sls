@@ -141,8 +141,8 @@
 (define-inline (smtp-errno)
   (foreign-call "ikrt_smtp_errno"))
 
-(define-inline (smtp-strerror)
-  (foreign-call "ikrt_smtp_strerror"))
+(define-inline (smtp-strerror code)
+  (foreign-call "ikrt_smtp_strerror" code))
 
 
 ;;;; session management
