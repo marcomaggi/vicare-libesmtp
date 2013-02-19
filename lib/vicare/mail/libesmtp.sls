@@ -875,6 +875,10 @@
 ;;; --------------------------------------------------------------------
 
 (define (smtp-recipient-status recipient)
+  ;;Return  an  instance  of   SMTP-STATUS  representing  the  recipient
+  ;;success/failure status from  a previous SMTP session.   If no status
+  ;;informations are available: return #f.
+  ;;
   (define who 'smtp-recipient-status)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient))
