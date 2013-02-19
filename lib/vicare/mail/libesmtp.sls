@@ -38,6 +38,15 @@
 
     smtp-version
 
+    ;; status data structure
+    smtp-status
+    make-smtp-status			smtp-status?
+    smtp-status-code			set-smtp-status-code!
+    smtp-status-text			set-smtp-status-text!
+    smtp-status-enh-class		set-smtp-status-enh-class!
+    smtp-status-enh-subject		set-smtp-status-enh-subject!
+    smtp-status-enh-detail		set-smtp-status-enh-detail!
+
     ;; session management
     smtp-session
     smtp-session?			smtp-session?/alive
@@ -58,14 +67,6 @@
     smtp-message?			smtp-message?/alive
     smtp-message.vicare-arguments-validation
     smtp-message/alive.vicare-arguments-validation
-
-    smtp-status
-    make-smtp-status			smtp-status?
-    smtp-status-code			set-smtp-status-code!
-    smtp-status-text			set-smtp-status-text!
-    smtp-status-enh-class		set-smtp-status-enh-class!
-    smtp-status-enh-subject		set-smtp-status-enh-subject!
-    smtp-status-enh-detail		set-smtp-status-enh-detail!
 
     smtp-add-message
     smtp-enumerate-messages
@@ -88,6 +89,7 @@
     smtp-enumerate-recipients
     smtp-enumerate-recipients*
     smtp-option-require-all-recipients
+    smtp-recipient-status
 
     ;; headers management
     smtp-set-header
@@ -109,7 +111,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-recipient-status
     smtp-recipient-check-complete
     smtp-recipient-reset-status
     smtp-errno
@@ -508,6 +509,38 @@
   (%display "]"))
 
 
+;;;; data structures: status
+
+(define-struct smtp-status
+  (code
+		;Exact  integer in  the  range of  the  C language  type
+		;"signed int"; SMTP protocol status code.
+   text
+		;Scheme string; text from the server.
+   enh-class
+   enh-subject
+   enh-detail
+		;Exact  integers in  the range  of the  C language  type
+		;"signed int"; RFC 2034 enhanced status code triplet.
+   ))
+
+(define (%struct-smtp-status-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[smtp-status")
+  (%display " code=")		(%display ($smtp-status-code        S))
+  (%display " text=")		(%write   ($smtp-status-text        S))
+  (%display " enh-class=")	(%write   ($smtp-status-enh-class   S))
+  (%display " enh-subject=")	(%write   ($smtp-status-enh-subject S))
+  (%display " enh-detail=")	(%write   ($smtp-status-enh-detail  S))
+  (%display "]"))
+
+(define (%make-smtp-status/empty)
+  (make-smtp-status #f #f #f #f #f))
+
+
 ;;;; session management
 
 (define (smtp-create-session)
@@ -680,32 +713,6 @@
 
 ;;; --------------------------------------------------------------------
 
-(define-struct smtp-status
-  (code
-		;Exact  integer in  the  range of  the  C language  type
-		;"signed int"; SMTP protocol status code.
-   text
-		;Scheme string; text from the server.
-   enh-class
-   enh-subject
-   enh-detail
-		;Exact  integers in  the range  of the  C language  type
-		;"signed int"; RFC 2034 enhanced status code triplet.
-   ))
-
-(define (%struct-smtp-status-printer S port sub-printer)
-  (define-inline (%display thing)
-    (display thing port))
-  (define-inline (%write thing)
-    (write thing port))
-  (%display "#[smtp-status")
-  (%display " code=")		(%display ($smtp-status-code        S))
-  (%display " text=")		(%write   ($smtp-status-text        S))
-  (%display " enh-class=")	(%write   ($smtp-status-enh-class   S))
-  (%display " enh-subject=")	(%write   ($smtp-status-enh-subject S))
-  (%display " enh-detail=")	(%write   ($smtp-status-enh-detail  S))
-  (%display "]"))
-
 (define (smtp-message-transfer-status message)
   ;;Return  a  struct  instance  of type  SMTP-STATUS  representing  the
   ;;delivery  status   for  MESSAGE;  if  no   status  informations  are
@@ -714,7 +721,7 @@
   (define who 'smtp-message-transfer-status)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (let ((rv (capi.smtp-message-transfer-status message (make-smtp-status #f #f #f #f #f))))
+    (let ((rv (capi.smtp-message-transfer-status message (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -729,7 +736,7 @@
   (define who 'smtp-reverse-path-status)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (let ((rv (capi.smtp-reverse-path-status message (make-smtp-status #f #f #f #f #f))))
+    (let ((rv (capi.smtp-reverse-path-status message (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -864,6 +871,20 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
     (capi.smtp-option-require-all-recipients session onoff)))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-recipient-status recipient)
+  (define who 'smtp-recipient-status)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient))
+    (let ((rv (capi.smtp-recipient-status recipient (%make-smtp-status/empty))))
+      (and rv
+	   (let ((text ($smtp-status-text rv)))
+	     ($set-smtp-status-text! rv (if text
+					    (ascii->string text)
+					  ""))
+	     rv)))))
 
 
 ;;;; callback makers
@@ -1006,12 +1027,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-recipient-status)
-  (define who 'smtp-recipient-status)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-recipient-status)))
 
 (define (smtp-recipient-check-complete)
   (define who 'smtp-recipient-check-complete)

@@ -61,6 +61,7 @@
     smtp-add-recipient
     smtp-enumerate-recipients
     smtp-option-require-all-recipients
+    smtp-recipient-status
 
     ;; headers management
     smtp-set-header
@@ -70,7 +71,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-recipient-status
     smtp-recipient-check-complete
     smtp-recipient-reset-status
     smtp-errno
@@ -222,11 +222,11 @@
 (define-inline (smtp-option-require-all-recipients session state)
   (foreign-call "ikrt_smtp_option_require_all_recipients" session state))
 
+(define-inline (smtp-recipient-status recipient status-struct)
+  (foreign-call "ikrt_smtp_recipient_status" recipient status-struct))
+
 
 ;;;; still to be implemented
-
-(define-inline (smtp-recipient-status)
-  (foreign-call "ikrt_smtp_recipient_status"))
 
 (define-inline (smtp-recipient-check-complete)
   (foreign-call "ikrt_smtp_recipient_check_complete"))

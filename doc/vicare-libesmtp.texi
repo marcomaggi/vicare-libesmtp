@@ -1036,6 +1036,15 @@ recipient cannot be served; if @var{obj} is @false{} message delivery
 will not fail.
 @end defun
 
+@c ------------------------------------------------------------
+
+@defun smtp-recipient-status @var{recipient}
+Retrieve an instance of @code{smtp-status} representing the recipient
+success/failure status from a previous @smtp{} session.  If no status
+informations are available: return @false{}.
+@end defun
+
+
 @c page
 @node plain headers
 @section Headers management
@@ -1123,10 +1132,6 @@ constants, return the corresponding symbol.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-recipient-status
-@end defun
 
 
 @defun smtp-recipient-check-complete

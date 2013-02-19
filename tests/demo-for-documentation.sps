@@ -76,11 +76,11 @@
 		"event: ~a\n" (smtp-event->symbol event-no)))))
 
   (let* ((sex (smtp-create-session))
-	 (msg (smtp-add-message sex)))
+	 (msg (smtp-add-message sex))
+	 (rec (smtp-add-recipient msg "marco@localhost")))
     (assert (smtp-set-hostname sex "localhost"))
     (assert (smtp-set-server sex "localhost:smtp"))
     (assert (smtp-set-reverse-path msg "marco@localhost"))
-    (assert (smtp-add-recipient msg "marco@localhost"))
     (assert (smtp-set-monitorcb sex monitor-cb #f))
     (assert (smtp-set-eventcb sex event-cb))
     (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
@@ -89,6 +89,8 @@
 	     "message transfer status: ~a\n" (smtp-message-transfer-status msg))
     (fprintf (current-error-port)
 	     "reverse path status: ~a\n" (smtp-reverse-path-status msg))
+    (fprintf (current-error-port)
+	     "recipient status: ~a\n" (smtp-recipient-status rec))
     (assert (smtp-destroy-session sex)))
 
   #f)

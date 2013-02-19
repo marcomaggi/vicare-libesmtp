@@ -33,6 +33,38 @@
 
 
 /** --------------------------------------------------------------------
+ ** Data structures conversion.
+ ** ----------------------------------------------------------------- */
+
+static void
+smtp_status_to_scheme_struct (ikpcb * pcb, ikptr s_status, const smtp_status_t * status)
+{
+  /* fprintf(stderr, "%s: converting status %p\n", __func__, (void*)status); */
+  pcb->root0 = &s_status;
+  {
+    /* SMTP protocol status code */
+    IK_ASS(IK_LIBESMTP_STATUS_CODE(s_status),
+	   ika_integer_from_int(pcb, status->code));
+    /* Text from the server */
+    if (status->text) {
+      IK_ASS(IK_LIBESMTP_STATUS_TEXT(s_status),
+	     ika_bytevector_from_cstring(pcb, status->text));
+    } else {
+      IK_LIBESMTP_STATUS_TEXT(s_status) = IK_FALSE;
+    }
+    /* RFC 2034 enhanced status code triplet */
+    IK_ASS(IK_LIBESMTP_STATUS_ENH_CLASS(s_status),
+	   ika_integer_from_int(pcb, status->enh_class));
+    IK_ASS(IK_LIBESMTP_STATUS_ENH_SUBJECT(s_status),
+	   ika_integer_from_int(pcb, status->enh_subject));
+    IK_ASS(IK_LIBESMTP_STATUS_ENH_DETAIL(s_status),
+	   ika_integer_from_int(pcb, status->enh_detail));
+  }
+  pcb->root0 = NULL;
+}
+
+
+/** --------------------------------------------------------------------
  ** Version functions.
  ** ----------------------------------------------------------------- */
 
@@ -269,32 +301,6 @@ ikrt_smtp_set_message_str (ikptr s_message, ikptr s_string, ikpcb * pcb)
 
 /* ------------------------------------------------------------------ */
 
-static void
-smtp_status_to_scheme_struct (ikpcb * pcb, ikptr s_status, const smtp_status_t * status)
-{
-  /* fprintf(stderr, "%s: converting status %p\n", __func__, (void*)status); */
-  pcb->root0 = &s_status;
-  {
-    /* SMTP protocol status code */
-    IK_ASS(IK_LIBESMTP_STATUS_CODE(s_status),
-	   ika_integer_from_int(pcb, status->code));
-    /* Text from the server */
-    if (status->text) {
-      IK_ASS(IK_LIBESMTP_STATUS_TEXT(s_status),
-	     ika_bytevector_from_cstring(pcb, status->text));
-    } else {
-      IK_LIBESMTP_STATUS_TEXT(s_status) = IK_FALSE;
-    }
-    /* RFC 2034 enhanced status code triplet */
-    IK_ASS(IK_LIBESMTP_STATUS_ENH_CLASS(s_status),
-	   ika_integer_from_int(pcb, status->enh_class));
-    IK_ASS(IK_LIBESMTP_STATUS_ENH_SUBJECT(s_status),
-	   ika_integer_from_int(pcb, status->enh_subject));
-    IK_ASS(IK_LIBESMTP_STATUS_ENH_DETAIL(s_status),
-	   ika_integer_from_int(pcb, status->enh_detail));
-  }
-  pcb->root0 = NULL;
-}
 ikptr
 ikrt_smtp_message_transfer_status (ikptr s_message, ikptr s_status, ikpcb * pcb)
 {
@@ -400,6 +406,26 @@ ikrt_smtp_option_require_all_recipients (ikptr s_session, ikptr s_onoff, ikpcb *
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_recipient_status (ikptr s_recipient, ikptr s_status, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_RECIPIENT_STATUS
+  smtp_recipient_t	rec = IK_LIBESMTP_RECIPIENT(s_recipient);
+  const smtp_status_t *	status;
+  /* fprintf(stderr, "%s: enter\n", __func__); */
+  status = smtp_recipient_status(rec);
+  if (status) {
+    smtp_status_to_scheme_struct(pcb, s_status, status);
+    /* fprintf(stderr, "%s: successful leave\n", __func__); */
+    return s_status;
+  } else {
+    /* fprintf(stderr, "%s: erroneous leave\n", __func__); */
+    return IK_FALSE;
+  }
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -500,16 +526,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_recipient_status (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_RECIPIENT_STATUS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_recipient_check_complete (ikpcb * pcb)
