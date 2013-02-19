@@ -933,6 +933,13 @@ delivery status for @var{message}; if no status informations are
 available: return @false{}.
 @end defun
 
+
+@defun smtp-reverse-path-status @var{message}
+Return a struct instance of type @code{smtp-status} representing the
+reverse path status for @var{message}; if no status informations are
+available: return @false{}.
+@end defun
+
 @c page
 @node plain recipients
 @section Recipient management
@@ -1108,14 +1115,6 @@ constants, return the corresponding symbol.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-message-transfer-status
-@end defun
-
-
-@defun smtp-reverse-path-status
-@end defun
 
 
 @defun smtp-message-reset-status

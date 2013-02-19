@@ -54,6 +54,7 @@
     smtp-set-message-fp
     smtp-set-message-str
     smtp-message-transfer-status
+    smtp-reverse-path-status
 
     ;; recipient management
     smtp-add-recipient
@@ -68,7 +69,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-reverse-path-status
     smtp-message-reset-status
     smtp-recipient-status
     smtp-recipient-check-complete
@@ -186,6 +186,9 @@
 (define-inline (smtp-message-transfer-status message status-struct)
   (foreign-call "ikrt_smtp_message_transfer_status" message status-struct))
 
+(define-inline (smtp-reverse-path-status message status-struct)
+  (foreign-call "ikrt_smtp_reverse_path_status" message status-struct))
+
 
 ;;;; headers management
 
@@ -212,9 +215,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-reverse-path-status)
-  (foreign-call "ikrt_smtp_reverse_path_status"))
 
 (define-inline (smtp-message-reset-status)
   (foreign-call "ikrt_smtp_message_reset_status"))

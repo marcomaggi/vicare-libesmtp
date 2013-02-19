@@ -66,14 +66,14 @@
   (define monitor-cb
     (make-smtp-monitorcb
      (lambda (buf.ptr buf.len writing)
-       (printf (current-error-port)
-	       "monitor: ~a\n" (ffi.cstring->string buf.ptr buf.len)))))
+       (fprintf (current-error-port)
+		"monitor: ~a\n" (ffi.cstring->string buf.ptr buf.len)))))
 
   (define event-cb
     (make-smtp-eventcb
      (lambda (session event-no)
-       (printf (current-error-port)
-	       "event: ~a\n" (smtp-event->symbol event-no)))))
+       (fprintf (current-error-port)
+		"event: ~a\n" (smtp-event->symbol event-no)))))
 
   (let* ((sex (smtp-create-session))
 	 (msg (smtp-add-message sex)))
@@ -85,8 +85,10 @@
     (assert (smtp-set-eventcb sex event-cb))
     (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
     (assert (smtp-start-session sex))
-    (pretty-print (smtp-message-transfer-status msg)
-		  (current-error-port))
+    (fprintf (current-error-port)
+	     "message transfer status: ~a\n" (smtp-message-transfer-status msg))
+    (fprintf (current-error-port)
+	     "reverse path status: ~a\n" (smtp-reverse-path-status msg))
     (assert (smtp-destroy-session sex)))
 
   #f)

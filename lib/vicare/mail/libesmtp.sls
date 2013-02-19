@@ -722,6 +722,21 @@
 					  ""))
 	     rv)))))
 
+(define (smtp-reverse-path-status message)
+  ;;Retrieve the reverse path status from a previous SMTP session; if no
+  ;;status informations are available: return #f.
+  ;;
+  (define who 'smtp-reverse-path-status)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (let ((rv (capi.smtp-reverse-path-status message (make-smtp-status #f #f #f #f #f))))
+      (and rv
+	   (let ((text ($smtp-status-text rv)))
+	     ($set-smtp-status-text! rv (if text
+					    (ascii->string text)
+					  ""))
+	     rv)))))
+
 
 ;;;; headers management
 
@@ -888,7 +903,7 @@
   ;;		 int event_no,
   ;;		 void *arg,
   ;;		 ...);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (session-pointer event-no custom-data)
 	       (guard (E (else
@@ -979,12 +994,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-reverse-path-status)
-  (define who 'smtp-reverse-path-status)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-reverse-path-status)))
 
 (define (smtp-message-reset-status)
   (define who 'smtp-message-reset-status)
