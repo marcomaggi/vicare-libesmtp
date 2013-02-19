@@ -27,8 +27,10 @@
 
 #!r6rs
 (import (vicare)
-  (vicare mail libesmtp)
-  (vicare mail libesmtp constants)
+  (prefix (vicare mail libesmtp)
+	  esmtp.)
+  (prefix (vicare mail libesmtp constants)
+	  esmtp.)
   (prefix (vicare ffi) ffi.)
   (vicare checks))
 
@@ -43,25 +45,25 @@
 (parametrise ((check-test-name	'version))
 
   (check
-      (fixnum? (vicare-libesmtp-version-interface-current))
+      (fixnum? (esmtp.vicare-libesmtp-version-interface-current))
     => #t)
 
   (check
-      (fixnum? (vicare-libesmtp-version-interface-revision))
+      (fixnum? (esmtp.vicare-libesmtp-version-interface-revision))
     => #t)
 
   (check
-      (fixnum? (vicare-libesmtp-version-interface-age))
+      (fixnum? (esmtp.vicare-libesmtp-version-interface-age))
     => #t)
 
   (check
-      (string? (vicare-libesmtp-version))
+      (string? (esmtp.vicare-libesmtp-version))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (string? (smtp-version))
+      (string? (esmtp.smtp-version))
     => #t)
 
   #t)
@@ -72,86 +74,86 @@
 
   (check
       ;;This will be destroyed by the garbage collector.
-      (let ((sex (smtp-create-session)))
-	(smtp-session? sex))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-session? sex))
     => #t)
 
   (check
       ;;This will be destroyed by the garbage collector.
-      (let ((sex (smtp-create-session)))
-	(smtp-session?/alive sex))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-session?/alive sex))
     => #t)
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-destroy-session sex))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-destroy-session sex))
     => (void))
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-destroy-session sex)
-	(smtp-destroy-session sex)
-	(smtp-destroy-session sex))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-destroy-session sex)
+	(esmtp.smtp-destroy-session sex)
+	(esmtp.smtp-destroy-session sex))
     => (void))
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-destroy-session sex)
-	(smtp-session?/alive sex))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-destroy-session sex)
+	(esmtp.smtp-session?/alive sex))
     => #f)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-set-hostname sex "localhost"))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-set-hostname sex "localhost"))
     => #t)
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-set-hostname sex))
-    => #t)
-
-;;; --------------------------------------------------------------------
-
-  (check
-      (let ((sex (smtp-create-session)))
-	(smtp-set-server sex "localhost:25"))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-set-hostname sex))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-set-timeout sex Timeout_GREETING 123))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-set-server sex "localhost:25"))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let ((sex (smtp-create-session))
-	    (cb  (make-smtp-eventcb
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-set-timeout sex esmtp.Timeout_GREETING 123))
+    => #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (esmtp.smtp-create-session))
+	    (cb  (esmtp.make-smtp-eventcb
 		  (lambda (session event-no)
 		    (void)))))
-	(smtp-set-eventcb sex cb))
+	(esmtp.smtp-set-eventcb sex cb))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let ((sex (smtp-create-session))
-	    (cb  (make-smtp-monitorcb
+      (let ((sex (esmtp.smtp-create-session))
+	    (cb  (esmtp.make-smtp-monitorcb
 		  (lambda (buf.ptr buf.len writing)
 		    (void)))))
-	(smtp-set-monitorcb sex cb #f))
+	(esmtp.smtp-set-monitorcb sex cb #f))
     => #t)
 
   (check
-      (let ((sex (smtp-create-session))
-	    (cb  (make-smtp-monitorcb
+      (let ((sex (esmtp.smtp-create-session))
+	    (cb  (esmtp.make-smtp-monitorcb
 		  (lambda (buf.ptr buf.len writing)
 		    (void)))))
-	(smtp-set-monitorcb sex cb 123))
+	(esmtp.smtp-set-monitorcb sex cb 123))
     => #t)
 
 
@@ -163,80 +165,80 @@
 
   (check
       ;;This will be destroyed by the garbage collector.
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-message? msg))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-message? msg))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
       (with-result
-       (let* ((sex  (smtp-create-session))
-	      (msg1 (smtp-add-message sex))
-	      (msg2 (smtp-add-message sex))
-	      (cb   (make-smtp-enumerate-messagecb
+       (let* ((sex  (esmtp.smtp-create-session))
+	      (msg1 (esmtp.smtp-add-message sex))
+	      (msg2 (esmtp.smtp-add-message sex))
+	      (cb   (esmtp.make-smtp-enumerate-messagecb
 		     (lambda (msg)
 		       (add-result msg)))))
-	 (smtp-enumerate-messages sex cb)))
+	 (esmtp.smtp-enumerate-messages sex cb)))
     (=> (lambda (result expected)
 	  (and (equal? (void) (car result))
 	       (let ((msgs (cadr result)))
 		 (and (= 2 (length msgs))
-		      (for-all smtp-message? msgs))))))
+		      (for-all esmtp.smtp-message? msgs))))))
     #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
       (with-result
-       (let* ((sex  (smtp-create-session))
-	      (msg1 (smtp-add-message sex))
-	      (msg2 (smtp-add-message sex))
+       (let* ((sex  (esmtp.smtp-create-session))
+	      (msg1 (esmtp.smtp-add-message sex))
+	      (msg2 (esmtp.smtp-add-message sex))
 	      (cb   (lambda (msg)
 		      (add-result msg))))
-	 (smtp-enumerate-messages* sex cb)))
+	 (esmtp.smtp-enumerate-messages* sex cb)))
     (=> (lambda (result expected)
 	  (and (equal? (void) (car result))
 	       (let ((msgs (cadr result)))
 		 (and (= 2 (length msgs))
-		      (for-all smtp-message? msgs))))))
+		      (for-all esmtp.smtp-message? msgs))))))
     #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-reverse-path msg "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-reverse-path msg "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-reverse-path msg))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-reverse-path msg))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex))
-	     (cb  (make-smtp-messagecb (lambda (dummy len-pointer)
-					 (null-pointer)))))
-	(smtp-set-messagecb msg cb))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex))
+	     (cb  (esmtp.make-smtp-messagecb (lambda (dummy len-pointer)
+					       (null-pointer)))))
+	(esmtp.smtp-set-messagecb msg cb))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-message-fp msg (null-pointer)))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-message-fp msg (null-pointer)))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-message-str msg "From: marco@localhost\n\r\
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-message-str msg "From: marco@localhost\n\r\
                                    To: marco@localhost\n\r\
 
                                    ciao\n\r"))
@@ -245,9 +247,9 @@
 ;;; --------------------------------------------------------------------
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-message-reset-status msg))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-message-reset-status msg))
     => #t)
 
   (collect))
@@ -258,30 +260,30 @@
 
   (check
       ;;This will be destroyed by the garbage collector.
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex))
-	     (rec (smtp-add-recipient msg "marco@localhost")))
-	(smtp-recipient? rec))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex))
+	     (rec (esmtp.smtp-add-recipient msg "marco@localhost")))
+	(esmtp.smtp-recipient? rec))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
       (with-result
-       (let* ((sex  (smtp-create-session))
-	      (msg  (smtp-add-message sex))
-	      (rec1 (smtp-add-recipient msg "marco@localhost"))
-	      (rec2 (smtp-add-recipient msg "root@localhost"))
-	      (cb   (make-smtp-enumerate-recipientcb
+       (let* ((sex  (esmtp.smtp-create-session))
+	      (msg  (esmtp.smtp-add-message sex))
+	      (rec1 (esmtp.smtp-add-recipient msg "marco@localhost"))
+	      (rec2 (esmtp.smtp-add-recipient msg "root@localhost"))
+	      (cb   (esmtp.make-smtp-enumerate-recipientcb
 		     (lambda (rec mbox)
 		       (add-result (cons rec (ffi.cstring->string mbox)))))))
-	 (smtp-enumerate-recipients msg cb)))
+	 (esmtp.smtp-enumerate-recipients msg cb)))
     (=> (lambda (result expected)
 	  (and (equal? #t (car result))
 	       (let ((pairs (cadr result)))
 		 (and (= 2 (length pairs))
 		      (for-all (lambda (pair)
-				 (and (smtp-recipient? (car pair))
+				 (and (esmtp.smtp-recipient? (car pair))
 				      (string? (cdr pair))))
 			pairs))))))
     #t)
@@ -290,39 +292,39 @@
 
   (check
       (with-result
-       (let* ((sex  (smtp-create-session))
-	      (msg  (smtp-add-message sex))
-	      (rec1 (smtp-add-recipient msg "marco@localhost"))
-	      (rec2 (smtp-add-recipient msg "root@localhost"))
+       (let* ((sex  (esmtp.smtp-create-session))
+	      (msg  (esmtp.smtp-add-message sex))
+	      (rec1 (esmtp.smtp-add-recipient msg "marco@localhost"))
+	      (rec2 (esmtp.smtp-add-recipient msg "root@localhost"))
 	      (cb   (lambda (rec)
 		      (add-result rec))))
-	 (smtp-enumerate-recipients* msg cb)))
+	 (esmtp.smtp-enumerate-recipients* msg cb)))
     (=> (lambda (result expected)
 	  (and (equal? (void) (car result))
 	       (let ((recs (cadr result)))
 		 (and (= 2 (length recs))
-		      (for-all smtp-recipient? recs))))))
+		      (for-all esmtp.smtp-recipient? recs))))))
     #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-option-require-all-recipients sex #t))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-option-require-all-recipients sex #t))
     => #t)
 
   (check
-      (let ((sex (smtp-create-session)))
-	(smtp-option-require-all-recipients sex #f))
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-option-require-all-recipients sex #f))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex))
-	     (rec (smtp-add-recipient msg "marco@localhost")))
-	(smtp-recipient-reset-status rec))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex))
+	     (rec (esmtp.smtp-add-recipient msg "marco@localhost")))
+	(esmtp.smtp-recipient-reset-status rec))
     => #t)
 
   (collect))
@@ -332,91 +334,91 @@
 	      (struct-guardian-logger	#f))
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "X-Loop:" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "X-Loop:" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Date:" 123000))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Date:" 123000))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Message-Id:" "123"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Message-Id:" "123"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "From:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "From:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Disposition-Notification-To:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Disposition-Notification-To:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "To:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "To:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Cc:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Cc:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Bcc:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Bcc:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Reply-To:" "Marco Maggi" "marco@localhost"))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Reply-To:" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header msg "Sender:" "Marco Maggi" "marco@localhost"))
-    => #t)
-
-;;; --------------------------------------------------------------------
-
-  (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header-option msg "X-Loop:" Hdr_OVERRIDE))
-    => #t)
-
-  (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-header-option msg "X-Loop:" Hdr_PROHIBIT))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header msg "Sender:" "Marco Maggi" "marco@localhost"))
     => #t)
 
 ;;; --------------------------------------------------------------------
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-resent-headers msg #t))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header-option msg "X-Loop:" esmtp.Hdr_OVERRIDE))
+    => #t)
+
+  (check
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-header-option msg "X-Loop:" esmtp.Hdr_PROHIBIT))
+    => #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-resent-headers msg #t))
     => #f)
 
   (check
-      (let* ((sex (smtp-create-session))
-	     (msg (smtp-add-message sex)))
-	(smtp-set-resent-headers msg #f))
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-set-resent-headers msg #f))
     => #t)
 
   (collect))
@@ -425,43 +427,43 @@
 (parametrise ((check-test-name		'headers))
 
   (check
-      (smtp-event->symbol SMTP_EV_MAILSTATUS)
+      (esmtp.smtp-event->symbol esmtp.SMTP_EV_MAILSTATUS)
     => 'SMTP_EV_MAILSTATUS)
 
   (check
-      (smtp-errno->symbol SMTP_ERR_INVALID_RESPONSE_SYNTAX)
+      (esmtp.smtp-errno->symbol esmtp.SMTP_ERR_INVALID_RESPONSE_SYNTAX)
     => 'SMTP_ERR_INVALID_RESPONSE_SYNTAX)
 
   (check
-      (smtp-timeout->symbol Timeout_GREETING)
+      (esmtp.smtp-timeout->symbol esmtp.Timeout_GREETING)
     => 'Timeout_GREETING)
 
   (check
-      (smtp-cb->symbol SMTP_CB_READING)
+      (esmtp.smtp-cb->symbol esmtp.SMTP_CB_READING)
     => 'SMTP_CB_READING)
 
   (check
-      (smtp-hdr->symbol Hdr_OVERRIDE)
+      (esmtp.smtp-hdr->symbol esmtp.Hdr_OVERRIDE)
     => 'Hdr_OVERRIDE)
 
   (check
-      (smtp-notify->symbol Notify_NOTSET)
+      (esmtp.smtp-notify->symbol esmtp.Notify_NOTSET)
     => 'Notify_NOTSET)
 
   (check
-      (smtp-e8bitmime->symbol E8bitmime_NOTSET)
+      (esmtp.smtp-e8bitmime->symbol esmtp.E8bitmime_NOTSET)
     => 'E8bitmime_NOTSET)
 
   (check
-      (smtp-by->symbol By_NOTSET)
+      (esmtp.smtp-by->symbol esmtp.By_NOTSET)
     => 'By_NOTSET)
 
   (check
-      (smtp-starttls->symbol Starttls_DISABLED)
+      (esmtp.smtp-starttls->symbol esmtp.Starttls_DISABLED)
     => 'Starttls_DISABLED)
 
   (check
-      (smtp-ret->symbol Ret_NOTSET)
+      (esmtp.smtp-ret->symbol esmtp.Ret_NOTSET)
     => 'Ret_NOTSET)
 
   #t)
