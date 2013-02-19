@@ -642,6 +642,8 @@ ikrt_smtp_recipient_get_application_data (ikpcb * pcb)
 #endif
 }
 
+/* ------------------------------------------------------------------ */
+
 ikptr
 ikrt_smtp_auth_set_context (ikpcb * pcb)
 {
@@ -651,6 +653,8 @@ ikrt_smtp_auth_set_context (ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+
+/* ------------------------------------------------------------------ */
 
 ikptr
 ikrt_smtp_dsn_set_ret (ikpcb * pcb)
@@ -692,6 +696,8 @@ ikrt_smtp_dsn_set_orcpt (ikpcb * pcb)
 #endif
 }
 
+/* ------------------------------------------------------------------ */
+
 ikptr
 ikrt_smtp_size_set_estimate (ikpcb * pcb)
 {
@@ -722,6 +728,8 @@ ikrt_smtp_deliverby_set_mode (ikpcb * pcb)
 #endif
 }
 
+/* ------------------------------------------------------------------ */
+
 ikptr
 ikrt_smtp_starttls_enable (ikpcb * pcb)
 {
@@ -751,6 +759,8 @@ ikrt_smtp_starttls_set_password_cb (ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+
+/* ------------------------------------------------------------------ */
 
 ikptr
 ikrt_smtp_etrn_add_node (ikpcb * pcb)
