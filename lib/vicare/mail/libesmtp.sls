@@ -90,6 +90,7 @@
     smtp-enumerate-recipients*
     smtp-option-require-all-recipients
     smtp-recipient-status
+    smtp-recipient-check-complete
 
     ;; headers management
     smtp-set-header
@@ -111,7 +112,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-recipient-check-complete
     smtp-recipient-reset-status
     smtp-errno
     smtp-strerror
@@ -890,6 +890,15 @@
 					  ""))
 	     rv)))))
 
+(define (smtp-recipient-check-complete recipient)
+  ;;Check whether processing is complete  for the specified recipient of
+  ;;the message.  If complete return #t, otherwise return #f.
+  ;;
+  (define who 'smtp-recipient-check-complete)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient))
+    (capi.smtp-recipient-check-complete recipient)))
+
 
 ;;;; callback makers
 
@@ -1031,12 +1040,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-recipient-check-complete)
-  (define who 'smtp-recipient-check-complete)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-recipient-check-complete)))
 
 (define (smtp-recipient-reset-status)
   (define who 'smtp-recipient-reset-status)

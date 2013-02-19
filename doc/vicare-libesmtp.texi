@@ -1133,6 +1133,13 @@ success/failure status from a previous @smtp{} session.  If no status
 informations are available: return @false{}.
 @end defun
 
+
+@defun smtp-recipient-check-complete @var{recipient}
+Check whether processing is complete for the specified recipient of the
+message.  If complete return @true{}, otherwise return @false{}.
+@end defun
+
+
 @c page
 @node plain constants
 @section Converting constants to symbols
@@ -1151,10 +1158,6 @@ constants, return the corresponding symbol.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-recipient-check-complete
-@end defun
 
 
 @defun smtp-recipient-reset-status

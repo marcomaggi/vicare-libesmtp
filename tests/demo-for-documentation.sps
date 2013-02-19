@@ -91,6 +91,8 @@
 	     "reverse path status: ~a\n" (smtp-reverse-path-status msg))
     (fprintf (current-error-port)
 	     "recipient status: ~a\n" (smtp-recipient-status rec))
+    (fprintf (current-error-port)
+	     "recipient complete?: ~a\n" (smtp-recipient-check-complete rec))
     (assert (smtp-destroy-session sex)))
 
   #f)

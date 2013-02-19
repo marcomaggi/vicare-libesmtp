@@ -62,6 +62,7 @@
     smtp-enumerate-recipients
     smtp-option-require-all-recipients
     smtp-recipient-status
+    smtp-recipient-check-complete
 
     ;; headers management
     smtp-set-header
@@ -71,7 +72,7 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-recipient-check-complete
+
     smtp-recipient-reset-status
     smtp-errno
     smtp-strerror
@@ -199,18 +200,6 @@
   (foreign-call "ikrt_smtp_message_reset_status" message))
 
 
-;;;; headers management
-
-(define-inline (smtp-set-header message header value1 value2)
-  (foreign-call "ikrt_smtp_set_header" message header value1 value2))
-
-(define-inline (smtp-set-header-option message header option)
-  (foreign-call "ikrt_smtp_set_header_option" message header option))
-
-(define-inline (smtp-set-resent-headers message onoff)
-  (foreign-call "ikrt_smtp_set_resent_headers" message onoff))
-
-
 ;;;; recipient management
 
 (define-inline (smtp-add-recipient message mailbox)
@@ -225,11 +214,23 @@
 (define-inline (smtp-recipient-status recipient status-struct)
   (foreign-call "ikrt_smtp_recipient_status" recipient status-struct))
 
+(define-inline (smtp-recipient-check-complete recipient)
+  (foreign-call "ikrt_smtp_recipient_check_complete" recipient))
+
+
+;;;; headers management
+
+(define-inline (smtp-set-header message header value1 value2)
+  (foreign-call "ikrt_smtp_set_header" message header value1 value2))
+
+(define-inline (smtp-set-header-option message header option)
+  (foreign-call "ikrt_smtp_set_header_option" message header option))
+
+(define-inline (smtp-set-resent-headers message onoff)
+  (foreign-call "ikrt_smtp_set_resent_headers" message onoff))
+
 
 ;;;; still to be implemented
-
-(define-inline (smtp-recipient-check-complete)
-  (foreign-call "ikrt_smtp_recipient_check_complete"))
 
 (define-inline (smtp-recipient-reset-status)
   (foreign-call "ikrt_smtp_recipient_reset_status"))
