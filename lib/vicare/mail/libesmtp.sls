@@ -797,22 +797,22 @@
 	 (string		header))
       (let ((header.bv (string->ascii header)))
 	(case-strings header
-	  (("Date:")
+	  (("Date")
 	   (with-arguments-validation (who)
 	       ((signed-long	value1))
 	     (capi.smtp-set-header message header.bv value1 #f)))
-	  (("Message-Id:")
+	  (("Message-Id")
 	   (with-general-c-strings
 	       ((value		value1))
 	     (string-to-bytevector string->ascii)
 	     (capi.smtp-set-header message header.bv value #f)))
-	  (("From:" "Disposition-Notification-To:")
+	  (("From" "Disposition-Notification-To")
 	   (with-general-c-strings
 	       ((phrase		value1)
 		(mailbox	value2))
 	     (string-to-bytevector string->ascii)
 	     (capi.smtp-set-header message header.bv phrase mailbox)))
-	  (("To:" "Cc:" "Bcc:" "Reply-To:" "Sender:")
+	  (("To" "Cc" "Bcc" "Reply-To" "Sender")
 	   (with-general-c-strings
 	       ((phrase		value1)
 		(address	value2))
@@ -973,7 +973,7 @@
     (lambda (user-scheme-callback)
       (maker (lambda (optional-buffer-pointer len-pointer unused-custom-data)
 	       (guard (E (else
-			  #;(pretty-print E (current-error-port))
+			  (pretty-print E (current-error-port))
 			  (null-pointer)))
 		 (user-scheme-callback optional-buffer-pointer len-pointer)))))))
 

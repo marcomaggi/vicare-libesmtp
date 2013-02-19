@@ -336,61 +336,61 @@
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "X-Loop:" "marco@localhost"))
+	(esmtp.smtp-set-header msg "X-Loop" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Date:" 123000))
+	(esmtp.smtp-set-header msg "Date" 123000))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Message-Id:" "123"))
+	(esmtp.smtp-set-header msg "Message-Id" "123"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "From:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "From" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Disposition-Notification-To:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "Disposition-Notification-To" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "To:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "To" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Cc:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "Cc" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Bcc:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "Bcc" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Reply-To:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "Reply-To" "Marco Maggi" "marco@localhost"))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header msg "Sender:" "Marco Maggi" "marco@localhost"))
+	(esmtp.smtp-set-header msg "Sender" "Marco Maggi" "marco@localhost"))
     => #t)
 
 ;;; --------------------------------------------------------------------
@@ -398,13 +398,13 @@
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header-option msg "X-Loop:" esmtp.Hdr_OVERRIDE))
+	(esmtp.smtp-set-header-option msg "X-Loop" esmtp.Hdr_OVERRIDE))
     => #t)
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
 	     (msg (esmtp.smtp-add-message sex)))
-	(esmtp.smtp-set-header-option msg "X-Loop:" esmtp.Hdr_PROHIBIT))
+	(esmtp.smtp-set-header-option msg "X-Loop" esmtp.Hdr_PROHIBIT))
     => #t)
 
 ;;; --------------------------------------------------------------------

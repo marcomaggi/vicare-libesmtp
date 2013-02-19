@@ -232,8 +232,13 @@ ikrt_smtp_start_session (ikptr s_session, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_START_SESSION
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  ikptr			sk;
   int			rv;
-  rv = smtp_start_session(sex);
+  sk = ik_enter_c_function(pcb);
+  {
+    rv = smtp_start_session(sex);
+  }
+  ik_leave_c_function(pcb, sk);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
@@ -294,6 +299,7 @@ ikrt_smtp_set_messagecb (ikptr s_message, ikptr s_callback, ikpcb * pcb)
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
   smtp_messagecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
   int			rv;
+  /* fprintf(stderr, "%s: setting message cb: %p\n", __func__, (void *)cb); */
   rv = smtp_set_messagecb(msg, cb, NULL);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
@@ -321,6 +327,7 @@ ikrt_smtp_set_message_str (ikptr s_message, ikptr s_string, ikpcb * pcb)
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
   char *		str = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_string);
   int			rv;
+  /* fprintf(stderr, "%s: message string: \"%s\"\n", __func__, str); */
   /* "smtp_set_message_str()" is a C preprocessor macro!!! */
   rv = smtp_set_message_str(msg, str);
   return IK_BOOLEAN_FROM_INT(rv);
@@ -497,28 +504,28 @@ ikrt_smtp_set_header (ikptr s_message,
   char *	header_name = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_header_name);
   int		rv;
   /* fprintf(stderr, "%s: header name: %s\n", __func__, header_name); */
-  if (0 == strcmp(header_name, "Date:"))
+  if (0 == strcmp(header_name, "Date"))
     {
       time_t	time = (time_t)ik_integer_to_long(s_value_1);
       rv = smtp_set_header(msg, header_name, &time);
     }
-  else if (0 == strcmp(header_name, "Message-Id:"))
+  else if (0 == strcmp(header_name, "Message-Id"))
     {
       char *	value = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
       rv = smtp_set_header(msg, header_name, value);
     }
-  else if ((0 == strcmp(header_name, "From:")) ||
-	   (0 == strcmp(header_name, "Disposition-Notification-To:")))
+  else if ((0 == strcmp(header_name, "From")) ||
+	   (0 == strcmp(header_name, "Disposition-Notification-To")))
     {
       char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
       char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
       rv = smtp_set_header(msg, header_name, phrase, mailbox);
     }
-  else if ((0 == strcmp(header_name, "To:"))		||
-	   (0 == strcmp(header_name, "Cc:"))		||
-	   (0 == strcmp(header_name, "Bcc:"))		||
-	   (0 == strcmp(header_name, "Reply-To:"))	||
-	   (0 == strcmp(header_name, "Sender:")))
+  else if ((0 == strcmp(header_name, "To"))		||
+	   (0 == strcmp(header_name, "Cc"))		||
+	   (0 == strcmp(header_name, "Bcc"))		||
+	   (0 == strcmp(header_name, "Reply-To"))	||
+	   (0 == strcmp(header_name, "Sender")))
     {
       char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
       char *	address = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
