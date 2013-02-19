@@ -116,6 +116,12 @@
     smtp-errno->symbol
     smtp-timeout->symbol
     smtp-cb->symbol
+    smtp-hdr->symbol
+    smtp-notify->symbol
+    smtp-e8bitmime->symbol
+    smtp-by->symbol
+    smtp-starttls->symbol
+    smtp-ret->symbol
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
@@ -1100,6 +1106,37 @@
    SMTP_CB_WRITING
    SMTP_CB_HEADERS))
 
+(define-exact-integer->symbol-function smtp-hdr->symbol
+  (Hdr_OVERRIDE
+   Hdr_PROHIBIT))
+
+(define-exact-integer->symbol-function smtp-notify->symbol
+  (Notify_NOTSET
+   Notify_NEVER
+   Notify_SUCCESS
+   Notify_FAILURE
+   Notify_DELAY))
+
+(define-exact-integer->symbol-function smtp-e8bitmime->symbol
+  (E8bitmime_NOTSET
+   E8bitmime_7BIT
+   E8bitmime_8BITMIME
+   E8bitmime_BINARYMIME))
+
+(define-exact-integer->symbol-function smtp-by->symbol
+  (By_NOTSET
+   By_NOTIFY
+   By_RETURN))
+
+(define-exact-integer->symbol-function smtp-starttls->symbol
+  (Starttls_DISABLED
+   Starttls_ENABLED
+   Starttls_REQUIRED))
+
+(define-exact-integer->symbol-function smtp-ret->symbol
+  (Ret_NOTSET
+   Ret_FULL
+   Ret_HDRS))
 
 
 ;;;; still to be implemented

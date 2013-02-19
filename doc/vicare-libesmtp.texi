@@ -1203,6 +1203,41 @@ constants, return the corresponding symbol.
 @end defun
 
 
+@defun smtp-hdr->symbol @var{constant}
+Given an exact integer representing one of the @code{Hdr_} constants,
+return the corresponding symbol.
+@end defun
+
+
+@defun smtp-notify->symbol @var{constant}
+Given an exact integer representing one of the @code{Notify_} constants,
+return the corresponding symbol.
+@end defun
+
+
+@defun smtp-e8bitmime->symbol @var{constant}
+Given an exact integer representing one of the @code{E8bitmime_}
+constants, return the corresponding symbol.
+@end defun
+
+
+@defun smtp-by->symbol @var{constant}
+Given an exact integer representing one of the @code{By_} constants,
+return the corresponding symbol.
+@end defun
+
+
+@defun smtp-starttls->symbol @var{constant}
+Given an exact integer representing one of the @code{Starttls_}
+constants, return the corresponding symbol.
+@end defun
+
+
+@defun smtp-ret->symbol @var{constant}
+Given an exact integer representing one of the @code{Ret_} constants,
+return the corresponding symbol.
+@end defun
+
 @c page
 @node plain unimplemented
 @section Still to be implemented

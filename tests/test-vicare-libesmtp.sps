@@ -440,6 +440,30 @@
       (smtp-cb->symbol SMTP_CB_READING)
     => 'SMTP_CB_READING)
 
+  (check
+      (smtp-hdr->symbol Hdr_OVERRIDE)
+    => 'Hdr_OVERRIDE)
+
+  (check
+      (smtp-notify->symbol Notify_NOTSET)
+    => 'Notify_NOTSET)
+
+  (check
+      (smtp-e8bitmime->symbol E8bitmime_NOTSET)
+    => 'E8bitmime_NOTSET)
+
+  (check
+      (smtp-by->symbol By_NOTSET)
+    => 'By_NOTSET)
+
+  (check
+      (smtp-starttls->symbol Starttls_DISABLED)
+    => 'Starttls_DISABLED)
+
+  (check
+      (smtp-ret->symbol Ret_NOTSET)
+    => 'Ret_NOTSET)
+
   #t)
 
 
