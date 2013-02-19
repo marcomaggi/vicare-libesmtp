@@ -91,6 +91,7 @@
     smtp-option-require-all-recipients
     smtp-recipient-status
     smtp-recipient-check-complete
+    smtp-recipient-reset-status
 
     ;; headers management
     smtp-set-header
@@ -112,7 +113,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-recipient-reset-status
     smtp-errno
     smtp-strerror
     smtp-set-application-data
@@ -899,6 +899,16 @@
       ((smtp-recipient/alive	recipient))
     (capi.smtp-recipient-check-complete recipient)))
 
+(define (smtp-recipient-reset-status recipient)
+  ;;Reset  the  recipient status  to  the  state  it would  have  before
+  ;;SMTP-START-SESSION is  called for the  first time on  the containing
+  ;;session.  If successful return #t, otherwise return #f.
+  ;;
+  (define who 'smtp-recipient-reset-status)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient))
+    (capi.smtp-recipient-reset-status recipient)))
+
 
 ;;;; callback makers
 
@@ -1040,12 +1050,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-recipient-reset-status)
-  (define who 'smtp-recipient-reset-status)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-recipient-reset-status)))
 
 (define (smtp-errno)
   (define who 'smtp-errno)

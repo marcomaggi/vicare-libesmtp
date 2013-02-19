@@ -438,6 +438,19 @@ ikrt_smtp_recipient_check_complete (ikptr s_recipient, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_recipient_reset_status (ikptr s_recipient, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_RECIPIENT_RESET_STATUS
+  smtp_recipient_t	rec = IK_LIBESMTP_RECIPIENT(s_recipient);
+  int			rv;
+  rv = smtp_recipient_reset_status(rec);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
 
 
 /** --------------------------------------------------------------------
@@ -538,16 +551,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_recipient_reset_status (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_RECIPIENT_RESET_STATUS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_errno (ikpcb * pcb)

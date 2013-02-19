@@ -316,6 +316,15 @@
 	(smtp-option-require-all-recipients sex #f))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex))
+	     (rec (smtp-add-recipient msg "marco@localhost")))
+	(smtp-recipient-reset-status rec))
+    => #t)
+
   (collect))
 
 

@@ -1140,6 +1140,13 @@ message.  If complete return @true{}, otherwise return @false{}.
 @end defun
 
 
+@defun smtp-recipient-reset-status @var{recipient}
+Reset the recipient status to the state it would have before
+@func{smtp-start-session} is called for the first time on the containing
+session.  If successful return @true{}, otherwise return @false{}.
+@end defun
+
+
 @c page
 @node plain constants
 @section Converting constants to symbols
@@ -1158,10 +1165,6 @@ constants, return the corresponding symbol.
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-recipient-reset-status
-@end defun
 
 
 @defun smtp-errno

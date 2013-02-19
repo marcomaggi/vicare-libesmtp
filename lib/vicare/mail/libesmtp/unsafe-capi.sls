@@ -63,6 +63,7 @@
     smtp-option-require-all-recipients
     smtp-recipient-status
     smtp-recipient-check-complete
+    smtp-recipient-reset-status
 
     ;; headers management
     smtp-set-header
@@ -72,8 +73,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-
-    smtp-recipient-reset-status
     smtp-errno
     smtp-strerror
     smtp-set-application-data
@@ -217,6 +216,9 @@
 (define-inline (smtp-recipient-check-complete recipient)
   (foreign-call "ikrt_smtp_recipient_check_complete" recipient))
 
+(define-inline (smtp-recipient-reset-status recipient)
+  (foreign-call "ikrt_smtp_recipient_reset_status" recipient))
+
 
 ;;;; headers management
 
@@ -231,9 +233,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-recipient-reset-status)
-  (foreign-call "ikrt_smtp_recipient_reset_status"))
 
 (define-inline (smtp-errno)
   (foreign-call "ikrt_smtp_errno"))
