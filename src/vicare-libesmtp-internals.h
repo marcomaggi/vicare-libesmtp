@@ -66,6 +66,13 @@
 #define IK_LIBESMTP_RECIPIENT(RECIPIENT)	\
   ((smtp_recipient_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_RECIPIENT_POINTER(RECIPIENT)))
 
+/* Accessors for the fields of the Scheme structure "smtp_status_t". */
+#define IK_LIBESMTP_STATUS_CODE(STATUS)			IK_FIELD((STATUS),0)
+#define IK_LIBESMTP_STATUS_TEXT(STATUS)			IK_FIELD((STATUS),1)
+#define IK_LIBESMTP_STATUS_ENH_CLASS(STATUS)		IK_FIELD((STATUS),2)
+#define IK_LIBESMTP_STATUS_ENH_SUBJECT(STATUS)		IK_FIELD((STATUS),3)
+#define IK_LIBESMTP_STATUS_ENH_DETAIL(STATUS)		IK_FIELD((STATUS),4)
+
 
 /** --------------------------------------------------------------------
  ** Support for missing functions.

@@ -872,6 +872,67 @@ string: a Scheme string, a Scheme bytevector, a @code{memory-block}
 instance, a pointer object.
 @end defun
 
+@c ------------------------------------------------------------
+
+@subsubheading Message delivery status
+
+
+@deftp {Struct Type} smtp-status
+Type of data structure mirroring the C language type
+@code{smtp_status_t}.  It has the following fields:
+
+@table @code
+@item code
+Exact integer in the range of the C language type @code{signed int};
+@smtp{} protocol status code.
+
+@item text
+Scheme string; text from the server.
+
+@item enh-class
+@itemx enh-subject
+@itemx enh-detail
+Exact integers in the range of the C language type @code{signed int};
+@rfc{} 2034 enhanced status code triplet.
+@end table
+@end deftp
+
+
+@defun make-smtp-status @var{code} @var{text} @var{enh-class} @var{enh-subject} @var{enh-detail}
+Build and return a new instance of @code{smtp-status}.
+@end defun
+
+
+@defun smtp-status? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-status};
+otherwise return @false{}.
+@end defun
+
+
+@defun smtp-status-code @var{status}
+@defunx smtp-status-text @var{status}
+@defunx smtp-status-enh-class @var{status}
+@defunx smtp-status-enh-subject @var{status}
+@defunx smtp-status-enh-detail @var{status}
+Accessors for the fields of @code{smtp-status} instances.
+@end defun
+
+
+@defun set-smtp-status-code! @var{status} @var{value}
+@defunx set-smtp-status-text! @var{status} @var{value}
+@defunx set-smtp-status-enh-class! @var{status} @var{value}
+@defunx set-smtp-status-enh-subject! @var{status} @var{value}
+@defunx set-smtp-status-enh-detail! @var{status} @var{value}
+Mutators for the fields of @code{smtp-status} instances.
+@end defun
+
+
+@defun smtp-message-transfer-status @var{message}
+Return a struct instance of type @code{smtp-status} representing the
+delivery status for @var{message}; if no status informations are
+available: return @false{}.
+@end defun
+
 @c page
 @node plain recipients
 @section Recipient management

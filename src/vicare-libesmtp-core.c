@@ -266,6 +266,47 @@ ikrt_smtp_set_message_str (ikptr s_message, ikptr s_string, ikpcb * pcb)
   feature_failure(__func__);
 #endif
 }
+ikptr
+ikrt_smtp_message_transfer_status (ikptr s_message, ikptr s_status, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_MESSAGE_TRANSFER_STATUS
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  const smtp_status_t *	status;
+  /* fprintf(stderr, "%s: enter\n", __func__); */
+  status = smtp_message_transfer_status(msg);
+  if (status) {
+    /* fprintf(stderr, "%s: converting status %p\n", __func__, (void*)status); */
+    pcb->root0 = &s_status;
+    {
+      /* SMTP protocol status code */
+      IK_ASS(IK_LIBESMTP_STATUS_CODE(s_status),
+	     ika_integer_from_int(pcb, status->code));
+      /* Text from the server */
+      if (status->text) {
+	IK_ASS(IK_LIBESMTP_STATUS_TEXT(s_status),
+	       ika_bytevector_from_cstring(pcb, status->text));
+      } else {
+	IK_LIBESMTP_STATUS_TEXT(s_status) = IK_FALSE;
+      }
+      /* RFC 2034 enhanced status code triplet */
+      IK_ASS(IK_LIBESMTP_STATUS_ENH_CLASS(s_status),
+	     ika_integer_from_int(pcb, status->enh_class));
+      IK_ASS(IK_LIBESMTP_STATUS_ENH_SUBJECT(s_status),
+	     ika_integer_from_int(pcb, status->enh_subject));
+      IK_ASS(IK_LIBESMTP_STATUS_ENH_DETAIL(s_status),
+	     ika_integer_from_int(pcb, status->enh_detail));
+    }
+    pcb->root0 = NULL;
+    /* fprintf(stderr, "%s: successful leave\n", __func__); */
+    return s_status;
+  } else {
+    /* fprintf(stderr, "%s: erroneous leave\n", __func__); */
+    return IK_FALSE;
+  }
+#else
+  feature_failure(__func__);
+#endif
+}
 
 
 /** --------------------------------------------------------------------
@@ -416,16 +457,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_message_transfer_status (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_MESSAGE_TRANSFER_STATUS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_reverse_path_status (ikpcb * pcb)
