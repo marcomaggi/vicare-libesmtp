@@ -27,9 +27,12 @@
 
 #!r6rs
 (import (vicare)
-  (vicare mail libesmtp)
-  (vicare mail libesmtp constants)
-  (prefix (vicare ffi) ffi.)
+  (prefix (vicare mail libesmtp)
+	  esmtp.)
+  (prefix (vicare mail libesmtp constants)
+	  esmtp.)
+  (prefix (vicare ffi)
+	  ffi.)
   (vicare syntactic-extensions))
 
 
@@ -44,11 +47,11 @@
 (let ()
 
   (%pretty-print (list 'version-informations
-		       (vicare-libesmtp-version-interface-current)
-		       (vicare-libesmtp-version-interface-revision)
-		       (vicare-libesmtp-version-interface-age)
-		       (vicare-libesmtp-version)
-		       (smtp-version)))
+		       (esmtp.vicare-libesmtp-version-interface-current)
+		       (esmtp.vicare-libesmtp-version-interface-revision)
+		       (esmtp.vicare-libesmtp-version-interface-age)
+		       (esmtp.vicare-libesmtp-version)
+		       (esmtp.smtp-version)))
 
   #t)
 
@@ -66,40 +69,46 @@ Subject: demo of vicare/libesmtp\r\n
 This is the text.\r\n")
 
     (define monitor-cb
-      (make-smtp-monitorcb
+      (esmtp.make-smtp-monitorcb
        (lambda (buf.ptr buf.len writing)
 	 (fprintf (current-error-port)
 		  "monitor: ~a, ~a\n" writing (ffi.cstring->string buf.ptr buf.len)))))
 
     (define event-cb
-      (make-smtp-eventcb
+      (esmtp.make-smtp-eventcb
        (lambda (session event-no)
 	 (fprintf (current-error-port)
-		  "event: ~a\n" (smtp-event->symbol event-no)))))
+		  "event: ~a\n" (esmtp.smtp-event->symbol event-no)))))
 
-    (let* ((sex (smtp-create-session))
-	   (msg (smtp-add-message sex))
-	   (rec (smtp-add-recipient msg "<marco@localhost>")))
-      (assert (smtp-set-hostname sex "localhost"))
-      (assert (smtp-set-server sex "localhost:smtp"))
-      (assert (smtp-set-reverse-path msg "<marco@localhost>"))
-      (assert (smtp-set-monitorcb sex monitor-cb #t))
-      (assert (smtp-set-eventcb sex event-cb))
-      (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
-      (assert (smtp-start-session sex))
-      (let ((errno (smtp-errno)))
+    (let* ((sex (esmtp.smtp-create-session))
+	   (msg (esmtp.smtp-add-message sex))
+	   (rec (esmtp.smtp-add-recipient msg "<marco@localhost>")))
+      (assert (esmtp.smtp-set-hostname sex "localhost"))
+      (assert (esmtp.smtp-set-server sex "localhost:smtp"))
+      (assert (esmtp.smtp-set-reverse-path msg "<marco@localhost>"))
+      (assert (esmtp.smtp-set-monitorcb sex monitor-cb #t))
+      (assert (esmtp.smtp-set-eventcb sex event-cb))
+      (assert (esmtp.smtp-set-message-str msg (ffi.string->cstring message-text)))
+      (assert (esmtp.smtp-start-session sex))
+      (let ((errno (esmtp.smtp-errno)))
 	(fprintf (current-error-port)
 		 "API errno: ~a (~a), \"~a\"\n"
-		 errno (smtp-errno->symbol errno) (smtp-strerror errno)))
+		 errno
+		 (esmtp.smtp-errno->symbol errno)
+		 (esmtp.smtp-strerror errno)))
       (fprintf (current-error-port)
-	       "message transfer status: ~a\n" (smtp-message-transfer-status msg))
+	       "message transfer status: ~a\n"
+	       (esmtp.smtp-message-transfer-status msg))
       (fprintf (current-error-port)
-	       "reverse path status: ~a\n" (smtp-reverse-path-status msg))
+	       "reverse path status: ~a\n"
+	       (esmtp.smtp-reverse-path-status msg))
       (fprintf (current-error-port)
-	       "recipient status: ~a\n" (smtp-recipient-status rec))
+	       "recipient status: ~a\n"
+	       (esmtp.smtp-recipient-status rec))
       (fprintf (current-error-port)
-	       "recipient complete?: ~a\n" (smtp-recipient-check-complete rec))
-      (assert (smtp-destroy-session sex)))
+	       "recipient complete?: ~a\n"
+	       (esmtp.smtp-recipient-check-complete rec))
+      (assert (esmtp.smtp-destroy-session sex)))
 
     #f))
 
@@ -117,38 +126,38 @@ This is the text.\r\n")
      This is the text.\r\n\r\n")
 
     (define monitor-cb
-      (make-smtp-monitorcb
+      (esmtp.make-smtp-monitorcb
        (lambda (buf.ptr buf.len writing)
 	 (fprintf (current-error-port)
 		  "monitor: ~a\n" (ffi.cstring->string buf.ptr buf.len)))))
 
     (define event-cb
-      (make-smtp-eventcb
+      (esmtp.make-smtp-eventcb
        (lambda (session event-no)
 	 (fprintf (current-error-port)
-		  "event: ~a\n" (smtp-event->symbol event-no)))))
+		  "event: ~a\n" (esmtp.smtp-event->symbol event-no)))))
 
-    (let* ((sex (smtp-create-session))
-	   (msg (smtp-add-message sex))
-	   (rec (smtp-add-recipient msg "<mrc.mgg@gmail.com>")))
-      (assert (smtp-set-hostname sex "localhost"))
-      (assert (smtp-set-server sex "smtp.gmail.com:25"))
-      (assert (smtp-set-reverse-path msg "<marco.maggi-ipsu@poste.it>"))
-      (assert (smtp-set-monitorcb sex monitor-cb #f))
-      (assert (smtp-set-eventcb sex event-cb))
-      (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
-      (assert (smtp-start-session sex))
-      (let ((errno (smtp-errno)))
+    (let* ((sex (esmtp.smtp-create-session))
+	   (msg (esmtp.smtp-add-message sex))
+	   (rec (esmtp.smtp-add-recipient msg "<mrc.mgg@gmail.com>")))
+      (assert (esmtp.smtp-set-hostname sex "localhost"))
+      (assert (esmtp.smtp-set-server sex "smtp.gmail.com:25"))
+      (assert (esmtp.smtp-set-reverse-path msg "<marco.maggi-ipsu@poste.it>"))
+      (assert (esmtp.smtp-set-monitorcb sex monitor-cb #f))
+      (assert (esmtp.smtp-set-eventcb sex event-cb))
+      (assert (esmtp.smtp-set-message-str msg (ffi.string->cstring message-text)))
+      (assert (esmtp.smtp-start-session sex))
+      (let ((errno (esmtp.smtp-errno)))
 	(fprintf (current-error-port)
 		 "API errno: ~a (~a), \"~a\"\n"
-		 errno (smtp-errno->symbol errno) (smtp-strerror errno)))
+		 errno (esmtp.smtp-errno->symbol errno) (esmtp.smtp-strerror errno)))
       (fprintf (current-error-port)
-	       "message transfer status: ~a\n" (smtp-message-transfer-status msg))
+	       "message transfer status: ~a\n" (esmtp.smtp-message-transfer-status msg))
       (fprintf (current-error-port)
-	       "reverse path status: ~a\n" (smtp-reverse-path-status msg))
+	       "reverse path status: ~a\n" (esmtp.smtp-reverse-path-status msg))
       (fprintf (current-error-port)
-	       "recipient complete?: ~a\n" (smtp-recipient-check-complete rec))
-      (assert (smtp-destroy-session sex)))
+	       "recipient complete?: ~a\n" (esmtp.smtp-recipient-check-complete rec))
+      (assert (esmtp.smtp-destroy-session sex)))
 
     #f))
 
