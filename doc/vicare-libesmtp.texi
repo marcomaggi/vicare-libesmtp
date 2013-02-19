@@ -1057,31 +1057,32 @@ libesmtp}.
 Set a header in the @var{message}.  If successful return @true{}, else
 return @false{}.
 
-@var{header-name} must be a Scheme string representing a header name.
-Some headers are specially recognised by @libesmtp{}:
+@var{header-name} must be a Scheme string representing a header name,
+@strong{without} the trailing colon character.  Some headers are
+specially recognised by @libesmtp{}:
 
 @table @code
-@item Date:
+@item Date
 Requires @vari{value} to be an exact integer in the range of the C
 language type @code{signed long}; internally this value is converted to
 @code{time_t}.  @varii{value} is ignored.
 
-@item Message-Id:
+@item Message-Id
 Requires @vari{value} to be a general C buffer holding an @asciiz{}
 string: a Scheme string, a Scheme bytevector, a @code{memory-block}
 instance, a pointer object.  @varii{value} is ignored.
 
-@item From:
-@itemx Disposition-Notification-To:
+@item From
+@itemx Disposition-Notification-To
 Require both @vari{value} and @varii{value} to be a general C buffer
 holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
 @code{memory-block} instance, a pointer object.
 
-@item To:
-@itemx Cc:
-@itemx Bcc:
-@itemx Reply-To:
-@itemx Sender:
+@item To
+@itemx Cc
+@itemx Bcc
+@itemx Reply-To
+@itemx Sender
 Require both @vari{value} and @varii{value} to be a general C buffer
 holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
 @code{memory-block} instance, a pointer object.
