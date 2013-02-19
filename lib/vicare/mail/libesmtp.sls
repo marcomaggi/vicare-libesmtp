@@ -38,6 +38,10 @@
 
     smtp-version
 
+    ;; library errors
+    smtp-errno
+    smtp-strerror
+
     ;; status data structure
     smtp-status
     make-smtp-status			smtp-status?
@@ -109,12 +113,11 @@
 
     ;; constant to symbol conversion
     smtp-event->symbol
+    smtp-errno->symbol
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-errno
-    smtp-strerror
     smtp-set-application-data
     smtp-get-application-data
     smtp-message-set-application-data
@@ -275,6 +278,18 @@
   (define who 'smtp-version)
   (let ((rv (capi.smtp-version)))
     (and rv (ascii->string rv))))
+
+
+;;;; library errors
+
+(define (smtp-errno)
+  (capi.smtp-errno))
+
+(define (smtp-strerror)
+  (define who 'smtp-strerror)
+  (with-arguments-validation (who)
+      ()
+    (capi.smtp-strerror)))
 
 
 ;;;; data structures: session
@@ -1047,21 +1062,32 @@
    SMTP_EV_UNUSABLE_CA_LIST
    ))
 
+(define-exact-integer->symbol-function smtp-errno->symbol
+  (SMTP_ERR_NOTHING_TO_DO
+   SMTP_ERR_DROPPED_CONNECTION
+   SMTP_ERR_INVALID_RESPONSE_SYNTAX
+   SMTP_ERR_STATUS_MISMATCH
+   SMTP_ERR_INVALID_RESPONSE_STATUS
+   SMTP_ERR_INVAL
+   SMTP_ERR_EXTENSION_NOT_AVAILABLE
+
+   SMTP_ERR_EAI_ADDRFAMILY
+   SMTP_ERR_EAI_NODATA
+   SMTP_ERR_EAI_FAIL
+   SMTP_ERR_EAI_AGAIN
+   SMTP_ERR_EAI_MEMORY
+   SMTP_ERR_EAI_FAMILY
+   SMTP_ERR_EAI_BADFLAGS
+   SMTP_ERR_EAI_NONAME
+   SMTP_ERR_EAI_SERVICE
+   SMTP_ERR_EAI_SOCKTYPE
+
+   SMTP_ERR_UNTERMINATED_RESPONSE
+   SMTP_ERR_CLIENT_ERROR))
+
 
 
 ;;;; still to be implemented
-
-(define (smtp-errno)
-  (define who 'smtp-errno)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-errno)))
-
-(define (smtp-strerror)
-  (define who 'smtp-strerror)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-strerror)))
 
 (define (smtp-set-application-data)
   (define who 'smtp-set-application-data)

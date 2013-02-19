@@ -36,6 +36,10 @@
     vicare-libesmtp-version
     smtp-version
 
+    ;; library errors
+    smtp-errno
+    smtp-strerror
+
     ;; session management
     smtp-create-session
     smtp-destroy-session
@@ -73,8 +77,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-errno
-    smtp-strerror
     smtp-set-application-data
     smtp-get-application-data
     smtp-message-set-application-data
@@ -132,6 +134,15 @@
 
 (define-inline (smtp-version)
   (foreign-call "ikrt_smtp_version"))
+
+
+;;;; library errors
+
+(define-inline (smtp-errno)
+  (foreign-call "ikrt_smtp_errno"))
+
+(define-inline (smtp-strerror)
+  (foreign-call "ikrt_smtp_strerror"))
 
 
 ;;;; session management
@@ -233,12 +244,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-errno)
-  (foreign-call "ikrt_smtp_errno"))
-
-(define-inline (smtp-strerror)
-  (foreign-call "ikrt_smtp_strerror"))
 
 (define-inline (smtp-set-application-data)
   (foreign-call "ikrt_smtp_set_application_data"))

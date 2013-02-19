@@ -86,6 +86,33 @@ ikrt_smtp_version (ikpcb * pcb)
 
 
 /** --------------------------------------------------------------------
+ ** Library errors.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_errno (ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ERRNO
+  return ika_integer_from_int(pcb, smtp_errno());
+#else
+  feature_failure(__func__);
+#endif
+}
+
+ikptr
+ikrt_smtp_strerror (ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_STRERROR
+  return IK_VOID;
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+
+
+/** --------------------------------------------------------------------
  ** Session management.
  ** ----------------------------------------------------------------- */
 
@@ -551,26 +578,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_errno (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ERRNO
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_strerror (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_STRERROR
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_set_application_data (ikpcb * pcb)

@@ -86,6 +86,8 @@
     (assert (smtp-set-message-str msg (ffi.string->cstring message-text)))
     (assert (smtp-start-session sex))
     (fprintf (current-error-port)
+	     "API errno: ~a (~a)\n" (smtp-errno) (smtp-errno->symbol (smtp-errno)))
+    (fprintf (current-error-port)
 	     "message transfer status: ~a\n" (smtp-message-transfer-status msg))
     (fprintf (current-error-port)
 	     "reverse path status: ~a\n" (smtp-reverse-path-status msg))

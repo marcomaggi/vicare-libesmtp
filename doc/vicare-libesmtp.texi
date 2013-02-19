@@ -265,6 +265,7 @@ the very unlikely case that this function fails: @false{} is returned.
 
 @menu
 * plain structs::               Data structures.
+* plain errors::                Library errors.
 * plain sessions::              Session management.
 * plain messages::              Message management.
 * plain recipients::            Recipient management.
@@ -610,6 +611,26 @@ Accessors for the fields of @code{smtp-status} instances.
 @defunx set-smtp-status-enh-detail! @var{status} @var{value}
 Mutators for the fields of @code{smtp-status} instances.
 @end defun
+
+@c page
+@node plain errors
+@section Library errors
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-errno
+Return an exact integer representing the error code for the most recent
+@libesmtp{} @api{} call.  The returned value represents one the of the
+@code{SMTP_ERR_} constants or zero if no error occurred.
+@end defun
+
+
+@defun smtp-strerror
+@end defun
+
 
 @c page
 @node plain sessions
@@ -1162,17 +1183,15 @@ constants, return the corresponding symbol.
 @end defun
 
 
+@defun smtp-errno->symbol @var{constant}
+Given an exact integer representing one of the @code{SMTP_ERR_}
+constants, return the corresponding symbol.
+@end defun
+
+
 @c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-errno
-@end defun
-
-
-@defun smtp-strerror
-@end defun
 
 
 @defun smtp-set-application-data
