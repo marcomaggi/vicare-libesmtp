@@ -114,6 +114,8 @@
     ;; constant to symbol conversion
     smtp-event->symbol
     smtp-errno->symbol
+    smtp-timeout->symbol
+    smtp-cb->symbol
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
@@ -1085,6 +1087,18 @@
 
    SMTP_ERR_UNTERMINATED_RESPONSE
    SMTP_ERR_CLIENT_ERROR))
+
+(define-exact-integer->symbol-function smtp-timeout->symbol
+  (Timeout_GREETING
+   Timeout_ENVELOPE
+   Timeout_DATA
+   Timeout_TRANSFER
+   Timeout_DATA2))
+
+(define-exact-integer->symbol-function smtp-cb->symbol
+  (SMTP_CB_READING
+   SMTP_CB_WRITING
+   SMTP_CB_HEADERS))
 
 
 

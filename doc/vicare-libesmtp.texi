@@ -1191,6 +1191,18 @@ constants, return the corresponding symbol.
 @end defun
 
 
+@defun smtp-timeout->symbol @var{constant}
+Given an exact integer representing one of the @code{Timeout_}
+constants, return the corresponding symbol.
+@end defun
+
+
+@defun smtp-cb->symbol @var{constant}
+Given an exact integer representing one of the @code{SMTP_CB_}
+constants, return the corresponding symbol.
+@end defun
+
+
 @c page
 @node plain unimplemented
 @section Still to be implemented

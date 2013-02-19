@@ -422,6 +422,27 @@
   (collect))
 
 
+(parametrise ((check-test-name		'headers))
+
+  (check
+      (smtp-event->symbol SMTP_EV_MAILSTATUS)
+    => 'SMTP_EV_MAILSTATUS)
+
+  (check
+      (smtp-errno->symbol SMTP_ERR_INVALID_RESPONSE_SYNTAX)
+    => 'SMTP_ERR_INVALID_RESPONSE_SYNTAX)
+
+  (check
+      (smtp-timeout->symbol Timeout_GREETING)
+    => 'Timeout_GREETING)
+
+  (check
+      (smtp-cb->symbol SMTP_CB_READING)
+    => 'SMTP_CB_READING)
+
+  #t)
+
+
 ;;;; done
 
 (check-report)
