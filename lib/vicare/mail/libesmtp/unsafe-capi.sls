@@ -55,6 +55,7 @@
     smtp-set-message-str
     smtp-message-transfer-status
     smtp-reverse-path-status
+    smtp-message-reset-status
 
     ;; recipient management
     smtp-add-recipient
@@ -69,7 +70,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-message-reset-status
     smtp-recipient-status
     smtp-recipient-check-complete
     smtp-recipient-reset-status
@@ -171,8 +171,12 @@
 (define-inline (smtp-enumerate-messages session callback)
   (foreign-call "ikrt_smtp_enumerate_messages" session callback))
 
+;;; --------------------------------------------------------------------
+
 (define-inline (smtp-set-reverse-path message mailbox)
   (foreign-call "ikrt_smtp_set_reverse_path" message mailbox))
+
+;;; --------------------------------------------------------------------
 
 (define-inline (smtp-set-messagecb message c-callback)
   (foreign-call "ikrt_smtp_set_messagecb" message c-callback))
@@ -183,11 +187,16 @@
 (define-inline (smtp-set-message-str message string)
   (foreign-call "ikrt_smtp_set_message_str" message string))
 
+;;; --------------------------------------------------------------------
+
 (define-inline (smtp-message-transfer-status message status-struct)
   (foreign-call "ikrt_smtp_message_transfer_status" message status-struct))
 
 (define-inline (smtp-reverse-path-status message status-struct)
   (foreign-call "ikrt_smtp_reverse_path_status" message status-struct))
+
+(define-inline (smtp-message-reset-status message)
+  (foreign-call "ikrt_smtp_message_reset_status" message))
 
 
 ;;;; headers management
@@ -215,9 +224,6 @@
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-message-reset-status)
-  (foreign-call "ikrt_smtp_message_reset_status"))
 
 (define-inline (smtp-recipient-status)
   (foreign-call "ikrt_smtp_recipient_status"))

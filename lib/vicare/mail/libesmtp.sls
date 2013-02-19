@@ -75,6 +75,8 @@
     smtp-set-message-fp
     smtp-set-message-str
     smtp-message-transfer-status
+    smtp-reverse-path-status
+    smtp-message-reset-status
 
     ;; recipient management
     smtp-recipient
@@ -107,8 +109,6 @@
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
 
-    smtp-reverse-path-status
-    smtp-message-reset-status
     smtp-recipient-status
     smtp-recipient-check-complete
     smtp-recipient-reset-status
@@ -737,6 +737,18 @@
 					  ""))
 	     rv)))))
 
+;;; --------------------------------------------------------------------
+
+(define (smtp-message-reset-status message)
+  ;;Reset  the  message  status  to  the  state  it  would  have  before
+  ;;SMTP-START-SESSION is  called for the  first time on  the containing
+  ;;session.  If successful return #t, otherwise return #f.
+  ;;
+  (define who 'smtp-message-reset-status)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (capi.smtp-message-reset-status message)))
+
 
 ;;;; headers management
 
@@ -994,12 +1006,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-message-reset-status)
-  (define who 'smtp-message-reset-status)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-message-reset-status)))
 
 (define (smtp-recipient-status)
   (define who 'smtp-recipient-status)

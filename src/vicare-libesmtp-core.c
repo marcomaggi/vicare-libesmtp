@@ -336,6 +336,21 @@ ikrt_smtp_reverse_path_status (ikptr s_message, ikptr s_status, ikpcb * pcb)
 #endif
 }
 
+/* ------------------------------------------------------------------ */
+
+ikptr
+ikrt_smtp_message_reset_status (ikptr s_message, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_MESSAGE_RESET_STATUS
+  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
+  int			rv;
+  rv = smtp_message_reset_status(msg);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
 
 /** --------------------------------------------------------------------
  ** Recipient management.
@@ -485,16 +500,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_message_reset_status (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_MESSAGE_RESET_STATUS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 ikptr
 ikrt_smtp_recipient_status (ikpcb * pcb)

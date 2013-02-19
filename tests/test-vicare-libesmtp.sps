@@ -165,7 +165,7 @@
       ;;This will be destroyed by the garbage collector.
       (let* ((sex (smtp-create-session))
 	     (msg (smtp-add-message sex)))
-	(smtp-session? sex))
+	(smtp-message? msg))
     => #t)
 
 ;;; --------------------------------------------------------------------
@@ -242,6 +242,13 @@
                                    ciao\n\r"))
     => #t)
 
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (smtp-create-session))
+	     (msg (smtp-add-message sex)))
+	(smtp-message-reset-status msg))
+    => #t)
 
   (collect))
 
