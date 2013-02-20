@@ -36,6 +36,7 @@
 #endif
 #include <vicare.h>
 #include <string.h>
+#include <auth-client.h>
 #include <libesmtp.h>
 
 
@@ -72,6 +73,13 @@
 #define IK_LIBESMTP_STATUS_ENH_CLASS(STATUS)		IK_FIELD((STATUS),2)
 #define IK_LIBESMTP_STATUS_ENH_SUBJECT(STATUS)		IK_FIELD((STATUS),3)
 #define IK_LIBESMTP_STATUS_ENH_DETAIL(STATUS)		IK_FIELD((STATUS),4)
+
+/* Accessors for the fields of the Scheme structure "auth_context_t". */
+#define IK_LIBESMTP_AUTH_CONTEXT_POINTER(CTX)		IK_FIELD((CTX),0)
+#define IK_LIBESMTP_AUTH_CONTEXT_OWNER(CTX)		IK_FIELD((CTX),1)
+#define IK_LIBESMTP_AUTH_CONTEXT_DESTRUCTOR(CTX)	IK_FIELD((CTX),2)
+#define IK_LIBESMTP_AUTH_CONTEXT(CTX)		\
+  ((auth_context_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_AUTH_CONTEXT_POINTER(CTX)))
 
 
 /** --------------------------------------------------------------------

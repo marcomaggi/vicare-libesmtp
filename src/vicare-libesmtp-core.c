@@ -660,6 +660,28 @@ ikrt_smtp_recipient_get_application_data (ikptr s_recipient, ikpcb * pcb)
 
 
 /** --------------------------------------------------------------------
+ ** Auth extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_auth_set_context (ikptr s_session, ikptr s_auth_context, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_AUTH_SET_CONTEXT
+#if 0
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  auth_context_t	ctx = IK_LIBESMTP_AUTH_CONTEXT(s_auth_context);
+  int			rv;
+  rv = smtp_auth_set_context(sex, ctx);
+  return IK_BOOLEAN_FROM_INT(rv);
+#endif
+  return IK_VOID;
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
  ** Still to be implemented.
  ** ----------------------------------------------------------------- */
 
@@ -675,16 +697,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_auth_set_context (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_AUTH_SET_CONTEXT
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 /* ------------------------------------------------------------------ */
 
