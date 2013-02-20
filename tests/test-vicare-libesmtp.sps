@@ -424,6 +424,37 @@
   (collect))
 
 
+(parametrise ((check-test-name		'data)
+	      (struct-guardian-logger	#f))
+
+  (check
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-set-application-data sex (integer->pointer 123))
+	(esmtp.smtp-get-application-data sex))
+    => (integer->pointer 123))
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex)))
+	(esmtp.smtp-message-set-application-data msg (integer->pointer 123))
+	(esmtp.smtp-message-get-application-data msg))
+    => (integer->pointer 123))
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let* ((sex (esmtp.smtp-create-session))
+	     (msg (esmtp.smtp-add-message sex))
+	     (rec (esmtp.smtp-add-recipient msg "marco@localhost")))
+	(esmtp.smtp-recipient-set-application-data rec (integer->pointer 123))
+	(esmtp.smtp-recipient-get-application-data rec))
+    => (integer->pointer 123))
+
+  (collect))
+
+
 (parametrise ((check-test-name		'headers))
 
   (check

@@ -272,6 +272,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain headers::               Headers management.
 * plain status::                Session results.
 * plain constants::             Converting constants to symbols.
+* plain data::                  Application data.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
@@ -1240,32 +1241,54 @@ return the corresponding symbol.
 @end defun
 
 @c page
+@node plain data
+@section Application data
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-set-application-data @var{session} @var{data-pointer}
+Register a pointer object as application data associated to
+@var{session}.  Return a pointer object.
+@end defun
+
+
+@defun smtp-get-application-data @var{session}
+Return a pointer object referencing the application data associated to
+@var{session}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@defun smtp-message-set-application-data @var{message} @var{data-pointer}
+Register a pointer object as application data associated to
+@var{message}.  Return a pointer object.
+@end defun
+
+
+@defun smtp-message-get-application-data @var{message}
+Return a pointer object referencing the application data associated to
+@var{message}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@defun smtp-recipient-set-application-data @var{recipient} @var{data-pointer}
+Register a pointer object as application data associated to
+@var{recipient}.  Return a pointer object.
+@end defun
+
+
+@defun smtp-recipient-get-application-data @var{recipient}
+Return a pointer object referencing the application data associated to
+@var{recipient}.
+@end defun
+
+@c page
 @node plain unimplemented
 @section Still to be implemented
-
-
-@defun smtp-set-application-data
-@end defun
-
-
-@defun smtp-get-application-data
-@end defun
-
-
-@defun smtp-message-set-application-data
-@end defun
-
-
-@defun smtp-message-get-application-data
-@end defun
-
-
-@defun smtp-recipient-set-application-data
-@end defun
-
-
-@defun smtp-recipient-get-application-data
-@end defun
 
 
 @defun smtp-auth-set-context

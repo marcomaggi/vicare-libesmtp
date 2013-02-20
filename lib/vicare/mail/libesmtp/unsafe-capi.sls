@@ -74,15 +74,17 @@
     smtp-set-header-option
     smtp-set-resent-headers
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
-
+    ;; application data
     smtp-set-application-data
     smtp-get-application-data
     smtp-message-set-application-data
     smtp-message-get-application-data
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
+
+;;; --------------------------------------------------------------------
+;;; still to be implemented
+
     smtp-auth-set-context
     smtp-dsn-set-ret
     smtp-dsn-set-envid
@@ -243,25 +245,32 @@
   (foreign-call "ikrt_smtp_set_resent_headers" message onoff))
 
 
+;;;; application data
+
+(define-inline (smtp-set-application-data session data-pointer)
+  (foreign-call "ikrt_smtp_set_application_data" session data-pointer))
+
+(define-inline (smtp-get-application-data session)
+  (foreign-call "ikrt_smtp_get_application_data" session))
+
+;;; --------------------------------------------------------------------
+
+(define-inline (smtp-message-set-application-data message data-pointer)
+  (foreign-call "ikrt_smtp_message_set_application_data" message data-pointer))
+
+(define-inline (smtp-message-get-application-data message)
+  (foreign-call "ikrt_smtp_message_get_application_data" message))
+
+;;; --------------------------------------------------------------------
+
+(define-inline (smtp-recipient-set-application-data recipient data-pointer)
+  (foreign-call "ikrt_smtp_recipient_set_application_data" recipient data-pointer))
+
+(define-inline (smtp-recipient-get-application-data recipient)
+  (foreign-call "ikrt_smtp_recipient_get_application_data" recipient))
+
+
 ;;;; still to be implemented
-
-(define-inline (smtp-set-application-data)
-  (foreign-call "ikrt_smtp_set_application_data"))
-
-(define-inline (smtp-get-application-data)
-  (foreign-call "ikrt_smtp_get_application_data"))
-
-(define-inline (smtp-message-set-application-data)
-  (foreign-call "ikrt_smtp_message_set_application_data"))
-
-(define-inline (smtp-message-get-application-data)
-  (foreign-call "ikrt_smtp_message_get_application_data"))
-
-(define-inline (smtp-recipient-set-application-data)
-  (foreign-call "ikrt_smtp_recipient_set_application_data"))
-
-(define-inline (smtp-recipient-get-application-data)
-  (foreign-call "ikrt_smtp_recipient_get_application_data"))
 
 (define-inline (smtp-auth-set-context)
   (foreign-call "ikrt_smtp_auth_set_context"))

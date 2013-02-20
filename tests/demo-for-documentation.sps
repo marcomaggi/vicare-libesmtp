@@ -131,6 +131,9 @@ Subject: demo of vicare/libesmtp\r\n\
 \r\n\
 This is the text.\r\n")
 
+    (define cstr.ptr (ffi.string->cstring message-text))
+    (define cstr.len (ffi.strlen cstr.ptr))
+
     (define monitor-cb
       (esmtp.make-smtp-monitorcb
        (lambda (buf.ptr buf.len writing)
@@ -147,16 +150,39 @@ This is the text.\r\n")
 
     (define message-cb
       (esmtp.make-smtp-messagecb
-       (lambda (unused len.ptr)
-	 (if (ffi.pointer-null? len.ptr)
-	     (null-pointer)
-	   (let* ((cstr.ptr (ffi.string->cstring message-text))
-		  (cstr.len (ffi.strlen cstr.ptr)))
-	     (ffi.pointer-set-c-signed-int! len.ptr 0 cstr.len)
-	     (pretty-print (list 'message-cb cstr.ptr cstr.len
-				 (ffi.cstring->string cstr.ptr cstr.len))
-			   (current-error-port))
-	     cstr.ptr)))))
+       (let ((sending? #t))
+	 (lambda (unused len.ptr)
+	   (pretty-print (list 'message-cb 'enter)
+			 (current-error-port))
+	   (ffi.pointer-set-c-pointer! unused 0 (null-pointer))
+	   (if (ffi.pointer-null? len.ptr)
+	       ;;If LEN.PTR is set to NULL:  this call is to ask to rewind
+	       ;;the message; the return value is not used.
+	       (begin
+		 (pretty-print (list 'message-cb 'rewind)
+			       (current-error-port))
+		 (null-pointer))
+	     ;;If LEN.PTR is  not NULL: this callback must  a pointer to
+	     ;;the  start of  the message  buffer and  set the  location
+	     ;;referenced by LEN.PTR to the  number of octets of data in
+	     ;;the buffer.
+	     (if sending?
+		 (begin
+		   (ffi.pointer-set-c-signed-int! len.ptr 0 cstr.len)
+		   (set! sending? #f)
+		   (pretty-print (list 'message-cb 'sending-data
+				       cstr.ptr cstr.len
+				       (ffi.pointer-ref-c-signed-int len.ptr 0))
+				 (current-error-port))
+		   cstr.ptr)
+	       ;;The  callback is  called  repeatedly  until the  entire
+	       ;;message has been processed.   When all the message data
+	       ;;has been read the callback should return NULL.
+	       (begin
+		 (pretty-print (list 'message-cb 'end-of-data)
+			       (current-error-port))
+		 (ffi.pointer-set-c-signed-int! len.ptr 0 0)
+		 cstr.ptr #;(null-pointer))))))))
 
     (let* ((sex (esmtp.smtp-create-session))
 	   (msg (esmtp.smtp-add-message sex))

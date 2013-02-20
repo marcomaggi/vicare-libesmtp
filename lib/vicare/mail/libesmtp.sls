@@ -123,15 +123,17 @@
     smtp-starttls->symbol
     smtp-ret->symbol
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
-
+    ;; application data
     smtp-set-application-data
     smtp-get-application-data
     smtp-message-set-application-data
     smtp-message-get-application-data
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
+
+;;; --------------------------------------------------------------------
+;;; still to be implemented
+
     smtp-auth-set-context
     smtp-dsn-set-ret
     smtp-dsn-set-envid
@@ -934,6 +936,52 @@
     (capi.smtp-recipient-reset-status recipient)))
 
 
+;;;; application data
+
+(define (smtp-set-application-data session data-pointer)
+  (define who 'smtp-set-application-data)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			data-pointer))
+    (capi.smtp-set-application-data session data-pointer)))
+
+(define (smtp-get-application-data session)
+  (define who 'smtp-get-application-data)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session))
+    (capi.smtp-get-application-data session)))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-message-set-application-data message data-pointer)
+  (define who 'smtp-message-set-application-data)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (pointer			data-pointer))
+    (capi.smtp-message-set-application-data message data-pointer)))
+
+(define (smtp-message-get-application-data message)
+  (define who 'smtp-message-get-application-data)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (capi.smtp-message-get-application-data message)))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-recipient-set-application-data recipient data-pointer)
+  (define who 'smtp-recipient-set-application-data)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient)
+       (pointer			data-pointer))
+    (capi.smtp-recipient-set-application-data recipient data-pointer)))
+
+(define (smtp-recipient-get-application-data recipient)
+  (define who 'smtp-recipient-get-application-data)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient))
+    (capi.smtp-recipient-get-application-data recipient)))
+
+
 ;;;; callback makers
 
 (define make-smtp-enumerate-messagecb
@@ -1140,42 +1188,6 @@
 
 
 ;;;; still to be implemented
-
-(define (smtp-set-application-data)
-  (define who 'smtp-set-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-set-application-data)))
-
-(define (smtp-get-application-data)
-  (define who 'smtp-get-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-get-application-data)))
-
-(define (smtp-message-set-application-data)
-  (define who 'smtp-message-set-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-message-set-application-data)))
-
-(define (smtp-message-get-application-data)
-  (define who 'smtp-message-get-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-message-get-application-data)))
-
-(define (smtp-recipient-set-application-data)
-  (define who 'smtp-recipient-set-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-recipient-set-application-data)))
-
-(define (smtp-recipient-get-application-data)
-  (define who 'smtp-recipient-get-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-recipient-get-application-data)))
 
 (define (smtp-auth-set-context)
   (define who 'smtp-auth-set-context)

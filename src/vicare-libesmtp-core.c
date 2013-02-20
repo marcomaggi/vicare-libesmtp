@@ -573,6 +573,93 @@ ikrt_smtp_set_resent_headers (ikptr s_message, ikptr s_onoff, ikpcb * pcb)
 
 
 /** --------------------------------------------------------------------
+ ** Application data.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_set_application_data (ikptr s_session, ikptr s_data_pointer, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SET_APPLICATION_DATA
+  smtp_session_t	sex  = IK_LIBESMTP_SESSION(s_session);
+  void *		data = IK_POINTER_DATA_VOIDP(s_data_pointer);
+  void *		rv;
+  rv = smtp_set_application_data(sex, data);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_get_application_data (ikptr s_session, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_GET_APPLICATION_DATA
+  smtp_session_t	sex  = IK_LIBESMTP_SESSION(s_session);
+  void *		rv;
+  rv = smtp_get_application_data(sex);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+/* ------------------------------------------------------------------ */
+
+ikptr
+ikrt_smtp_message_set_application_data (ikptr s_message, ikptr s_data_pointer, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_MESSAGE_SET_APPLICATION_DATA
+  smtp_message_t	sex  = IK_LIBESMTP_MESSAGE(s_message);
+  void *		data = IK_POINTER_DATA_VOIDP(s_data_pointer);
+  void *		rv;
+  rv = smtp_message_set_application_data(sex, data);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_message_get_application_data (ikptr s_message, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_MESSAGE_GET_APPLICATION_DATA
+  smtp_message_t	sex  = IK_LIBESMTP_MESSAGE(s_message);
+  void *		rv;
+  rv = smtp_message_get_application_data(sex);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+/* ------------------------------------------------------------------ */
+
+ikptr
+ikrt_smtp_recipient_set_application_data (ikptr s_recipient, ikptr s_data_pointer, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_RECIPIENT_SET_APPLICATION_DATA
+  smtp_recipient_t	sex  = IK_LIBESMTP_RECIPIENT(s_recipient);
+  void *		data = IK_POINTER_DATA_VOIDP(s_data_pointer);
+  void *		rv;
+  rv = smtp_recipient_set_application_data(sex, data);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_recipient_get_application_data (ikptr s_recipient, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_RECIPIENT_GET_APPLICATION_DATA
+  smtp_recipient_t	sex  = IK_LIBESMTP_RECIPIENT(s_recipient);
+  void *		rv;
+  rv = smtp_recipient_get_application_data(sex);
+  return ika_pointer_alloc(pcb, (long)rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
  ** Still to be implemented.
  ** ----------------------------------------------------------------- */
 
@@ -588,68 +675,6 @@ ikrt_libesmtp_template (ikpcb * pcb)
 }
 #endif
 
-
-ikptr
-ikrt_smtp_set_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_get_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_GET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_message_set_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_MESSAGE_SET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_message_get_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_MESSAGE_GET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_recipient_set_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_RECIPIENT_SET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_recipient_get_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_RECIPIENT_GET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-/* ------------------------------------------------------------------ */
 
 ikptr
 ikrt_smtp_auth_set_context (ikpcb * pcb)
