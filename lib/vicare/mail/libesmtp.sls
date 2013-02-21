@@ -1033,11 +1033,11 @@
   ;;		(void **ctx,
   ;;		 int *len,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+  (let ((maker (ffi.make-c-callback-maker 'pointer '(pointer pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (optional-buffer-pointer len-pointer unused-custom-data)
 	       (guard (E (else
-			  (pretty-print E (current-error-port))
+			  #;(pretty-print E (current-error-port))
 			  (null-pointer)))
 		 (user-scheme-callback optional-buffer-pointer len-pointer)))))))
 
@@ -1078,7 +1078,8 @@
   ;;		 int buflen,
   ;;		 int rwflag,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int signed-int pointer))))
+  (let ((maker (ffi.make-c-callback-maker 'signed-int
+					  '(pointer signed-int signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (buf.ptr buf.len rwflag custom-data)
 	       (guard (E (else

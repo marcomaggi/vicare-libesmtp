@@ -152,16 +152,10 @@ This is the text.\r\n")
       (esmtp.make-smtp-messagecb
        (let ((sending? #t))
 	 (lambda (unused len.ptr)
-	   (pretty-print (list 'message-cb 'enter)
-			 (current-error-port))
-	   (ffi.pointer-set-c-pointer! unused 0 (null-pointer))
 	   (if (ffi.pointer-null? len.ptr)
 	       ;;If LEN.PTR is set to NULL:  this call is to ask to rewind
 	       ;;the message; the return value is not used.
-	       (begin
-		 (pretty-print (list 'message-cb 'rewind)
-			       (current-error-port))
-		 (null-pointer))
+	       (null-pointer)
 	     ;;If LEN.PTR is  not NULL: this callback must  a pointer to
 	     ;;the  start of  the message  buffer and  set the  location
 	     ;;referenced by LEN.PTR to the  number of octets of data in
@@ -170,19 +164,13 @@ This is the text.\r\n")
 		 (begin
 		   (ffi.pointer-set-c-signed-int! len.ptr 0 cstr.len)
 		   (set! sending? #f)
-		   (pretty-print (list 'message-cb 'sending-data
-				       cstr.ptr cstr.len
-				       (ffi.pointer-ref-c-signed-int len.ptr 0))
-				 (current-error-port))
 		   cstr.ptr)
 	       ;;The  callback is  called  repeatedly  until the  entire
 	       ;;message has been processed.   When all the message data
 	       ;;has been read the callback should return NULL.
 	       (begin
-		 (pretty-print (list 'message-cb 'end-of-data)
-			       (current-error-port))
 		 (ffi.pointer-set-c-signed-int! len.ptr 0 0)
-		 cstr.ptr #;(null-pointer))))))))
+		 (null-pointer))))))))
 
     (let* ((sex (esmtp.smtp-create-session))
 	   (msg (esmtp.smtp-add-message sex))
