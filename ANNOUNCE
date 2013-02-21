@@ -11,7 +11,7 @@ it provides bindings for the libESMTP C language library.
 
   This package makes use of the GNU Autotools.
 
-  The latest version of this package can be downloaded from Github:
+  The latest version of this package can be downloaded from:
 
 	<http://code.google.com/p/vicare-scheme/downloads/list>
 
