@@ -1,4 +1,4 @@
-Subject: [announce] Vicare/libESMTP revision 0.1d0
+Subject: [announce] Vicare/libESMTP revision 0.1d1
 
 			    Vicare/libESMTP
 			    ===============
@@ -27,6 +27,12 @@ development takes place at:
 tested libESMTP version 1.0.6; the libESMTP library is available at:
 
 	      <http://www.stafford.uklinux.net/libesmtp/>
+
+
+Notes for revision 0.1d1
+------------------------
+
+*
 
 
 Notes for revision 0.1d0
