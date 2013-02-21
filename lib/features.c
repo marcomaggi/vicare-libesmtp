@@ -471,6 +471,128 @@ printf("(define-inline-constant HAVE_SMTP_ETRN_GET_APPLICATION_DATA %s)\n",
 #endif
   );
 
+/* ------------------------------------------------------------------ */
+
+printf("(define-inline-constant HAVE_AUTH_CLIENT_INIT %s)\n",
+#ifdef HAVE_AUTH_CLIENT_INIT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_CLIENT_EXIT %s)\n",
+#ifdef HAVE_AUTH_CLIENT_EXIT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_CREATE_CONTEXT %s)\n",
+#ifdef HAVE_AUTH_CREATE_CONTEXT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_DESTROY_CONTEXT %s)\n",
+#ifdef HAVE_AUTH_DESTROY_CONTEXT
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_SET_MECHANISM_FLAGS %s)\n",
+#ifdef HAVE_AUTH_SET_MECHANISM_FLAGS
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_SET_MECHANISM_SSF %s)\n",
+#ifdef HAVE_AUTH_SET_MECHANISM_SSF
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_SET_INTERACT_CB %s)\n",
+#ifdef HAVE_AUTH_SET_INTERACT_CB
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_CLIENT_ENABLED %s)\n",
+#ifdef HAVE_AUTH_CLIENT_ENABLED
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_SET_MECHANISM %s)\n",
+#ifdef HAVE_AUTH_SET_MECHANISM
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_MECHANISM_NAME %s)\n",
+#ifdef HAVE_AUTH_MECHANISM_NAME
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_RESPONSE %s)\n",
+#ifdef HAVE_AUTH_RESPONSE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_GET_SSF %s)\n",
+#ifdef HAVE_AUTH_GET_SSF
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_ENCODE %s)\n",
+#ifdef HAVE_AUTH_ENCODE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_DECODE %s)\n",
+#ifdef HAVE_AUTH_DECODE
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
+printf("(define-inline-constant HAVE_AUTH_SET_EXTERNAL_ID %s)\n",
+#ifdef HAVE_AUTH_SET_EXTERNAL_ID
+  "#t"
+#else
+  "#f"
+#endif
+  );
+
 
   printf("\n\
 ;;;; done\n\

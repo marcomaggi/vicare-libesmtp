@@ -36,7 +36,9 @@
 #endif
 #include <vicare.h>
 #include <string.h>
-#include <auth-client.h>
+#ifdef HAVE_AUTH_CLIENT_H
+#  include <auth-client.h>
+#endif
 #include <libesmtp.h>
 
 

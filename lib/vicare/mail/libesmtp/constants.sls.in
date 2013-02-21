@@ -132,7 +132,17 @@
     ;; Protocol monitor callback.  Values for writing
     SMTP_CB_READING
     SMTP_CB_WRITING
-    SMTP_CB_HEADERS)
+    SMTP_CB_HEADERS
+
+;;; --------------------------------------------------------------------
+
+    AUTH_USER
+    AUTH_REALM
+    AUTH_PASS
+    AUTH_CLEARTEXT
+
+    AUTH_PLUGIN_PLAIN
+    AUTH_PLUGIN_EXTERNAL)
   (import (rename (only (vicare syntactic-extensions)
 			define-inline-constant)
 		  (define-inline-constant	defc)))
@@ -246,6 +256,16 @@
 (defc SMTP_CB_READING		@VALUEOF_SMTP_CB_READING@)
 (defc SMTP_CB_WRITING		@VALUEOF_SMTP_CB_WRITING@)
 (defc SMTP_CB_HEADERS		@VALUEOF_SMTP_CB_HEADERS@)
+
+;;; --------------------------------------------------------------------
+
+(defc AUTH_USER			@VALUEOF_AUTH_USER@)
+(defc AUTH_REALM		@VALUEOF_AUTH_REALM@)
+(defc AUTH_PASS			@VALUEOF_AUTH_PASS@)
+(defc AUTH_CLEARTEXT		@VALUEOF_AUTH_CLEARTEXT@)
+
+(defc AUTH_PLUGIN_PLAIN		@VALUEOF_AUTH_PLUGIN_PLAIN@)
+(defc AUTH_PLUGIN_EXTERNAL	@VALUEOF_AUTH_PLUGIN_EXTERNAL@)
 
 
 ;;;; done

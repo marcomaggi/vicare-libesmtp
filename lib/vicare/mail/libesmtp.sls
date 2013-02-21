@@ -150,6 +150,22 @@
     smtp-etrn-node-status
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
+
+    auth-client-init
+    auth-client-exit
+    auth-create-context
+    auth-destroy-context
+    auth-set-mechanism-flags
+    auth-set-mechanism-ssf
+    auth-set-interact-cb
+    auth-client-enabled
+    auth-set-mechanism
+    auth-mechanism-name
+    auth-response
+    auth-get-ssf
+    auth-encode
+    auth-decode
+    auth-set-external-id
     )
   (import (vicare)
     (vicare mail libesmtp constants)
@@ -1284,6 +1300,98 @@
   (with-arguments-validation (who)
       ()
     (capi.smtp-etrn-get-application-data)))
+
+;;; --------------------------------------------------------------------
+
+(define (auth-client-init)
+  (define who 'auth-client-init)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-init)))
+
+(define (auth-client-exit)
+  (define who 'auth-client-exit)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-exit)))
+
+(define (auth-create-context)
+  (define who 'auth-create-context)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-create-context)))
+
+(define (auth-destroy-context)
+  (define who 'auth-destroy-context)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-destroy-context)))
+
+(define (auth-set-mechanism-flags)
+  (define who 'auth-set-mechanism-flags)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism-flags)))
+
+(define (auth-set-mechanism-ssf)
+  (define who 'auth-set-mechanism-ssf)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism-ssf)))
+
+(define (auth-set-interact-cb)
+  (define who 'auth-set-interact-cb)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-interact-cb)))
+
+(define (auth-client-enabled)
+  (define who 'auth-client-enabled)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-enabled)))
+
+(define (auth-set-mechanism)
+  (define who 'auth-set-mechanism)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism)))
+
+(define (auth-mechanism-name)
+  (define who 'auth-mechanism-name)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-mechanism-name)))
+
+(define (auth-response)
+  (define who 'auth-response)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-response)))
+
+(define (auth-get-ssf)
+  (define who 'auth-get-ssf)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-get-ssf)))
+
+(define (auth-encode)
+  (define who 'auth-encode)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-encode)))
+
+(define (auth-decode)
+  (define who 'auth-decode)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-decode)))
+
+(define (auth-set-external-id)
+  (define who 'auth-set-external-id)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-external-id)))
 
 
 ;;;; done

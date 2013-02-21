@@ -102,7 +102,21 @@
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
 
-
+    auth-client-init
+    auth-client-exit
+    auth-create-context
+    auth-destroy-context
+    auth-set-mechanism-flags
+    auth-set-mechanism-ssf
+    auth-set-interact-cb
+    auth-client-enabled
+    auth-set-mechanism
+    auth-mechanism-name
+    auth-response
+    auth-get-ssf
+    auth-encode
+    auth-decode
+    auth-set-external-id
     )
   (import (vicare))
 
@@ -270,6 +284,11 @@
   (foreign-call "ikrt_smtp_recipient_get_application_data" recipient))
 
 
+;;;; authentication
+
+
+
+
 ;;;; still to be implemented
 
 (define-inline (smtp-auth-set-context)
@@ -319,6 +338,53 @@
 
 (define-inline (smtp-etrn-get-application-data)
   (foreign-call "ikrt_smtp_etrn_get_application_data"))
+
+;;; --------------------------------------------------------------------
+
+(define-inline (auth-client-init)
+  (foreign-call "auth_client_init"))
+
+(define-inline (auth-client-exit)
+  (foreign-call "auth_client_exit"))
+
+(define-inline (auth-create-context)
+  (foreign-call "auth_create_context"))
+
+(define-inline (auth-destroy-context)
+  (foreign-call "auth_destroy_context"))
+
+(define-inline (auth-set-mechanism-flags)
+  (foreign-call "auth_set_mechanism_flags"))
+
+(define-inline (auth-set-mechanism-ssf)
+  (foreign-call "auth_set_mechanism_ssf"))
+
+(define-inline (auth-set-interact-cb)
+  (foreign-call "auth_set_interact_cb"))
+
+(define-inline (auth-client-enabled)
+  (foreign-call "auth_client_enabled"))
+
+(define-inline (auth-set-mechanism)
+  (foreign-call "auth_set_mechanism"))
+
+(define-inline (auth-mechanism-name)
+  (foreign-call "auth_mechanism_name"))
+
+(define-inline (auth-response)
+  (foreign-call "auth_response"))
+
+(define-inline (auth-get-ssf)
+  (foreign-call "auth_get_ssf"))
+
+(define-inline (auth-encode)
+  (foreign-call "auth_encode"))
+
+(define-inline (auth-decode)
+  (foreign-call "auth_decode"))
+
+(define-inline (auth-set-external-id)
+  (foreign-call "auth_set_external_id"))
 
 
 ;;;; done
