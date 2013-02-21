@@ -35,20 +35,21 @@
 	  esmtp.)
   (prefix (vicare ffi)
 	  ffi.)
-  (vicare syntactic-extensions))
-
-(px.signal-bub-init)
+  (only (vicare syntactic-extensions)
+	unwind-protect))
 
 
 ;;;; helpers
 
-(define-inline (%pretty-print ?thing)
-  (pretty-print ?thing (current-error-port)))
+(define-syntax %pretty-print
+  (syntax-rules ()
+    ((_ ?thing)
+     (pretty-print ?thing (current-error-port)))))
 
 
 ;;;; version functions
 
-(let ()
+(when #f
 
   (%pretty-print (list 'version-informations
 		       (esmtp.vicare-libesmtp-version-interface-current)
@@ -60,7 +61,207 @@
   #t)
 
 
-;;;; send a message using SMTP-SET-MESSAGE-STR
+;;;; send a message from localhost to localhost
+;;
+;;* Use SMTP-SET-MESSAGE-STR.
+;;
+;;* No debugging callbacks.
+;;
+
+(when #f
+  (let ()
+
+    (define local-hostname
+      "localhost")
+
+    (define smtp-server
+      "localhost:smtp")
+
+    (define sender-mailbox
+      "marco@localhost")
+
+    (define recipient-mailbox
+      "marco@localhost")
+
+    (define message-text
+      "From: <marco@localhost>\r\n\
+       To: <marco@localhost>\r\n\
+       Subject: demo of vicare/libesmtp\r\n\
+       \r\n\
+       This is the text.\r\n")
+
+    (let* ((sex  (esmtp.smtp-create-session))
+	   (msg  (esmtp.smtp-add-message sex))
+	   (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+	   (cstr (ffi.string->cstring message-text)))
+      (unwind-protect
+	  (begin
+	    (esmtp.smtp-set-server sex smtp-server)
+	    (esmtp.smtp-set-reverse-path msg sender-mailbox)
+	    (esmtp.smtp-set-hostname sex local-hostname)
+	    (esmtp.smtp-set-message-str msg cstr)
+	    (esmtp.smtp-start-session sex)
+	    (fprintf (current-error-port)
+		     "recipient complete? ~a\n"
+		     (esmtp.smtp-recipient-check-complete rec)))
+	(esmtp.smtp-destroy-session sex)))
+
+    #f))
+
+
+;;;; send a message from localhost to localhost
+;;
+;;* Use SMTP-SET-MESSAGECB.
+;;
+;;* No debugging callbacks.
+;;
+
+(when #t
+  (let ()
+
+    (define local-hostname
+      "localhost")
+
+    (define smtp-server
+      "localhost:smtp")
+
+    (define sender-mailbox
+      "marco@localhost")
+
+    (define recipient-mailbox
+      "marco@localhost")
+
+    (define message-text
+      "From: <marco@localhost>\r\n\
+       To: <marco@localhost>\r\n\
+       Subject: demo of vicare/libesmtp\r\n\
+       \r\n\
+       This is the text.\r\n")
+
+    (define (make-message-cb message-text)
+      (let ((cstr.ptr	#f)
+	    (cstr.len	#f))
+	(lambda (unused len.ptr)
+	  (cond ((ffi.pointer-null? len.ptr)
+		 ;;If LEN.PTR  is set to NULL:  this call is to  ask the
+		 ;;application to  rewind the message; the  return value
+		 ;;is not used, but it must be a pointer.
+		 (set! cstr.ptr (ffi.string->cstring message-text))
+		 (set! cstr.len (ffi.strlen cstr.ptr))
+		 (null-pointer))
+		(cstr.len
+		 ;;If LEN.PTR is  not NULL: this callback  must return a
+		 ;;pointer to  the start of  the next message  chunk and
+		 ;;set the location referenced  by LEN.PTR to the number
+		 ;;of octets of data in the buffer.
+		 (ffi.pointer-set-c-signed-int! len.ptr 0 cstr.len)
+		 (set! cstr.len #f)
+		 cstr.ptr)
+		(else
+		 ;;The callback  is called  repeatedly until  the entire
+		 ;;message  has been  processed.  When  all the  message
+		 ;;data has been read the callback must return NULL.
+		 (ffi.pointer-set-c-signed-int! len.ptr 0 0)
+		 (null-pointer))))))
+
+    (let* ((sex  (esmtp.smtp-create-session))
+	   (msg  (esmtp.smtp-add-message sex))
+	   (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+	   (mcb  (esmtp.make-smtp-messagecb
+		  (make-message-cb message-text))))
+      (unwind-protect
+	  (begin
+	    (esmtp.smtp-set-server sex smtp-server)
+	    (esmtp.smtp-set-reverse-path msg sender-mailbox)
+	    (esmtp.smtp-set-hostname sex local-hostname)
+	    (esmtp.smtp-set-messagecb msg mcb)
+	    (esmtp.smtp-start-session sex)
+	    (fprintf (current-error-port)
+		     "recipient complete? ~a\n"
+		     (esmtp.smtp-recipient-check-complete rec)))
+	(esmtp.smtp-destroy-session sex)
+	(ffi.free-c-callback mcb)))
+
+    #f))
+
+
+;;;; send a message from localhost to localhost
+;;
+;;* Use SMTP-SET-MESSAGE-STR.
+;;
+;;* Show monitor callback.
+;;
+;;* Show event callback.
+;;
+
+(when #f
+  (let ()
+
+    (define local-hostname
+      "localhost")
+
+    (define smtp-server
+      "localhost:smtp")
+
+    (define sender-mailbox
+      "marco@localhost")
+
+    (define recipient-mailbox
+      "marco@localhost")
+
+    (define message-text
+      "From: <marco@localhost>\r\n\
+       To: <marco@localhost>\r\n\
+       Subject: demo of vicare/libesmtp\r\n\
+       \r\n\
+       This is the text.\r\n")
+
+    (define (monitor-cb buf.ptr buf.len writing)
+      (fprintf (current-error-port)
+	       "monitor: ~a, ~a"
+	       (esmtp.smtp-cb->symbol writing)
+	       (ffi.cstring->string buf.ptr buf.len)))
+
+    (define (event-cb session event-no)
+      (fprintf (current-error-port)
+	       "event: ~a\n"
+	       (esmtp.smtp-event->symbol event-no)))
+
+    (let* ((sex  (esmtp.smtp-create-session))
+	   (msg  (esmtp.smtp-add-message sex))
+	   (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+	   (cstr (ffi.string->cstring message-text))
+	   (mcb  (esmtp.make-smtp-monitorcb monitor-cb))
+	   (ecb  (esmtp.make-smtp-eventcb   event-cb)))
+      (unwind-protect
+	  (begin
+	    (esmtp.smtp-set-monitorcb sex mcb #t)
+	    (esmtp.smtp-set-eventcb   sex ecb)
+	    (esmtp.smtp-set-server sex smtp-server)
+	    (esmtp.smtp-set-reverse-path msg sender-mailbox)
+	    (esmtp.smtp-set-hostname sex local-hostname)
+	    (esmtp.smtp-set-message-str msg cstr)
+	    (esmtp.smtp-start-session sex)
+	    (fprintf (current-error-port)
+		     "recipient complete? ~a\n"
+		     (esmtp.smtp-recipient-check-complete rec)))
+	(esmtp.smtp-destroy-session sex)
+	(ffi.free-c-callback mcb)
+	(ffi.free-c-callback ecb)))
+
+    #f))
+
+
+;;;; send a message from localhost to localhost
+;;
+;;* Use SMTP-SET-MESSAGE-STR.
+;;
+;;* Show monitor callback.
+;;
+;;* Show event callback.
+;;
+;;* At the end print result informations.
+;;
 
 (when #f
   (let ()
@@ -121,7 +322,7 @@ This is the text.\r\n")
 
 ;;;; send a message using SMTP-SET-MESSAGECB
 
-(when #t
+(when #f
   (let ()
 
     (define message-text

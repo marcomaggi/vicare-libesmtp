@@ -264,6 +264,7 @@ the very unlikely case that this function fails: @false{} is returned.
 
 
 @menu
+* plain examples::              Usage examples.
 * plain structs::               Data structures.
 * plain errors::                Library errors.
 * plain sessions::              Session management.
@@ -275,6 +276,226 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain data::                  Application data.
 * plain unimplemented::         Still to be implemented.
 @end menu
+
+@c page
+@node plain examples
+@section Usage examples
+
+
+@menu
+* plain examples simple::       Simple message mailing.
+* plain examples cb::           Simple message mailing using the full
+                                message callback.
+* plain examples debug::        Simple message mailing with
+                                debug callbacks.
+@end menu
+
+@c page
+@node plain examples simple
+@subsection Simple message mailing
+
+
+The following program sends a message with no frills; make use of
+@func{smtp-set-message-str} to feed the message to @libesmtp{}:
+
+@smallexample
+#!r6rs
+(import (vicare)
+  (prefix (vicare mail libesmtp) esmtp.)
+  (prefix (vicare mail libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.)
+  (only (vicare syntactic-extensions)
+        unwind-protect))
+
+(define local-hostname
+  "localhost")
+
+(define smtp-server
+  "localhost:smtp")
+
+(define sender-mailbox
+  "marco@@localhost")
+
+(define recipient-mailbox
+  "marco@@localhost")
+
+(define message-text
+  "From: <marco@@localhost>\r\n\
+   To: <marco@@localhost>\r\n\
+   Subject: demo of vicare/libesmtp\r\n\
+   \r\n\
+   This is the text.\r\n")
+
+(let* ((sex  (esmtp.smtp-create-session))
+       (msg  (esmtp.smtp-add-message sex))
+       (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+       (cstr (ffi.string->cstring message-text)))
+  (unwind-protect
+      (begin
+        (esmtp.smtp-set-server sex smtp-server)
+        (esmtp.smtp-set-reverse-path msg sender-mailbox)
+        (esmtp.smtp-set-hostname sex local-hostname)
+        (esmtp.smtp-set-message-str msg cstr)
+        (esmtp.smtp-start-session sex)
+        (fprintf (current-error-port)
+                 "recipient complete? ~a\n"
+                 (esmtp.smtp-recipient-check-complete rec)))
+    (esmtp.smtp-destroy-session sex)))
+@end smallexample
+
+@c page
+@node plain examples cb
+@subsection Simple message mailing using the full message callback
+
+
+The following program sends a message with no frills; make use of
+@func{smtp-set-messagecb} to feed the message to @libesmtp{}:
+
+@smallexample
+#!r6rs
+(import (vicare)
+  (prefix (vicare mail libesmtp) esmtp.)
+  (prefix (vicare mail libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.)
+  (only (vicare syntactic-extensions)
+        unwind-protect))
+
+(define local-hostname
+  "localhost")
+
+(define smtp-server
+  "localhost:smtp")
+
+(define sender-mailbox
+  "marco@@localhost")
+
+(define recipient-mailbox
+  "marco@@localhost")
+
+(define message-text
+  "From: <marco@@localhost>\r\n\
+   To: <marco@@localhost>\r\n\
+   Subject: demo of vicare/libesmtp\r\n\
+   \r\n\
+   This is the text.\r\n")
+
+(define (make-message-cb message-text)
+  (let ((cstr.ptr   #f)
+        (cstr.len   #f))
+    (lambda (unused len.ptr)
+      (cond ((ffi.pointer-null? len.ptr)
+             ;;If LEN.PTR  is set to NULL:  this call is to  ask the
+             ;;application to  rewind the message; the  return value
+             ;;is not used, but it must be a pointer.
+             (set! cstr.ptr (ffi.string->cstring message-text))
+             (set! cstr.len (ffi.strlen cstr.ptr))
+             (null-pointer))
+
+            (cstr.len
+             ;;If LEN.PTR is  not NULL: this callback  must return a
+             ;;pointer to  the start of  the next message  chunk and
+             ;;set the location referenced  by LEN.PTR to the number
+             ;;of octets of data in the buffer.
+             (ffi.pointer-set-c-signed-int! len.ptr 0 cstr.len)
+             (set! cstr.len #f)
+             cstr.ptr)
+
+            (else
+             ;;The callback  is called  repeatedly until  the entire
+             ;;message  has been  processed.  When  all the  message
+             ;;data has been read the callback must return NULL.
+             (ffi.pointer-set-c-signed-int! len.ptr 0 0)
+             (null-pointer))))))
+
+(let* ((sex  (esmtp.smtp-create-session))
+       (msg  (esmtp.smtp-add-message sex))
+       (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+       (mcb  (esmtp.make-smtp-messagecb
+                (make-message-cb message-text))))
+  (unwind-protect
+      (begin
+        (esmtp.smtp-set-server sex smtp-server)
+        (esmtp.smtp-set-reverse-path msg sender-mailbox)
+        (esmtp.smtp-set-hostname sex local-hostname)
+        (esmtp.smtp-set-messagecb msg mcb)
+        (esmtp.smtp-start-session sex)
+        (fprintf (current-error-port)
+                 "recipient complete? ~a\n"
+                 (esmtp.smtp-recipient-check-complete rec)))
+    (esmtp.smtp-destroy-session sex)
+    (ffi.free-c-callback mcb)))
+@end smallexample
+
+@c page
+@node plain examples debug
+@subsection Simple message mailing with debug callbacks
+
+
+The following program sends a message and shows debugging callbacks;
+make use of @func{smtp-set-message-str} to feed the message to
+@libesmtp{}:
+
+@smallexample
+#!r6rs
+(import (vicare)
+  (prefix (vicare mail libesmtp) esmtp.)
+  (prefix (vicare mail libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.)
+  (only (vicare syntactic-extensions)
+        unwind-protect))
+
+(define local-hostname
+  "localhost")
+
+(define smtp-server
+  "localhost:smtp")
+
+(define sender-mailbox
+  "marco@@localhost")
+
+(define recipient-mailbox
+  "marco@@localhost")
+
+(define message-text
+  "From: <marco@@localhost>\r\n\
+   To: <marco@@localhost>\r\n\
+   Subject: demo of vicare/libesmtp\r\n\
+   \r\n\
+   This is the text.\r\n")
+
+(define (monitor-cb buf.ptr buf.len writing)
+  (fprintf (current-error-port)
+           "monitor: ~a, ~a"
+           (esmtp.smtp-cb->symbol writing)
+           (ffi.cstring->string buf.ptr buf.len)))
+
+(define (event-cb session event-no)
+  (fprintf (current-error-port)
+           "event: ~a\n"
+           (esmtp.smtp-event->symbol event-no)))
+
+(let* ((sex  (esmtp.smtp-create-session))
+       (msg  (esmtp.smtp-add-message sex))
+       (rec  (esmtp.smtp-add-recipient msg recipient-mailbox))
+       (cstr (ffi.string->cstring message-text))
+       (mcb  (esmtp.make-smtp-monitorcb monitor-cb))
+       (ecb  (esmtp.make-smtp-eventcb   event-cb)))
+  (unwind-protect
+      (begin
+        (esmtp.smtp-set-monitorcb sex mcb #t)
+        (esmtp.smtp-set-eventcb   sex ecb)
+        (esmtp.smtp-set-server sex smtp-server)
+        (esmtp.smtp-set-reverse-path msg sender-mailbox)
+        (esmtp.smtp-set-hostname sex local-hostname)
+        (esmtp.smtp-set-message-str msg cstr)
+        (esmtp.smtp-start-session sex)
+        (fprintf (current-error-port)
+                 "recipient complete? ~a\n"
+                 (esmtp.smtp-recipient-check-complete rec)))
+    (esmtp.smtp-destroy-session sex)
+    (ffi.free-c-callback mcb)
+    (ffi.free-c-callback ecb)))
+@end smallexample
 
 @c page
 @node plain structs
