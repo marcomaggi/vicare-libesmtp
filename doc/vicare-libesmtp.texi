@@ -1354,6 +1354,69 @@ Return a pointer object referencing the application data associated to
 @defun smtp-etrn-get-application-data
 @end defun
 
+@c ------------------------------------------------------------
+
+@defun auth-client-init
+
+@end defun
+
+@defun auth-client-exit
+
+@end defun
+
+@defun auth-create-context
+
+@end defun
+
+@defun auth-destroy-context
+
+@end defun
+
+@defun auth-set-mechanism-flags
+
+@end defun
+
+@defun auth-set-mechanism-ssf
+
+@end defun
+
+@defun auth-set-interact-cb
+
+@end defun
+
+@defun auth-client-enabled
+
+@end defun
+
+@defun auth-set-mechanism
+
+@end defun
+
+@defun auth-mechanism-name
+
+@end defun
+
+@defun auth-response
+
+@end defun
+
+@defun auth-get-ssf
+
+@end defun
+
+@defun auth-encode
+
+@end defun
+
+@defun auth-decode
+
+@end defun
+
+@defun auth-set-external-id
+
+@end defun
+
+
 @c page
 @c ------------------------------------------------------------
 @c Appendices.
