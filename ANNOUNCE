@@ -32,7 +32,9 @@ tested libESMTP version 1.0.6; the libESMTP library is available at:
 Notes for revision 0.1d0
 ------------------------
 
-* This is a libesmtp package.
+* Development release.  Comments and testing are welcome.
+
+* Neither AUTH nor SSL supported so far.  Coming in the next release.
 
 
 ### end of file
