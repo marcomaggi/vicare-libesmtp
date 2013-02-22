@@ -16,6 +16,10 @@
 libESMTP
 @end macro
 
+@macro etrn{}
+@acronym{ETRN}
+@end macro
+
 @c page
 @c ------------------------------------------------------------
 @c Values.
@@ -274,6 +278,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain status::                Session results.
 * plain constants::             Converting constants to symbols.
 * plain data::                  Application data.
+* plain extensions::            @smtp{} extensions.
 * plain unimplemented::         Still to be implemented.
 @end menu
 
@@ -506,6 +511,7 @@ make use of @func{smtp-set-message-str} to feed the message to
 * plain structs session::       Session data structures.
 * plain structs message::       Message data structures.
 * plain structs recipient::     Recipient data structures.
+* plain structs etrn node::     @etrn{} node data structures.
 * plain structs status::        Status data structures.
 @end menu
 
@@ -777,6 +783,90 @@ Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?/alive}.
 @end deffn
 
 @c page
+@node plain structs etrn node
+@subsection @etrn{} node data structures
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@deftp {Struct Type} smtp-etrn-node
+@cindex @var{etrn-node} argument
+@cindex Argument @var{etrn-node}
+An opaque Scheme structure holding an instance of the C language type
+@code{smtp_etrn_node_t}, it references an @etrn{} node.
+
+When instances of this type are used as arguments to functions: this
+documentation identifies them as @var{etrn-node}.
+
+Instances of type @code{smtp-etrn-node} never own the the underlying
+@etrn{} node structure; when these instances are garbage collected or
+when @func{smtp-destroy-session} is applied to the session owning the
+associated message: the @etrn{} node is closed, all the associated data
+is finalised; any error is ignored in this procedure.
+@end deftp
+
+
+@defun smtp-etrn-node? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-etrn-node};
+otherwise return @false{}.
+@end defun
+
+
+@defun smtp-etrn-node?/alive @var{obj}
+Return @true{} if @var{obj} is an instance of @code{smtp-etrn-node} and
+the etrn-node it represents is open; otherwise return @false{}.
+@end defun
+
+
+@defun smtp-etrn-node-destructor @var{etrn-node}
+@defunx set-smtp-etrn-node-destructor! @var{etrn-node} @var{func}
+Retrieve or set a destructor function associated to the @var{etrn-node}.
+
+Whenever the @var{etrn-node} is finalised: @var{func} is applied to
+@var{etrn-node} before the internal state of @var{etrn-node} is
+finalised.
+
+Notice that @var{func} can do anything, not only destroy some state
+associated to @var{etrn-node}; if we do:
+
+@example
+(define connection ...)
+(set-smtp-etrn-node-destructor! connection
+  (let ((state (make-some-data-struct)))
+    (case-lambda
+      ((conn)
+       (destroy state))
+      (()
+       state))))
+
+(let ((state ((smtp-etrn-node-destructor connection))))
+  (do-something-with connection state))
+@end example
+
+@noindent
+we can easily associate values to @var{etrn-node}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} smtp-etrn-node @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?}.
+@end deffn
+
+
+@deffn {Validation Clause} smtp-etrn-node/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?/alive}.
+@end deffn
+
+@c page
 @node plain structs status
 @subsection Status data structures
 
@@ -833,6 +923,18 @@ Accessors for the fields of @code{smtp-status} instances.
 @defunx set-smtp-status-enh-detail! @var{status} @var{value}
 Mutators for the fields of @code{smtp-status} instances.
 @end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} smtp-status @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-status?}.
+@end deffn
 
 @c page
 @node plain errors
@@ -1508,12 +1610,72 @@ Return a pointer object referencing the application data associated to
 @end defun
 
 @c page
-@node plain unimplemented
-@section Still to be implemented
+@node plain extensions
+@section @smtp{} extensions
+
+
+@menu
+* plain extensions auth::       AUTH extension.
+* plain extensions starttls::   StartTLS extension.
+* plain extensions deliver by:: Deliver By extension.
+* plain extensions dsn::        Deliver Status Notification extension.
+* plain extensions size::       Size extension.
+* plain extensions 8bit::       8bit-MIME Transport extension.
+* plain extensions etrn::       Remote Message Queue Starting (@etrn{})
+                                extension.
+@end menu
+
+@c page
+@node plain extensions auth
+@subsection AUTH extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
 
 
 @defun smtp-auth-set-context
 @end defun
+
+@c page
+@node plain extensions starttls
+@subsection StartTLS extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-starttls-enable
+@end defun
+
+
+@defun smtp-starttls-set-ctx
+@end defun
+
+
+@defun smtp-starttls-set-password-cb
+@end defun
+
+@c page
+@node plain extensions deliver by
+@subsection Deliver By extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@defun smtp-deliverby-set-mode
+@end defun
+
+@c page
+@node plain extensions dsn
+@subsection Deliver Status Notification extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
 
 
 @defun smtp-dsn-set-ret
@@ -1531,29 +1693,37 @@ Return a pointer object referencing the application data associated to
 @defun smtp-dsn-set-orcpt
 @end defun
 
+@c page
+@node plain extensions size
+@subsection Size extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
 
 @defun smtp-size-set-estimate
 @end defun
+
+@c page
+@node plain extensions 8bit
+@subsection 8bit-MIME Transport extension
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
 
 
 @defun smtp-8bitmime-set-body
 @end defun
 
-
-@defun smtp-deliverby-set-mode
-@end defun
-
-
-@defun smtp-starttls-enable
-@end defun
+@c page
+@node plain extensions etrn
+@subsection Remote Message Queue Starting (@etrn{}) extension
 
 
-@defun smtp-starttls-set-ctx
-@end defun
-
-
-@defun smtp-starttls-set-password-cb
-@end defun
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
 
 
 @defun smtp-etrn-add-node
@@ -1568,14 +1738,19 @@ Return a pointer object referencing the application data associated to
 @end defun
 
 
-@defun smtp-etrn-set-application-data
+@defun smtp-etrn-set-application-data @var{etrn-node} @var{data-pointer}
+Associate a pointer object to an @etrn{} node structure.
 @end defun
 
 
-@defun smtp-etrn-get-application-data
+@defun smtp-etrn-get-application-data @var{etrn-node}
+Return the data pointer associated to an @etrn{} node structure.
 @end defun
 
-@c ------------------------------------------------------------
+@c page
+@node plain unimplemented
+@section Still to be implemented
+
 
 @defun auth-client-init
 

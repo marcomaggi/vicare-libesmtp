@@ -50,6 +50,7 @@
     smtp-status-enh-class		set-smtp-status-enh-class!
     smtp-status-enh-subject		set-smtp-status-enh-subject!
     smtp-status-enh-detail		set-smtp-status-enh-detail!
+    smtp-status.vicare-arguments-validation
 
     ;; session management
     smtp-session
@@ -131,25 +132,43 @@
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
-
+    ;; SMTP authentication extension
     smtp-auth-set-context
+
+    ;; SMTP StartTLS extension
+    smtp-starttls-enable
+    smtp-starttls-set-ctx
+    smtp-starttls-set-password-cb
+
+    ;; SMTP Deliver By extension
+    smtp-deliverby-set-mode
+
+    ;; SMTP Deliver Status Notification extension
     smtp-dsn-set-ret
     smtp-dsn-set-envid
     smtp-dsn-set-notify
     smtp-dsn-set-orcpt
+
+    ;; SMTP Size extension
     smtp-size-set-estimate
+
+    ;; SMTP 8bit-MIME Transport extension
     smtp-8bitmime-set-body
-    smtp-deliverby-set-mode
-    smtp-starttls-enable
-    smtp-starttls-set-ctx
-    smtp-starttls-set-password-cb
+
+    ;; SMTP Remote Message Queue Starting (ETRN) extension
+    smtp-etrn-node
+    smtp-etrn-node?			smtp-etrn-node?/alive
+    smtp-etrn-node.vicare-arguments-validation
+    smtp-etrn-node/alive.vicare-arguments-validation
+
     smtp-etrn-add-node
     smtp-etrn-enumerate-nodes
     smtp-etrn-node-status
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
+
+;;; --------------------------------------------------------------------
+;;; still to be implemented
 
     auth-client-init
     auth-client-exit
@@ -211,6 +230,22 @@
 (define-argument-validation (smtp-recipient/alive who obj)
   (smtp-recipient?/alive obj)
   (assertion-violation who "expected live smtp-recipient structure as argument" obj))
+
+;;; --------------------------------------------------------------------
+
+(define-argument-validation (smtp-etrn-node who obj)
+  (smtp-etrn-node? obj)
+  (assertion-violation who "expected smtp-etrn-node structure as argument" obj))
+
+(define-argument-validation (smtp-etrn-node/alive who obj)
+  (smtp-etrn-node?/alive obj)
+  (assertion-violation who "expected live smtp-etrn-node structure as argument" obj))
+
+;;; --------------------------------------------------------------------
+
+(define-argument-validation (smtp-status who obj)
+  (smtp-status? obj)
+  (assertion-violation who "expected smtp-status structure as argument" obj))
 
 
 ;;;; helpers
@@ -336,20 +371,27 @@
 		;Hashtable holding  the messages added to  this session.
 		;When  this   session  is   closed:  the   messages  are
 		;finalised.
+   etrn-nodes-table
+		;Hashtable holding the ETRN nodes added to this session.
+		;When this session is closed: the nodes are finalised.
    ))
 
 (define (%make-smtp-session/owner pointer)
   ;;Build and return a new instance of SMTP-SESSION owning the POINTER.
   ;;
   (make-smtp-session pointer #t #f
-		     (make-hashtable values =))) ;table of SMTP-MESSAGE structures.
+		     (make-hashtable values =) ;table of SMTP-MESSAGE structures.
+		     (make-hashtable values =) ;table of SMTP-ETRN-NODE structures.
+		     ))
 
 (define (%make-smtp-session/not-owner pointer)
   ;;Build  and return  a new  instance  of SMTP-SESSION  not owning  the
   ;;POINTER.
   ;;
   (make-smtp-session pointer #f #f
-		     (make-hashtable values =))) ;table of SMTP-MESSAGE structures.
+		     (make-hashtable values =) ;table of SMTP-MESSAGE structures.
+		     (make-hashtable values =) ;table of SMTP-ETRN-NODE structures.
+		     ))
 
 (define ($live-smtp-session? session)
   ;;Evaluate to true if the SESSION argument contains a "smtp_session_t"
@@ -381,10 +423,19 @@
 	  ((= i len)
 	   (hashtable-clear! ($smtp-session-messages-table session)))
 	(%unsafe.smtp-destroy-message ($vector-ref messages i))))
+    ;;Finalise the Scheme "smtp-etrn-node" data structures, if any.
+    (let* ((nodes    ($smtp-session-etrn-nodes session))
+	   (len      ($vector-length nodes)))
+      (do ((i 0 (+ 1 i)))
+	  ((= i len)
+	   (hashtable-clear! ($smtp-session-etrn-nodes-table session)))
+	(%unsafe.smtp-destroy-etrn-node ($vector-ref nodes i))))
     ;;Finalise the libESMTP data structure.
     (when ($smtp-session-owner? session)
       (capi.smtp-destroy-session session))
     (set-pointer-null! ($smtp-session-pointer session))))
+
+;;; --------------------------------------------------------------------
 
 (define ($smtp-session-messages session)
   ;;Return a  vector holding the "smtp-message"  instances registered in
@@ -398,6 +449,21 @@
   (hashtable-set! ($smtp-session-messages-table session)
 		  (pointer->integer ($smtp-message-pointer message))
 		  message))
+
+;;; --------------------------------------------------------------------
+
+(define ($smtp-session-etrn-nodes session)
+  ;;Return a  vector holding the "smtp-etrn-nodes"  instances registered
+  ;;in SESSION.
+  ;;
+  (receive (keys nodes)
+      (hashtable-entries ($smtp-session-etrn-nodes-table session))
+    nodes))
+
+(define ($smtp-session-register-etrn-node! session etrn-node)
+  (hashtable-set! ($smtp-session-etrn-nodes-table session)
+		  (pointer->integer ($smtp-etrn-node-pointer etrn-node))
+		  etrn-node))
 
 ;;; --------------------------------------------------------------------
 
@@ -518,7 +584,7 @@
   ;;Evaluate   to   true   if   the  RECIPIENT   argument   contains   a
   ;;"smtp_recipient_t" not yet finalised.
   ;;
-  (not (pointer-null? ($smtp-message-pointer recipient))))
+  (not (pointer-null? ($smtp-recipient-pointer recipient))))
 
 (define (%unsafe.smtp-destroy-recipient recipient)
   ;;This  function is  called by  the  garbage collector  to finalise  a
@@ -532,7 +598,7 @@
     ;;Apply the destructor to RECIPIENT.
     (%struct-destructor-application recipient
       $smtp-recipient-destructor $set-smtp-recipient-destructor!)
-    (set-pointer-null! ($smtp-message-pointer recipient))))
+    (set-pointer-null! ($smtp-recipient-pointer recipient))))
 
 ;;; --------------------------------------------------------------------
 
@@ -581,6 +647,61 @@
 
 (define (%make-smtp-status/empty)
   (make-smtp-status #f #f #f #f #f))
+
+
+;;;; data structures: etrn-node
+
+(define-struct smtp-etrn-node
+  (pointer
+		;Pointer  object  equivalent to  an  instance  of the  C
+		;language type "smtp_etrn_node_t".
+   owner?
+		;Boolean, true if this Scheme  structure is the owner of
+		;the data structure referenced by the "pointer" field.
+   destructor
+		;False or a user-supplied function to be called whenever
+		;this instance  is closed.  The function  must accept at
+		;least one argument being the data structure itself.
+   ))
+
+(define (%make-smtp-etrn-node pointer)
+  (make-smtp-etrn-node pointer #f #f))
+
+(define ($live-smtp-etrn-node? etrn-node)
+  ;;Evaluate   to   true   if   the  ETRN-NODE   argument   contains   a
+  ;;"smtp_etrn_node_t" not yet finalised.
+  ;;
+  (not (pointer-null? ($smtp-etrn-node-pointer etrn-node))))
+
+(define (%unsafe.smtp-destroy-etrn-node etrn-node)
+  ;;This  function is  called by  the  garbage collector  to finalise  a
+  ;;"smtp-etrn-node"  instance.   It  is  safe to  apply  this  function
+  ;;multiple times to the same ETRN-NODE argument.
+  ;;
+  ;;The referenced "smtp_etrn_node_t" instance it NOT finalised, because
+  ;;it is always owned by the parent "smtp_session_t" instance.
+  ;;
+  (when ($live-smtp-etrn-node? etrn-node)
+    ;;Apply the destructor to ETRN-NODE.
+    (%struct-destructor-application etrn-node
+      $smtp-etrn-node-destructor $set-smtp-etrn-node-destructor!)
+    (set-pointer-null! ($smtp-etrn-node-pointer etrn-node))))
+
+;;; --------------------------------------------------------------------
+
+(define (smtp-etrn-node?/alive obj)
+  (and (smtp-etrn-node? obj)
+       ($live-smtp-etrn-node? obj)))
+
+(define (%struct-smtp-etrn-node-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[smtp-etrn-node")
+  (%display " pointer=")	(%display ($smtp-etrn-node-pointer  S))
+  (%display " owner?=")		(%write   ($smtp-etrn-node-owner?   S))
+  (%display "]"))
 
 
 ;;;; session management
@@ -998,6 +1119,156 @@
     (capi.smtp-recipient-get-application-data recipient)))
 
 
+;;;; SMTP authentication extension
+
+(define (smtp-auth-set-context session auth-context)
+  (define who 'smtp-auth-set-context)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			auth-context))
+    (capi.smtp-auth-set-context session auth-context)))
+
+
+;;;; SMTP StartTLS extension
+
+(define (smtp-starttls-enable session how)
+  (define who 'smtp-starttls-enable)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (signed-int		how))
+    (capi.smtp-starttls-enable session how)))
+
+(define (smtp-starttls-set-ctx session ssl-context)
+  (define who 'smtp-starttls-set-ctx)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			ssl-context))
+    (capi.smtp-starttls-set-ctx session ssl-context)))
+
+(define (smtp-starttls-set-password-cb c-callback)
+  (define who 'smtp-starttls-set-password-cb)
+  (with-arguments-validation (who)
+      ((pointer		c-callback))
+    (capi.smtp-starttls-set-password-cb c-callback)))
+
+
+;;;; SMTP Deliver By extension
+
+(define (smtp-deliverby-set-mode message time by-mode trace)
+  (define who 'smtp-deliverby-set-mode)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (signed-long		time)
+       (signed-int		by-mode)
+       (signed-int		trace))
+    (capi.smtp-deliverby-set-mode message time by-mode trace)))
+
+
+;;;; SMTP Deliver Status Notification extension
+
+(define (smtp-dsn-set-ret message flags)
+  (define who 'smtp-dsn-set-ret)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (signed-int		flags))
+    (capi.smtp-dsn-set-ret message flags)))
+
+(define (smtp-dsn-set-envid message envelope-identifier)
+  (define who 'smtp-dsn-set-envid)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message))
+    (with-general-c-strings
+	((envid		envelope-identifier))
+      (string-to-bytevector string->ascii)
+      (capi.smtp-dsn-set-envid message envid))))
+
+(define (smtp-dsn-set-notify recipient flags)
+  (define who 'smtp-dsn-set-notify)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient)
+       (signed-int		flags))
+    (capi.smtp-dsn-set-notify recipient flags)))
+
+(define (smtp-dsn-set-orcpt recipient address-type address)
+  (define who 'smtp-dsn-set-orcpt)
+  (with-arguments-validation (who)
+      ((smtp-recipient/alive	recipient))
+    (with-general-c-strings
+	((address-type^		address-type)
+	 (address^		address))
+      (string-to-bytevector string->ascii)
+      (capi.smtp-dsn-set-orcpt recipient address-type^ address^))))
+
+
+;;;; SMTP Size extension
+
+(define (smtp-size-set-estimate message size)
+  (define who 'smtp-size-set-estimate)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (unsigned-long		size))
+    (capi.smtp-size-set-estimate message size)))
+
+
+;;;; SMTP 8bit-MIME Transport extension
+
+(define (smtp-8bitmime-set-body message body)
+  (define who 'smtp-8bitmime-set-body)
+  (with-arguments-validation (who)
+      ((smtp-message/alive	message)
+       (signed-int		body))
+    (capi.smtp-8bitmime-set-body message body)))
+
+
+;;;; SMTP Remote Message Queue Starting (ETRN) extension
+
+(define (smtp-etrn-add-node session option node)
+  (define who 'smtp-etrn-add-node)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (signed-int		option))
+    (with-general-c-strings
+	((node^		node))
+      (string-to-bytevector string->ascii)
+      (let ((rv (capi.smtp-etrn-add-node session option node^)))
+	(and rv
+	     (let ((etrn-node (%make-smtp-etrn-node rv)))
+	       ($smtp-session-register-etrn-node! session etrn-node)
+	       etrn-node))))))
+
+(define (smtp-etrn-enumerate-nodes session c-callback)
+  (define who 'smtp-etrn-enumerate-nodes)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (pointer			c-callback))
+    (capi.smtp-etrn-enumerate-nodes session c-callback)))
+
+(define (smtp-etrn-node-status etrn-node)
+  (define who 'smtp-etrn-node-status)
+  (with-arguments-validation (who)
+      ((smtp-etrn-node/alive	etrn-node))
+    (let ((rv (capi.smtp-etrn-node-status etrn-node (%make-smtp-status/empty))))
+      (and rv
+	   (let ((text ($smtp-status-text rv)))
+	     ($set-smtp-status-text! rv (if text
+					    (ascii->string text)
+					  ""))
+	     rv)))))
+
+(define (smtp-etrn-set-application-data etrn-node data-pointer)
+  (define who 'smtp-etrn-set-application-data)
+  (with-arguments-validation (who)
+      ((smtp-etrn-node/alive	etrn-node)
+       (pointer			data-pointer))
+    (capi.smtp-etrn-set-application-data etrn-node data-pointer)))
+
+(define (smtp-etrn-get-application-data etrn-node)
+  (define who 'smtp-etrn-get-application-data)
+  (with-arguments-validation (who)
+      ((smtp-etrn-node/alive	etrn-node))
+    (capi.smtp-etrn-get-application-data etrn-node)))
+
+
 ;;;; callback makers
 
 (define make-smtp-enumerate-messagecb
@@ -1206,104 +1477,6 @@
 
 ;;;; still to be implemented
 
-(define (smtp-auth-set-context)
-  (define who 'smtp-auth-set-context)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-auth-set-context)))
-
-(define (smtp-dsn-set-ret)
-  (define who 'smtp-dsn-set-ret)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-dsn-set-ret)))
-
-(define (smtp-dsn-set-envid)
-  (define who 'smtp-dsn-set-envid)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-dsn-set-envid)))
-
-(define (smtp-dsn-set-notify)
-  (define who 'smtp-dsn-set-notify)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-dsn-set-notify)))
-
-(define (smtp-dsn-set-orcpt)
-  (define who 'smtp-dsn-set-orcpt)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-dsn-set-orcpt)))
-
-(define (smtp-size-set-estimate)
-  (define who 'smtp-size-set-estimate)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-size-set-estimate)))
-
-(define (smtp-8bitmime-set-body)
-  (define who 'smtp-8bitmime-set-body)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-8bitmime-set-body)))
-
-(define (smtp-deliverby-set-mode)
-  (define who 'smtp-deliverby-set-mode)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-deliverby-set-mode)))
-
-(define (smtp-starttls-enable)
-  (define who 'smtp-starttls-enable)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-starttls-enable)))
-
-(define (smtp-starttls-set-ctx)
-  (define who 'smtp-starttls-set-ctx)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-starttls-set-ctx)))
-
-(define (smtp-starttls-set-password-cb)
-  (define who 'smtp-starttls-set-password-cb)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-starttls-set-password-cb)))
-
-(define (smtp-etrn-add-node)
-  (define who 'smtp-etrn-add-node)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-etrn-add-node)))
-
-(define (smtp-etrn-enumerate-nodes)
-  (define who 'smtp-etrn-enumerate-nodes)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-etrn-enumerate-nodes)))
-
-(define (smtp-etrn-node-status)
-  (define who 'smtp-etrn-node-status)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-etrn-node-status)))
-
-(define (smtp-etrn-set-application-data)
-  (define who 'smtp-etrn-set-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-etrn-set-application-data)))
-
-(define (smtp-etrn-get-application-data)
-  (define who 'smtp-etrn-get-application-data)
-  (with-arguments-validation (who)
-      ()
-    (capi.smtp-etrn-get-application-data)))
-
-;;; --------------------------------------------------------------------
-
 (define (auth-client-init)
   (define who 'auth-client-init)
   (with-arguments-validation (who)
@@ -1405,6 +1578,9 @@
 
 (set-rtd-printer!	(type-descriptor smtp-recipient) %struct-smtp-recipient-printer)
 (set-rtd-destructor!	(type-descriptor smtp-recipient) %unsafe.smtp-destroy-recipient)
+
+(set-rtd-printer!	(type-descriptor smtp-etrn-node) %struct-smtp-etrn-node-printer)
+(set-rtd-destructor!	(type-descriptor smtp-etrn-node) %unsafe.smtp-destroy-etrn-node)
 
 (set-rtd-printer!	(type-descriptor smtp-status) %struct-smtp-status-printer)
 

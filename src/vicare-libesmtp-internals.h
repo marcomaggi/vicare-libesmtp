@@ -36,6 +36,10 @@
 #endif
 #include <vicare.h>
 #include <string.h>
+
+#ifdef HAVE_OPENSSL_SSL_H
+#  include <openssl/ssl.h>
+#endif
 #ifdef HAVE_AUTH_CLIENT_H
 #  include <auth-client.h>
 #endif
@@ -75,6 +79,13 @@
 #define IK_LIBESMTP_STATUS_ENH_CLASS(STATUS)		IK_FIELD((STATUS),2)
 #define IK_LIBESMTP_STATUS_ENH_SUBJECT(STATUS)		IK_FIELD((STATUS),3)
 #define IK_LIBESMTP_STATUS_ENH_DETAIL(STATUS)		IK_FIELD((STATUS),4)
+
+/* Accessors for the fields of the Scheme structure "smtp_recipient_t". */
+#define IK_LIBESMTP_ETRN_NODE_POINTER(ETRN_NODE)	IK_FIELD((ETRN_NODE),0)
+#define IK_LIBESMTP_ETRN_NODE_OWNER(ETRN_NODE)		IK_FIELD((ETRN_NODE),1)
+#define IK_LIBESMTP_ETRN_NODE_DESTRUCTOR(ETRN_NODE)	IK_FIELD((ETRN_NODE),2)
+#define IK_LIBESMTP_ETRN_NODE(ETRN_NODE)	\
+  ((smtp_etrn_node_t)IK_POINTER_DATA_VOIDP(IK_LIBESMTP_ETRN_NODE_POINTER(ETRN_NODE)))
 
 /* Accessors for the fields of the Scheme structure "auth_context_t". */
 #define IK_LIBESMTP_AUTH_CONTEXT_POINTER(CTX)		IK_FIELD((CTX),0)

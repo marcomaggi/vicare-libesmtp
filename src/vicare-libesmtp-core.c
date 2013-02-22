@@ -667,14 +667,256 @@ ikptr
 ikrt_smtp_auth_set_context (ikptr s_session, ikptr s_auth_context, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_AUTH_SET_CONTEXT
-#if 0
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
   auth_context_t	ctx = IK_LIBESMTP_AUTH_CONTEXT(s_auth_context);
   int			rv;
   rv = smtp_auth_set_context(sex, ctx);
   return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
 #endif
-  return IK_VOID;
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP StartTLS extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_starttls_enable (ikptr s_session, ikptr s_how, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_STARTTLS_ENABLE
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  enum starttls_option	how = ik_integer_to_int(s_how);
+  int			rv;
+  rv = smtp_starttls_enable(sex, how);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_starttls_set_ctx (ikptr s_session, ikptr s_ssl_context, ikpcb * pcb)
+{
+#if ((defined HAVE_SMTP_STARTTLS_SET_CTX) && (defined HAVE_OPENSSL_SSL_H))
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  SSL_CTX *		ctx = IK_POINTER_DATA_VOIDP(s_ssl_context);
+  int			rv;
+  rv = smtp_starttls_set_ctx(sex, ctx);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_starttls_set_password_cb (ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_STARTTLS_SET_PASSWORD_CB
+  smtp_starttls_passwordcb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  int				rv;
+  rv = smtp_starttls_set_password_cb(cb, NULL);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP Deliver By extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_deliverby_set_mode (ikptr s_message, ikptr s_time,
+			      ikptr s_by_mode, ikptr s_trace,
+			      ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DELIVERBY_SET_MODE
+  smtp_message_t	msg   = IK_LIBESMTP_MESSAGE(s_message);
+  long			time  = ik_integer_to_long(s_time);
+  enum by_mode		mode  = ik_integer_to_int(s_by_mode);
+  int			trace = ik_integer_to_int(s_trace);
+  int			rv;
+  rv = smtp_deliverby_set_mode(msg, time, mode, trace);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP Deliver Status Notification extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_dsn_set_ret (ikptr s_message, ikptr s_flags, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DSN_SET_RET
+  smtp_message_t	msg   = IK_LIBESMTP_MESSAGE(s_message);
+  enum ret_flags	flags = ik_integer_to_int(s_flags);
+  int			rv;
+  rv = smtp_dsn_set_ret(msg, flags);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_dsn_set_envid (ikptr s_message, ikptr s_envid, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DSN_SET_ENVID
+  smtp_message_t	msg   = IK_LIBESMTP_MESSAGE(s_message);
+  const char *		envid = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_envid);
+  int			rv;
+  rv = smtp_dsn_set_envid(msg, envid);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_dsn_set_notify (ikptr s_recipient, ikptr s_flags, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DSN_SET_NOTIFY
+  smtp_recipient_t	rec   = IK_LIBESMTP_RECIPIENT(s_recipient);
+  enum notify_flags	flags = ik_integer_to_int(s_flags);
+  int			rv;
+  rv = smtp_dsn_set_notify(rec, flags);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_dsn_set_orcpt (ikptr s_recipient, ikptr s_address_type, ikptr s_address, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_DSN_SET_ORCPT
+  smtp_recipient_t	rec   = IK_LIBESMTP_RECIPIENT(s_recipient);
+  const char *		address_type = \
+    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_address_type);
+  const char *		address      = \
+    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_address);
+  int			rv;
+  rv = smtp_dsn_set_orcpt(rec, address_type, address);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP Size extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_size_set_estimate (ikptr s_message, ikptr s_size, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_SIZE_SET_ESTIMATE
+  smtp_message_t	msg  = IK_LIBESMTP_MESSAGE(s_message);
+  unsigned long		size = ik_integer_to_ulong(s_size);
+  int			rv;
+  rv = smtp_size_set_estimate(msg, size);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP 8bit-MIME Transport extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_8bitmime_set_body (ikptr s_message, ikptr s_body, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_8bitmime_set_body
+  smtp_message_t	msg  = IK_LIBESMTP_MESSAGE(s_message);
+  enum e8bitmime_body	body = ik_integer_to_int(s_body);
+  int			rv;
+  rv = smtp_8bitmime_set_body(msg, body);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+
+
+/** --------------------------------------------------------------------
+ ** SMTP Remote Message Queue Starting (ETRN) extension.
+ ** ----------------------------------------------------------------- */
+
+ikptr
+ikrt_smtp_etrn_add_node (ikptr s_session, ikptr s_option, ikptr s_node, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ETRN_ADD_NODE
+  smtp_session_t	sex    = IK_LIBESMTP_SESSION(s_session);
+  int			option = ik_integer_to_int(s_option);
+  const char *		node   = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_node);
+  smtp_etrn_node_t	rv;
+  rv = smtp_etrn_add_node(sex, option, node);
+  return (rv)? ika_pointer_alloc(pcb, (long)rv) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_etrn_enumerate_nodes (ikptr s_session, ikptr s_callback, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ETRN_ENUMERATE_NODES
+  smtp_session_t		sex = IK_LIBESMTP_SESSION(s_session);
+  smtp_etrn_enumerate_nodecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
+  ikptr				sk;
+  int				rv;
+  sk = ik_enter_c_function(pcb);
+  {
+    rv = smtp_etrn_enumerate_nodes(sex, cb, NULL);
+  }
+  ik_leave_c_function(pcb, sk);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_etrn_node_status (ikptr s_etrn_node, ikptr s_status, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ETRN_NODE_STATUS
+  smtp_etrn_node_t	node   = IK_LIBESMTP_ETRN_NODE(s_etrn_node);
+  const smtp_status_t *	status;
+  status = smtp_etrn_node_status(node);
+  if (status) {
+    smtp_status_to_scheme_struct(pcb, s_status, status);
+    return s_status;
+  } else
+    return IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_etrn_set_application_data (ikptr s_etrn_node, ikptr s_data_pointer, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ETRN_SET_APPLICATION_DATA
+  smtp_etrn_node_t	node = IK_LIBESMTP_ETRN_NODE(s_etrn_node);
+  void *		data = IK_POINTER_DATA_VOIDP(s_data_pointer);
+  void *		rv;
+  rv = smtp_etrn_set_application_data(node, data);
+  return (rv)? ika_pointer_alloc(pcb, (long)rv) : IK_FALSE;
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_etrn_get_application_data (ikptr s_etrn_node, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_ETRN_GET_APPLICATION_DATA
+  smtp_etrn_node_t	node = IK_LIBESMTP_ETRN_NODE(s_etrn_node);
+  void *		rv;
+  rv = smtp_etrn_get_application_data(node);
+  return (rv)? ika_pointer_alloc(pcb, (long)rv) : IK_FALSE;
 #else
   feature_failure(__func__);
 #endif
@@ -696,164 +938,5 @@ ikrt_libesmtp_template (ikpcb * pcb)
 #endif
 }
 #endif
-
-
-/* ------------------------------------------------------------------ */
-
-ikptr
-ikrt_smtp_dsn_set_ret (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DSN_SET_RET
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_dsn_set_envid (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DSN_SET_ENVID
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_dsn_set_notify (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DSN_SET_NOTIFY
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_dsn_set_orcpt (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DSN_SET_ORCPT
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-/* ------------------------------------------------------------------ */
-
-ikptr
-ikrt_smtp_size_set_estimate (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_SIZE_SET_ESTIMATE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_8bitmime_set_body (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_8bitmime_set_body
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_deliverby_set_mode (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_DELIVERBY_SET_MODE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-/* ------------------------------------------------------------------ */
-
-ikptr
-ikrt_smtp_starttls_enable (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_STARTTLS_ENABLE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_starttls_set_ctx (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_STARTTLS_SET_CTX
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_starttls_set_password_cb (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_STARTTLS_SET_PASSWORD_CB
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-/* ------------------------------------------------------------------ */
-
-ikptr
-ikrt_smtp_etrn_add_node (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ETRN_ADD_NODE
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_etrn_enumerate_nodes (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ETRN_ENUMERATE_NODES
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_etrn_node_status (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ETRN_NODE_STATUS
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_etrn_set_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ETRN_SET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
-
-ikptr
-ikrt_smtp_etrn_get_application_data (ikpcb * pcb)
-{
-#ifdef HAVE_SMTP_ETRN_GET_APPLICATION_DATA
-  return IK_VOID;
-#else
-  feature_failure(__func__);
-#endif
-}
 
 /* end of file */

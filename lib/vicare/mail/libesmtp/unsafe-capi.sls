@@ -82,25 +82,38 @@
     smtp-recipient-set-application-data
     smtp-recipient-get-application-data
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
-
+    ;; SMTP AUTH extension
     smtp-auth-set-context
+
+    ;; SMTP StartTLS extension
+    smtp-starttls-enable
+    smtp-starttls-set-ctx
+    smtp-starttls-set-password-cb
+
+    ;; SMTP Deliver By extension
+    smtp-deliverby-set-mode
+
+    ;; SMTP Deliver Status Notification extension
     smtp-dsn-set-ret
     smtp-dsn-set-envid
     smtp-dsn-set-notify
     smtp-dsn-set-orcpt
+
+    ;; SMTP Size extension
     smtp-size-set-estimate
+
+    ;; SMTP 8bit-MIME Transport extension
     smtp-8bitmime-set-body
-    smtp-deliverby-set-mode
-    smtp-starttls-enable
-    smtp-starttls-set-ctx
-    smtp-starttls-set-password-cb
+
+    ;; SMTP Remote Message Queue Starting (ETRN) extension
     smtp-etrn-add-node
     smtp-etrn-enumerate-nodes
     smtp-etrn-node-status
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
+
+;;; --------------------------------------------------------------------
+;;; still to be implemented
 
     auth-client-init
     auth-client-exit
@@ -284,62 +297,76 @@
   (foreign-call "ikrt_smtp_recipient_get_application_data" recipient))
 
 
-;;;; authentication
+;;;; SMTP Authentication extension
 
+(define-inline (smtp-auth-set-context session auth-context)
+  (foreign-call "ikrt_smtp_auth_set_context" session auth-context))
 
+
+;;;; SMTP StartTLS extension
+
+(define-inline (smtp-starttls-enable session how)
+  (foreign-call "ikrt_smtp_starttls_enable" session how))
+
+(define-inline (smtp-starttls-set-ctx session ssl-context)
+  (foreign-call "ikrt_smtp_starttls_set_ctx" session ssl-context))
+
+(define-inline (smtp-starttls-set-password-cb c-callback)
+  (foreign-call "ikrt_smtp_starttls_set_password_cb" c-callback))
+
+
+;;;; SMTP Deliver By extension
+
+(define-inline (smtp-deliverby-set-mode message time by-mode trace)
+  (foreign-call "ikrt_smtp_deliverby_set_mode" message time by-mode trace))
+
+
+;;;; SMTP Deliver Status Notification extension
+
+(define-inline (smtp-dsn-set-ret message flags)
+  (foreign-call "ikrt_smtp_dsn_set_ret" message flags))
+
+(define-inline (smtp-dsn-set-envid message envid)
+  (foreign-call "ikrt_smtp_dsn_set_envid" message envid))
+
+(define-inline (smtp-dsn-set-notify recipient flags)
+  (foreign-call "ikrt_smtp_dsn_set_notify" recipient flags))
+
+(define-inline (smtp-dsn-set-orcpt recipient address-type address)
+  (foreign-call "ikrt_smtp_dsn_set_orcpt" recipient address-type address))
+
+
+;;;; SMTP Size extension
+
+(define-inline (smtp-size-set-estimate message size)
+  (foreign-call "ikrt_smtp_size_set_estimate" message size))
+
+
+;; SMTP 8bit-MIME Transport extension
+
+(define-inline (smtp-8bitmime-set-body message body)
+  (foreign-call "ikrt_smtp_8bitmime_set_body" message body))
+
+
+;;;; SMTP Remote Message Queue Starting (ETRN) extension
+
+(define-inline (smtp-etrn-add-node session option node)
+  (foreign-call "ikrt_smtp_etrn_add_node" session option node))
+
+(define-inline (smtp-etrn-enumerate-nodes session callback)
+  (foreign-call "ikrt_smtp_etrn_enumerate_nodes" session callback))
+
+(define-inline (smtp-etrn-node-status etrn-node status)
+  (foreign-call "ikrt_smtp_etrn_node_status" etrn-node status))
+
+(define-inline (smtp-etrn-set-application-data etrn-node data-pointer)
+  (foreign-call "ikrt_smtp_etrn_set_application_data" etrn-node data-pointer))
+
+(define-inline (smtp-etrn-get-application-data etrn-node)
+  (foreign-call "ikrt_smtp_etrn_get_application_data" etrn-node))
 
 
 ;;;; still to be implemented
-
-(define-inline (smtp-auth-set-context)
-  (foreign-call "ikrt_smtp_auth_set_context"))
-
-(define-inline (smtp-dsn-set-ret)
-  (foreign-call "ikrt_smtp_dsn_set_ret"))
-
-(define-inline (smtp-dsn-set-envid)
-  (foreign-call "ikrt_smtp_dsn_set_envid"))
-
-(define-inline (smtp-dsn-set-notify)
-  (foreign-call "ikrt_smtp_dsn_set_notify"))
-
-(define-inline (smtp-dsn-set-orcpt)
-  (foreign-call "ikrt_smtp_dsn_set_orcpt"))
-
-(define-inline (smtp-size-set-estimate)
-  (foreign-call "ikrt_smtp_size_set_estimate"))
-
-(define-inline (smtp-8bitmime-set-body)
-  (foreign-call "ikrt_smtp_8bitmime_set_body"))
-
-(define-inline (smtp-deliverby-set-mode)
-  (foreign-call "ikrt_smtp_deliverby_set_mode"))
-
-(define-inline (smtp-starttls-enable)
-  (foreign-call "ikrt_smtp_starttls_enable"))
-
-(define-inline (smtp-starttls-set-ctx)
-  (foreign-call "ikrt_smtp_starttls_set_ctx"))
-
-(define-inline (smtp-starttls-set-password-cb)
-  (foreign-call "ikrt_smtp_starttls_set_password_cb"))
-
-(define-inline (smtp-etrn-add-node)
-  (foreign-call "ikrt_smtp_etrn_add_node"))
-
-(define-inline (smtp-etrn-enumerate-nodes)
-  (foreign-call "ikrt_smtp_etrn_enumerate_nodes"))
-
-(define-inline (smtp-etrn-node-status)
-  (foreign-call "ikrt_smtp_etrn_node_status"))
-
-(define-inline (smtp-etrn-set-application-data)
-  (foreign-call "ikrt_smtp_etrn_set_application_data"))
-
-(define-inline (smtp-etrn-get-application-data)
-  (foreign-call "ikrt_smtp_etrn_get_application_data"))
-
-;;; --------------------------------------------------------------------
 
 (define-inline (auth-client-init)
   (foreign-call "auth_client_init"))

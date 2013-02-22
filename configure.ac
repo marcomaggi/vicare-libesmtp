@@ -42,6 +42,9 @@ AC_CHECK_PROG([VICARE],[vicare],[vicare],[:])
 #page
 #### libesmtp configuration
 
+AC_CHECK_HEADERS([openssl/ssl.h],,
+  [AC_MSG_WARN([missing libesmtp.h header])])
+
 AC_CHECK_HEADERS([libesmtp.h],,
   [AC_MSG_FAILURE([missing libesmtp.h header],[2])])
 
@@ -55,6 +58,9 @@ VICARE_EXTENSION_LIBRARY_VERSION([libesmtp],[0],[0],[0])
 
 m4_define([VICARE_INCLUDES],[
 AC_INCLUDES_DEFAULT
+#ifdef HAVE_OPENSSL_SSL_H
+#  include <openssl/ssl.h>
+#endif
 #ifdef HAVE_VICARE_H
 #  include <vicare.h>
 #endif
