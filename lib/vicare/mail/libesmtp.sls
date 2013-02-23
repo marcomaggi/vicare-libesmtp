@@ -54,7 +54,8 @@
 
     ;; session management
     smtp-session
-    smtp-session?			smtp-session?/alive
+    smtp-session?
+    smtp-session?/alive
     smtp-session.vicare-arguments-validation
     smtp-session/alive.vicare-arguments-validation
 
@@ -69,7 +70,8 @@
 
     ;; message management
     smtp-message
-    smtp-message?			smtp-message?/alive
+    smtp-message?
+    smtp-message?/alive
     smtp-message.vicare-arguments-validation
     smtp-message/alive.vicare-arguments-validation
 
@@ -86,7 +88,8 @@
 
     ;; recipient management
     smtp-recipient
-    smtp-recipient?			smtp-recipient?/alive
+    smtp-recipient?
+    smtp-recipient?/alive
     smtp-recipient.vicare-arguments-validation
     smtp-recipient/alive.vicare-arguments-validation
 
@@ -157,7 +160,8 @@
 
     ;; SMTP Remote Message Queue Starting (ETRN) extension
     smtp-etrn-node
-    smtp-etrn-node?			smtp-etrn-node?/alive
+    smtp-etrn-node?
+    smtp-etrn-node?/alive
     smtp-etrn-node.vicare-arguments-validation
     smtp-etrn-node/alive.vicare-arguments-validation
 
@@ -166,6 +170,13 @@
     smtp-etrn-node-status
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
+
+    ;; AUTH module
+    auth-context
+    auth-context?
+    auth-context?/alive
+    auth-context.vicare-arguments-validation
+    auth-context/alive.vicare-arguments-validation
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
@@ -240,6 +251,16 @@
 (define-argument-validation (smtp-etrn-node/alive who obj)
   (smtp-etrn-node?/alive obj)
   (assertion-violation who "expected live smtp-etrn-node structure as argument" obj))
+
+;;; --------------------------------------------------------------------
+
+(define-argument-validation (auth-context who obj)
+  (auth-context? obj)
+  (assertion-violation who "expected auth-context structure as argument" obj))
+
+(define-argument-validation (auth-context/alive who obj)
+  (auth-context?/alive obj)
+  (assertion-violation who "expected live auth-context structure as argument" obj))
 
 ;;; --------------------------------------------------------------------
 
@@ -701,6 +722,61 @@
   (%display "#[smtp-etrn-node")
   (%display " pointer=")	(%display ($smtp-etrn-node-pointer  S))
   (%display " owner?=")		(%write   ($smtp-etrn-node-owner?   S))
+  (%display "]"))
+
+
+;;;; data structures: auth-context
+
+(define-struct auth-context
+  (pointer
+		;Pointer  object  equivalent to  an  instance  of the  C
+		;language type "auth_context_t".
+   owner?
+		;Boolean, true if this Scheme  structure is the owner of
+		;the data structure referenced by the "pointer" field.
+   destructor
+		;False or a user-supplied function to be called whenever
+		;this instance  is closed.  The function  must accept at
+		;least one argument being the data structure itself.
+   ))
+
+(define (%make-auth-context pointer)
+  (make-auth-context pointer #t #f))
+
+(define ($live-auth-context? auth-ctx)
+  ;;Evaluate   to   true   if   the   AUTH-CTX   argument   contains   a
+  ;;"auth_context_t" not yet finalised.
+  ;;
+  (not (pointer-null? ($auth-context-pointer auth-ctx))))
+
+(define (%unsafe.smtp-destroy-auth-context auth-ctx)
+  ;;This  function is  called by  the  garbage collector  to finalise  a
+  ;;"auth-context" instance.  It is safe to apply this function multiple
+  ;;times to the same AUTH-CTX argument.
+  ;;
+  (when ($live-auth-context? auth-ctx)
+    ;;Apply the destructor to AUTH-CTX.
+    (%struct-destructor-application auth-ctx
+      $auth-context-destructor $set-auth-context-destructor!)
+    ;;Finalise the libESMTP data structure.
+    (when ($auth-context-owner? auth-ctx)
+      (capi.auth-destroy-context auth-ctx))
+    (set-pointer-null! ($auth-context-pointer auth-ctx))))
+
+;;; --------------------------------------------------------------------
+
+(define (auth-context?/alive obj)
+  (and (auth-context? obj)
+       ($live-auth-context? obj)))
+
+(define (%struct-auth-context-printer S port sub-printer)
+  (define-inline (%display thing)
+    (display thing port))
+  (define-inline (%write thing)
+    (write thing port))
+  (%display "#[auth-context")
+  (%display " pointer=")	(%display ($auth-context-pointer  S))
+  (%display " owner?=")		(%write   ($auth-context-owner?   S))
   (%display "]"))
 
 
@@ -1269,6 +1345,99 @@
     (capi.smtp-etrn-get-application-data etrn-node)))
 
 
+;;;; AUTH module
+
+(define (auth-client-init)
+  (define who 'auth-client-init)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-init)))
+
+(define (auth-client-exit)
+  (define who 'auth-client-exit)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-exit)))
+
+(define (auth-create-context)
+  (define who 'auth-create-context)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-create-context)))
+
+(define (auth-destroy-context auth-ctx)
+  (define who 'auth-destroy-context)
+  (with-arguments-validation (who)
+      ((auth-context	auth-ctx))
+    (%unsafe.smtp-destroy-auth-context auth-ctx)))
+
+(define (auth-set-mechanism-flags)
+  (define who 'auth-set-mechanism-flags)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism-flags)))
+
+(define (auth-set-mechanism-ssf)
+  (define who 'auth-set-mechanism-ssf)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism-ssf)))
+
+(define (auth-set-interact-cb)
+  (define who 'auth-set-interact-cb)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-interact-cb)))
+
+(define (auth-client-enabled)
+  (define who 'auth-client-enabled)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-client-enabled)))
+
+(define (auth-set-mechanism)
+  (define who 'auth-set-mechanism)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-mechanism)))
+
+(define (auth-mechanism-name)
+  (define who 'auth-mechanism-name)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-mechanism-name)))
+
+(define (auth-response)
+  (define who 'auth-response)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-response)))
+
+(define (auth-get-ssf)
+  (define who 'auth-get-ssf)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-get-ssf)))
+
+(define (auth-encode)
+  (define who 'auth-encode)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-encode)))
+
+(define (auth-decode)
+  (define who 'auth-decode)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-decode)))
+
+(define (auth-set-external-id)
+  (define who 'auth-set-external-id)
+  (with-arguments-validation (who)
+      ()
+    (capi.auth-set-external-id)))
+
+
 ;;;; callback makers
 
 (define make-smtp-enumerate-messagecb
@@ -1374,6 +1543,56 @@
 		 (user-scheme-callback node option domain)
 		 (void)))))))
 
+;;; --------------------------------------------------------------------
+
+(define make-auth-interact
+  ;; int (*auth_interact_t)
+  ;;		(auth_client_request_t request,
+  ;;		 char **result,
+  ;;		 int fields,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'signed-int
+					  '(pointer pointer signed-int pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (request-pointer result-opinter fields custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback )))))))
+
+(define make-auth-response
+  ;; const char *(*auth_response_t)
+  ;;		(void *ctx,
+  ;;		 const char *challenge,
+  ;;		 int *len,
+  ;;		 auth_interact_t interact,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'pointer '(pointer pointer pointer pointer pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (context-pointer challenge length interact custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback )))))))
+
+(define make-auth-recode
+  ;; int (*auth_recode_t)
+  ;;		(void *ctx,
+  ;;		 char **dstbuf,
+  ;;		 int *dstlen,
+  ;;		 const char *srcbuf,
+  ;;		 int srclen);
+  (let ((maker (ffi.make-c-callback-maker 'signed-int
+					  '(pointer pointer pointer pointer signed-int))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (context-pointer dst.ptr.ptr dst.len.ptr src.ptr src.len)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  (void)))
+		 (user-scheme-callback context-pointer
+				       dst.ptr.ptr dst.len.ptr
+				       src.ptr src.len)))))))
+
 
 ;;;; constant to symbol conversion
 
@@ -1475,99 +1694,6 @@
    Ret_HDRS))
 
 
-;;;; still to be implemented
-
-(define (auth-client-init)
-  (define who 'auth-client-init)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-client-init)))
-
-(define (auth-client-exit)
-  (define who 'auth-client-exit)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-client-exit)))
-
-(define (auth-create-context)
-  (define who 'auth-create-context)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-create-context)))
-
-(define (auth-destroy-context)
-  (define who 'auth-destroy-context)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-destroy-context)))
-
-(define (auth-set-mechanism-flags)
-  (define who 'auth-set-mechanism-flags)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-set-mechanism-flags)))
-
-(define (auth-set-mechanism-ssf)
-  (define who 'auth-set-mechanism-ssf)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-set-mechanism-ssf)))
-
-(define (auth-set-interact-cb)
-  (define who 'auth-set-interact-cb)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-set-interact-cb)))
-
-(define (auth-client-enabled)
-  (define who 'auth-client-enabled)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-client-enabled)))
-
-(define (auth-set-mechanism)
-  (define who 'auth-set-mechanism)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-set-mechanism)))
-
-(define (auth-mechanism-name)
-  (define who 'auth-mechanism-name)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-mechanism-name)))
-
-(define (auth-response)
-  (define who 'auth-response)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-response)))
-
-(define (auth-get-ssf)
-  (define who 'auth-get-ssf)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-get-ssf)))
-
-(define (auth-encode)
-  (define who 'auth-encode)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-encode)))
-
-(define (auth-decode)
-  (define who 'auth-decode)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-decode)))
-
-(define (auth-set-external-id)
-  (define who 'auth-set-external-id)
-  (with-arguments-validation (who)
-      ()
-    (capi.auth-set-external-id)))
-
-
 ;;;; done
 
 (set-rtd-printer!	(type-descriptor smtp-session) %struct-smtp-session-printer)
@@ -1581,6 +1707,9 @@
 
 (set-rtd-printer!	(type-descriptor smtp-etrn-node) %struct-smtp-etrn-node-printer)
 (set-rtd-destructor!	(type-descriptor smtp-etrn-node) %unsafe.smtp-destroy-etrn-node)
+
+(set-rtd-printer!	(type-descriptor auth-context) %struct-auth-context-printer)
+(set-rtd-destructor!	(type-descriptor auth-context) %unsafe.smtp-destroy-auth-context)
 
 (set-rtd-printer!	(type-descriptor smtp-status) %struct-smtp-status-printer)
 

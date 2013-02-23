@@ -20,6 +20,10 @@ libESMTP
 @acronym{ETRN}
 @end macro
 
+@macro auth{}
+@acronym{AUTH}
+@end macro
+
 @c page
 @c ------------------------------------------------------------
 @c Values.
@@ -279,7 +283,7 @@ the very unlikely case that this function fails: @false{} is returned.
 * plain constants::             Converting constants to symbols.
 * plain data::                  Application data.
 * plain extensions::            @smtp{} extensions.
-* plain unimplemented::         Still to be implemented.
+* plain auth::                  @auth{} module.
 @end menu
 
 @c page
@@ -512,6 +516,7 @@ make use of @func{smtp-set-message-str} to feed the message to
 * plain structs message::       Message data structures.
 * plain structs recipient::     Recipient data structures.
 * plain structs etrn node::     @etrn{} node data structures.
+* plain structs auth ctx::      @auth{} context structures.
 * plain structs status::        Status data structures.
 @end menu
 
@@ -564,7 +569,8 @@ otherwise return @false{}.
 
 @defun smtp-session?/alive @var{obj}
 Return @true{} if @var{obj} is an instance of @code{smtp-session} and
-the session it represents is open; otherwise return @false{}.
+the @code{smtp_session_t} it represents is open; otherwise return
+@false{}.
 @end defun
 
 
@@ -649,7 +655,8 @@ otherwise return @false{}.
 
 @defun smtp-message?/alive @var{obj}
 Return @true{} if @var{obj} is an instance of @code{smtp-message} and
-the message it represents is open; otherwise return @false{}.
+the @code{smtp_message_t} it represents is open; otherwise return
+@false{}.
 @end defun
 
 
@@ -732,7 +739,8 @@ otherwise return @false{}.
 
 @defun smtp-recipient?/alive @var{obj}
 Return @true{} if @var{obj} is an instance of @code{smtp-recipient} and
-the recipient it represents is open; otherwise return @false{}.
+the @code{smtp_recipient_t} it represents is open; otherwise return
+@false{}.
 @end defun
 
 
@@ -816,7 +824,8 @@ otherwise return @false{}.
 
 @defun smtp-etrn-node?/alive @var{obj}
 Return @true{} if @var{obj} is an instance of @code{smtp-etrn-node} and
-the etrn-node it represents is open; otherwise return @false{}.
+the @code{smtp_etrn_node_t} it represents is open; otherwise return
+@false{}.
 @end defun
 
 
@@ -864,6 +873,97 @@ Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?}.
 
 @deffn {Validation Clause} smtp-etrn-node/alive @var{obj}
 Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?/alive}.
+@end deffn
+
+@c page
+@node plain structs auth ctx
+@subsection @auth{} context structures
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
+
+
+@deftp {Struct Type} auth-context
+@cindex @var{auth-ctx} argument
+@cindex Argument @var{auth-ctx}
+An opaque Scheme structure holding an instance of the C language type
+@code{auth_context_t}, it references an @auth{} context data structure.
+
+When instances of this type are used as arguments to functions: this
+documentation identifies them as @var{auth-ctx}.
+
+There are two categories of @code{auth-context} instances: those
+who own the underlying @auth{} context and those who merely reference
+it.
+
+@itemize
+@item
+@code{auth-context} instances returned by @func{auth-create-context} do
+own the context.  When instances of this category are garbage collected
+or when @func{auth-destroy-context} is applied to them: the context is
+closed, all the associated data is finalised; any error is ignored in
+this procedure.
+@end itemize
+@end deftp
+
+
+@defun auth-context? @var{obj}
+Return @true{} if @var{obj} is an instance of @code{auth-context};
+otherwise return @false{}.
+@end defun
+
+
+@defun auth-context?/alive @var{obj}
+Return @true{} if @var{obj} is an instance of @code{auth-context} and
+the @code{auth_context_t} it represents is open; otherwise return
+@false{}.
+@end defun
+
+
+@defun auth-context-destructor @var{auth-ctx}
+@defunx set-auth-context-destructor! @var{auth-ctx} @var{func}
+Retrieve or set a destructor function associated to the @var{auth-ctx}.
+
+Whenever the @var{auth-ctx} is finalised: @var{func} is applied to
+@var{auth-ctx} before the internal state of @var{auth-ctx} is finalised.
+
+Notice that @var{func} can do anything, not only destroy some state
+associated to @var{auth-ctx}; if we do:
+
+@example
+(define connection ...)
+(set-auth-context-destructor! connection
+  (let ((state (make-some-data-struct)))
+    (case-lambda
+      ((conn)
+       (destroy state))
+      (()
+       state))))
+
+(let ((state ((auth-context-destructor connection))))
+  (do-something-with connection state))
+@end example
+
+@noindent
+we can easily associate values to @var{auth-ctx}.
+@end defun
+
+@c ------------------------------------------------------------
+
+@subsubheading Arguments validation
+
+The following bindings are meant to be used along the library
+@library{vicare arguments validation}.
+
+
+@deffn {Validation Clause} auth-context @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{auth-context?}.
+@end deffn
+
+
+@deffn {Validation Clause} auth-context/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{auth-context?/alive}.
 @end deffn
 
 @c page
@@ -1748,8 +1848,12 @@ Return the data pointer associated to an @etrn{} node structure.
 @end defun
 
 @c page
-@node plain unimplemented
-@section Still to be implemented
+@node plain auth
+@section @auth{} module
+
+
+The following bindings are exported by the library @library{vicare mail
+libesmtp}.
 
 
 @defun auth-client-init
@@ -1811,7 +1915,6 @@ Return the data pointer associated to an @etrn{} node structure.
 @defun auth-set-external-id
 
 @end defun
-
 
 @c page
 @c ------------------------------------------------------------

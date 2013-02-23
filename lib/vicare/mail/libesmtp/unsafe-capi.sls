@@ -112,9 +112,7 @@
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
 
-;;; --------------------------------------------------------------------
-;;; still to be implemented
-
+    ;; AUTH module
     auth-client-init
     auth-client-exit
     auth-create-context
@@ -129,8 +127,7 @@
     auth-get-ssf
     auth-encode
     auth-decode
-    auth-set-external-id
-    )
+    auth-set-external-id)
   (import (vicare))
 
 
@@ -366,7 +363,7 @@
   (foreign-call "ikrt_smtp_etrn_get_application_data" etrn-node))
 
 
-;;;; still to be implemented
+;;;; AUTH module
 
 (define-inline (auth-client-init)
   (foreign-call "auth_client_init"))
@@ -377,8 +374,8 @@
 (define-inline (auth-create-context)
   (foreign-call "auth_create_context"))
 
-(define-inline (auth-destroy-context)
-  (foreign-call "auth_destroy_context"))
+(define-inline (auth-destroy-context auth-ctx)
+  (foreign-call "auth_destroy_context" auth-ctx))
 
 (define-inline (auth-set-mechanism-flags)
   (foreign-call "auth_set_mechanism_flags"))

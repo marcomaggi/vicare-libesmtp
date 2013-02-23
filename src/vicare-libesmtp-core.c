@@ -134,8 +134,7 @@ ikptr
 ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_DESTROY_SESSION
-  ikptr			s_pointer	= IK_LIBESMTP_SESSION_POINTER(s_session);
-  smtp_session_t	sex		= IK_POINTER_DATA_VOIDP(s_pointer);
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
   if (sex) {
     int		rv;
     ikptr	sk;
@@ -147,9 +146,12 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
       rv = smtp_destroy_session(sex);
     }
     ik_leave_c_function(pcb, sk);
-    if (1 == rv) {
-      IK_POINTER_SET_NULL(s_pointer);
-    }
+    /* *NOTE* We cannot set the pointer field of S_SESSION to NULL here:
+       we are assuming  that a callback may be called  by the destructor
+       function; this  means the garbage  collectory may have  moved the
+       struct fields somewhere else.  We cannot track this movement here
+       because we cannot occupy the  "pcb->root" fields while a callback
+       is called. */
     return IK_BOOLEAN_FROM_INT(rv);
   } else
     return IK_TRUE;
