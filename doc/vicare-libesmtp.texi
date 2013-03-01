@@ -291,7 +291,7 @@ returned.
 * plain constants::             Converting constants to symbols.
 * plain data::                  Application data.
 * plain extensions::            @smtp{} extensions.
-* plain auth::                  @auth{} module.
+@c * plain auth::                  @auth{} module.
 @end menu
 
 @c page
@@ -1789,16 +1789,6 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-auth-set-context @var{session} @var{auth-context}
-Enable or disable @smtp{} @auth{} for @var{session}.  If successful
-return @true{}, else return @false{}.
-
-If @var{auth-context} is @false{}: @auth{} is disabled and the previous
-@auth{} context, if any, is unregistered from @var{session}.  Else
-@var{auth-context} must be an instance of @code{auth-context}.
-@end defun
-
-
 @defun smtp-gsasl-set-context @var{session} @var{gsasl-context}
 Enable or disable @smtp{} @auth{} for @var{session}.  If successful
 return @true{}, else return @false{}.
@@ -1807,6 +1797,18 @@ If @var{gsasl-context} is @false{}: @auth{} is disabled and the previous
 @auth{} context, if any, is unregistered from @var{session}.  Else
 @var{gsasl-context} must be a pointer object referencing a @code{Gsasl}
 data structure.
+@end defun
+
+
+@defun smtp-auth-set-context @var{session} @var{auth-context}
+@strong{This function is deprecated.}
+
+Enable or disable @smtp{} @auth{} for @var{session}.  If successful
+return @true{}, else return @false{}.
+
+If @var{auth-context} is @false{}: @auth{} is disabled and the previous
+@auth{} context, if any, is unregistered from @var{session}.  Else
+@var{auth-context} must be an instance of @code{auth-context}.
 @end defun
 
 @c page
@@ -2094,6 +2096,7 @@ Return the data pointer associated to an @etrn{} node structure.
 @end defun
 
 @c page
+@ignore
 @node plain auth
 @section @auth{} module
 
@@ -2106,61 +2109,63 @@ libesmtp}.
 
 @end defun
 
-@defun auth-client-exit
 
+@defun auth-client-exit
 @end defun
+
 
 @defun auth-create-context
-
 @end defun
+
 
 @defun auth-destroy-context
-
 @end defun
+
 
 @defun auth-set-mechanism-flags
-
 @end defun
+
 
 @defun auth-set-mechanism-ssf
-
 @end defun
+
 
 @defun auth-set-interact-cb
-
 @end defun
+
 
 @defun auth-client-enabled
-
 @end defun
+
 
 @defun auth-set-mechanism
-
 @end defun
+
 
 @defun auth-mechanism-name
-
 @end defun
+
 
 @defun auth-response
-
 @end defun
+
 
 @defun auth-get-ssf
-
 @end defun
+
 
 @defun auth-encode
-
 @end defun
+
 
 @defun auth-decode
-
 @end defun
+
 
 @defun auth-set-external-id
-
 @end defun
+
+@end ignore
 
 @c page
 @c ------------------------------------------------------------
