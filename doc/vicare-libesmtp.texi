@@ -1470,7 +1470,7 @@ invoking message.  This instance is @strong{not} an object returned by
 @item
 A pointer object referencing the mailbox of the recipient as @asciiz{}
 string.  Such string can be converted to Scheme with a call to
-@func{cstirng->string} from @library{vicare ffi}.
+@func{cstring->string} from @library{vicare ffi}.
 @end enumerate
 
 @var{user-scheme-callback} can return unspecified values.
@@ -2004,15 +2004,83 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-etrn-add-node
+@defun smtp-etrn-add-node @var{session} @var{option} @var{node}
+Add an @code{ETRN} node to the @smtp{} session.  If successful return an
+instance of @code{smtp-etrn-node}, else return @false{}.
+
+@var{node} must be a general C buffer holding an @asciiz{} string: a
+Scheme string, a Scheme bytevector, a @code{memory-block} instance, a
+pointer object.
 @end defun
 
 
-@defun smtp-etrn-enumerate-nodes
+@defun smtp-etrn-enumerate-nodes @var{session} @var{c-callback}
+For each @code{smtp_etrn_node_t} in the @code{smtp_sesssion_t}
+referenced by @var{session}: call the @var{c-callback} function.  If
+successful return @true{}, else return @false{}.
+
+@var{c-callback} must be the return value of a call to
+@func{make-smtp-etrn-enumerate-nodecb}.
 @end defun
 
 
-@defun smtp-etrn-node-status
+@defun make-smtp-etrn-enumerate-nodecb @var{user-scheme-callback}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp_etrn_enumerate_nodecb_t} callback; the returned pointer must
+be released with a call to @func{free-c-callback} from @library{vicare
+ffi}.
+
+@var{user-scheme-callback} must accept @math{3} arguments:
+
+@enumerate
+@item
+An instance of @code{smtp-etrn-node} referencing a node.  This instance
+is @strong{not} an object returned by @func{smtp-etrn-add-node}.
+
+@item
+An exact integer, in the range of the C language type @code{signed int},
+representing the option argument.
+
+@item
+A pointer object referencing the domain as @asciiz{} string.  Such
+string can be converted to Scheme with a call to @func{cstring->string}
+from @library{vicare ffi}.
+@end enumerate
+
+@var{user-scheme-callback} can return unspecified values.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns @code{(void)} to the caller.
+@var{user-scheme-callback} should take care of handling its own
+exceptions.
+@end itemize
+@end defun
+
+
+@defun smtp-etrn-enumerate-nodes @var{session} @var{scheme-callback}
+Apply @var{scheme-callback} to each @code{smtp-etrn-node} registered in
+@var{session}; return unspecified values.  The order of application is
+undefined.
+
+@var{scheme-callback} must be a Scheme procedure accepting a single
+argument: an instance of @code{smtp-etrn-node} registered in
+@var{session}.  The @code{smtp-etrn-node} instances handed to
+@var{scheme-callback} are the same returned by
+@func{smtp-etrn-add-node}.
+@end defun
+
+
+@defun smtp-etrn-node-status @var{etrn-node}
+Retrieve the @etrn{} node success/failure status from a previous @smtp{}
+session.  If successful return a @code{smtp-status} instance, otherwise
+return @false{}.
 @end defun
 
 

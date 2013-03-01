@@ -178,6 +178,7 @@
 
     smtp-etrn-add-node
     smtp-etrn-enumerate-nodes
+    smtp-etrn-enumerate-nodes*
     smtp-etrn-node-status
     smtp-etrn-set-application-data
     smtp-etrn-get-application-data
@@ -873,6 +874,14 @@
        (pointer			c-callback))
     (capi.smtp-etrn-enumerate-nodes session c-callback)))
 
+(define (smtp-etrn-enumerate-nodes* session scheme-callback)
+  (define who 'smtp-etrn-enumerate-nodes*)
+  (with-arguments-validation (who)
+      ((smtp-session/alive	session)
+       (procedure		scheme-callback))
+    (vector-for-each scheme-callback
+      ($smtp-session-vector-of-collected-smtp-etrn-node session))))
+
 (define (smtp-etrn-node-status etrn-node)
   (define who 'smtp-etrn-node-status)
   (with-arguments-validation (who)
@@ -1074,11 +1083,13 @@
   ;;		 void *arg);
   (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int pointer pointer))))
     (lambda (user-scheme-callback)
-      (maker (lambda (node option domain custom-data)
+      (maker (lambda (node-pointer option domain custom-data)
 	       (guard (E (else
 			  #;(pretty-print E (current-error-port))
 			  (void)))
-		 (user-scheme-callback node option domain)
+		 (user-scheme-callback (make-smtp-etrn-node/not-owner node-pointer #f)
+				       option
+				       domain)
 		 (void)))))))
 
 ;;; --------------------------------------------------------------------
