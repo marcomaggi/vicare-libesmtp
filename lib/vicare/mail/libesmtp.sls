@@ -58,6 +58,8 @@
     smtp-session?/alive
     smtp-session.vicare-arguments-validation
     smtp-session/alive.vicare-arguments-validation
+    false-or-smtp-session.vicare-arguments-validation
+    false-or-smtp-session/alive.vicare-arguments-validation
 
     smtp-create-session
     smtp-destroy-session
@@ -74,6 +76,8 @@
     smtp-message?/alive
     smtp-message.vicare-arguments-validation
     smtp-message/alive.vicare-arguments-validation
+    false-or-smtp-message.vicare-arguments-validation
+    false-or-smtp-message/alive.vicare-arguments-validation
 
     smtp-add-message
     smtp-enumerate-messages
@@ -92,6 +96,8 @@
     smtp-recipient?/alive
     smtp-recipient.vicare-arguments-validation
     smtp-recipient/alive.vicare-arguments-validation
+    false-or-smtp-recipient.vicare-arguments-validation
+    false-or-smtp-recipient/alive.vicare-arguments-validation
 
     smtp-add-recipient
     smtp-enumerate-recipients
@@ -165,6 +171,8 @@
     smtp-etrn-node?/alive
     smtp-etrn-node.vicare-arguments-validation
     smtp-etrn-node/alive.vicare-arguments-validation
+    false-or-smtp-etrn-node.vicare-arguments-validation
+    false-or-smtp-etrn-node/alive.vicare-arguments-validation
 
     smtp-etrn-add-node
     smtp-etrn-enumerate-nodes
@@ -178,6 +186,8 @@
     auth-context?/alive
     auth-context.vicare-arguments-validation
     auth-context/alive.vicare-arguments-validation
+    false-or-auth-context.vicare-arguments-validation
+    false-or-auth-context/alive.vicare-arguments-validation
 
 ;;; --------------------------------------------------------------------
 ;;; still to be implemented
@@ -217,7 +227,11 @@
 
 (define-argument-validation (smtp-status who obj)
   (smtp-status? obj)
-  (assertion-violation who "expected smtp-status structure as argument" obj))
+  (assertion-violation who "expected \"smtp-status\" structure as argument" obj))
+
+(define-argument-validation (false-or-smtp-status who obj)
+  (or (not obj) (smtp-status? obj))
+  (assertion-violation who "expected #f or \"smtp-status\" structure as argument" obj))
 
 
 ;;;; helpers
