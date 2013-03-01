@@ -1919,19 +1919,46 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-dsn-set-ret
+@defun smtp-dsn-set-ret @var{message} @var{flags}
+Instruct the reporting @acronym{MTA} whether to include the full content
+of the original message in the Delivery Status Notification, or just the
+headers.  If successful return @true{}, else return @false{}.
+
+@var{flags} must be an exact integer representing one of the constants
+@code{Ret_}.
 @end defun
 
 
-@defun smtp-dsn-set-envid
+@defun smtp-dsn-set-envid @var{message} @var{envelope-identifier}
+Set the envelope identifier; this value is returned in the @acronym{DSN}
+and may be used by the @acronym{MUA} to associate the @acronym{DSN} with
+the message that caused it to be generated.  If successful return
+@true{}, else return @false{}.
+
+@var{envelope-identifier} must be a general C buffer holding an
+@asciiz{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
 @end defun
 
 
-@defun smtp-dsn-set-notify
+@defun smtp-dsn-set-notify @var{recipient} @var{flags}
+Set the @acronym{DSN} notify options.  If successful return @true{},
+else return @false{}.
+
+@var{flags} must be an exact integer represneting the
+@code{Notify_NOTSET} or @code{Notify_NEVER} or the bitwise OR
+combination of any of @code{Notify_SUCCESS}, @code{Notify_FAILURE} and
+@code{Notify_DELAY}.
 @end defun
 
 
-@defun smtp-dsn-set-orcpt
+@defun smtp-dsn-set-orcpt @var{recipient} @var{address-type} @var{address}
+Set the @acronym{DSN} @code{ORCPT} option.  If successful return
+@true{}, else return @false{}.
+
+@var{address-type} and @var{address} must be general C buffers holding
+an @asciiz{} string: a Scheme string, a Scheme bytevector, a
+@code{memory-block} instance, a pointer object.
 @end defun
 
 @c page
@@ -1943,7 +1970,12 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-size-set-estimate
+@defun smtp-size-set-estimate @var{message} @var{size}
+Set an estimate of the size of the message to be transferred.  If
+successful return @true{}, else return @false{}.
+
+@var{size} must be an exact integer, in the range of the C language type
+@code{unsigned long}, representing the message size.
 @end defun
 
 @c page
@@ -1955,7 +1987,12 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-8bitmime-set-body
+@defun smtp-8bitmime-set-body @var{message} @var{body}
+Specify the body type.  If successful return @true{}, else return
+@false{}.
+
+@var{body} must be an exact integer representing one of the constants
+@code{E8bitmime_}.
 @end defun
 
 @c page
