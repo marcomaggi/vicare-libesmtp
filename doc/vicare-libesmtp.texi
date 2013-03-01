@@ -1706,6 +1706,18 @@ Given an exact integer representing one of the @code{Ret_} constants,
 return the corresponding symbol.
 @end defun
 
+
+@defun auth->symbol @var{constant}
+Given an exact integer representing one of the @code{AUTH_} constants,
+return the corresponding symbol.
+@end defun
+
+
+@defun auth-plugin->symbol @var{constant}
+Given an exact integer representing one of the @code{AUTH_PLUGIN_}
+constants, return the corresponding symbol.
+@end defun
+
 @c page
 @node plain data
 @section Application data

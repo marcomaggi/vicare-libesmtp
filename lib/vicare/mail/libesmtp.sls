@@ -132,6 +132,8 @@
     smtp-by->symbol
     smtp-starttls->symbol
     smtp-ret->symbol
+    auth->symbol
+    auth-plugin->symbol
 
     ;; application data
     smtp-set-application-data
@@ -1244,6 +1246,16 @@
   (Ret_NOTSET
    Ret_FULL
    Ret_HDRS))
+
+(define-exact-integer->symbol-function auth->symbol
+  (AUTH_USER
+   AUTH_REALM
+   AUTH_PASS
+   AUTH_CLEARTEXT))
+
+(define-exact-integer->symbol-function auth-plugin->symbol
+  (AUTH_PLUGIN_PLAIN
+   AUTH_PLUGIN_EXTERNAL))
 
 
 ;;;; done

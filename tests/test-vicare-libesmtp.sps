@@ -497,6 +497,14 @@
       (esmtp.smtp-ret->symbol esmtp.Ret_NOTSET)
     => 'Ret_NOTSET)
 
+  (check
+      (esmtp.auth->symbol esmtp.AUTH_REALM)
+    => 'AUTH_REALM)
+
+  (check
+      (esmtp.auth-plugin->symbol esmtp.AUTH_PLUGIN_PLAIN)
+    => 'AUTH_PLUGIN_PLAIN)
+
   #t)
 
 
