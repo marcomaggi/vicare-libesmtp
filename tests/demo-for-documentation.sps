@@ -26,7 +26,10 @@
 
 
 #!r6rs
-(import (vicare)
+(import (rnrs)
+  (only (vicare language-extensions)
+	pretty-print
+	fprintf)
   (prefix (vicare posix)
 	  px.)
   (prefix (vicare mail libesmtp)
@@ -148,7 +151,7 @@
 		 ;;is not used, but it must be a pointer.
 		 (set! cstr.ptr (ffi.string->cstring message-text))
 		 (set! cstr.len (ffi.strlen cstr.ptr))
-		 (null-pointer))
+		 (ffi.null-pointer))
 		(cstr.len
 		 ;;If LEN.PTR is  not NULL: this callback  must return a
 		 ;;pointer to  the start of  the next message  chunk and
@@ -162,7 +165,7 @@
 		 ;;message  has been  processed.  When  all the  message
 		 ;;data has been read the callback must return NULL.
 		 (ffi.pointer-set-c-signed-int! len.ptr 0 0)
-		 (null-pointer))))))
+		 (ffi.null-pointer))))))
 
     (let* ((sex  (esmtp.smtp-create-session))
 	   (msg  (esmtp.smtp-add-message sex))
