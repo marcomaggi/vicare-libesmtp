@@ -84,6 +84,7 @@
 
     ;; SMTP AUTH extension
     smtp-auth-set-context
+    smtp-gsasl-set-context
 
     ;; SMTP StartTLS extension
     smtp-starttls-enable
@@ -298,6 +299,9 @@
 
 (define-inline (smtp-auth-set-context session auth-context)
   (foreign-call "ikrt_smtp_auth_set_context" session auth-context))
+
+(define-inline (smtp-gsasl-set-context session auth-context)
+  (foreign-call "ikrt_smtp_gsasl_set_context" session auth-context))
 
 
 ;;;; SMTP StartTLS extension

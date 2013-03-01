@@ -143,6 +143,12 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
        continuation.  (Marco Maggi; Thu Feb 14, 2013) */
     sk = ik_enter_c_function(pcb);
     {
+#ifdef HAVE_SMTP_GSASL_SET_CONTEXT
+      smtp_gsasl_set_context(sex, NULL);
+#endif
+#ifdef HAVE_SMTP_AUTH_SET_CONTEXT
+      smtp_auth_set_context (sex, NULL);
+#endif
       rv = smtp_destroy_session(sex);
     }
     ik_leave_c_function(pcb, sk);
@@ -673,6 +679,19 @@ ikrt_smtp_auth_set_context (ikptr s_session, ikptr s_auth_context, ikpcb * pcb)
   auth_context_t	ctx = IK_LIBESMTP_AUTH_CONTEXT(s_auth_context);
   int			rv;
   rv = smtp_auth_set_context(sex, ctx);
+  return IK_BOOLEAN_FROM_INT(rv);
+#else
+  feature_failure(__func__);
+#endif
+}
+ikptr
+ikrt_smtp_gsasl_set_context (ikptr s_session, ikptr s_gsasl_context, ikpcb * pcb)
+{
+#ifdef HAVE_SMTP_gsasl_SET_CONTEXT
+  smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
+  struct Gsasl *	ctx = IK_POINTER_DATA_VOIDP(s_gsasl_context);
+  int			rv;
+  rv = smtp_gsasl_set_context(sex, ctx);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
