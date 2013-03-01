@@ -22,7 +22,7 @@ Vicare Scheme,  an R6RS compliant Scheme  implementation; it
 provides bindings for the libESMTP C language library.
 
   The  last   time  the  author  bothered   to  update  this
-paragraph, he had tested libESMTP version 1.0.6.
+paragraph, he had tested libESMTP version 1.0.7rc1.
 
   This package makes use of the GNU Autotools.
 
