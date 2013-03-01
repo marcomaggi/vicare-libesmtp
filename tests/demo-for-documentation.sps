@@ -49,7 +49,7 @@
 
 ;;;; version functions
 
-(when #f
+(when #t
 
   (%pretty-print (list 'version-informations
 		       (esmtp.vicare-libesmtp-version-interface-current)
@@ -68,7 +68,7 @@
 ;;* No debugging callbacks.
 ;;
 
-(when #f
+(when #t
   (let ()
 
     (define local-hostname
@@ -116,7 +116,7 @@
 ;;* No debugging callbacks.
 ;;
 
-(when #f
+(when #t
   (let ()
 
     (define local-hostname
@@ -194,7 +194,7 @@
 ;;* Show event callback.
 ;;
 
-(when #f
+(when #t
   (let ()
 
     (define local-hostname
@@ -263,7 +263,7 @@
 ;;* At the end print result informations.
 ;;
 
-(when #f
+(when #t
   (let ()
 
     (define local-hostname
