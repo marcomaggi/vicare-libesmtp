@@ -24,6 +24,10 @@ libESMTP
 @acronym{AUTH}
 @end macro
 
+@macro gsasl{}
+@acronym{GSASL}
+@end macro
+
 @c page
 @c ------------------------------------------------------------
 @c Values.
@@ -626,12 +630,16 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} smtp-session @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-session?}.
+@deffnx {Validation Clause} false-or-smtp-session @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-session?}; the
+second clause also accepts @false{}.
 @end deffn
 
 
 @deffn {Validation Clause} smtp-session/alive @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-session?/alive}.
+@deffnx {Validation Clause} false-or-smtp-session/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-session?/alive};
+the second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -647,13 +655,14 @@ libesmtp}.
 @cindex @var{message} argument
 @cindex Argument @var{message}
 An opaque Scheme structure holding an instance of the C language type
-@code{smtp_message_t}, it references a message.
+@code{smtp_message_t}, it references a message associated to an @smtp{}
+session.
 
 When instances of this type are used as arguments to functions: this
 documentation identifies them as @var{message}.
 
-Instances of type @code{smtp-message} never own the the underlying
-message; when these instances are garbage collected or when
+Instances of type @code{smtp-message} never own the underlying message;
+when these instances are garbage collected or when
 @func{smtp-destroy-session} is applied to the owning session: the
 message is closed, all the associated data is finalised; any error is
 ignored in this procedure.
@@ -710,12 +719,16 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} smtp-message @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-message?}.
+@deffnx {Validation Clause} false-or-smtp-message @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-message?}; the
+second clause also accepts @false{}.
 @end deffn
 
 
 @deffn {Validation Clause} smtp-message/alive @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-message?/alive}.
+@deffnx {Validation Clause} false-or-smtp-message/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-message?/alive};
+the second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -731,12 +744,13 @@ libesmtp}.
 @cindex @var{recipient} argument
 @cindex Argument @var{recipient}
 An opaque Scheme structure holding an instance of the C language type
-@code{smtp_recipient_t}, it references a message recipient.
+@code{smtp_recipient_t}, it references a message recipient associated to
+a message.
 
 When instances of this type are used as arguments to functions: this
 documentation identifies them as @var{recipient}.
 
-Instances of type @code{smtp-recipient} never own the the underlying
+Instances of type @code{smtp-recipient} never own the underlying
 recipient; when these instances are garbage collected or when
 @func{smtp-destroy-session} is applied to the session owning the
 associated message: the recipient is closed, all the associated data is
@@ -795,12 +809,16 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} smtp-recipient @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?}.
+@deffnx {Validation Clause} false-or-smtp-recipient @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?}; the
+second clause also accepts @false{}.
 @end deffn
 
 
 @deffn {Validation Clause} smtp-recipient/alive @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-recipient?/alive}.
+@deffnx {Validation Clause} false-or-smtp-recipient/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate
+@func{smtp-recipient?/alive}; the second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -816,14 +834,15 @@ libesmtp}.
 @cindex @var{etrn-node} argument
 @cindex Argument @var{etrn-node}
 An opaque Scheme structure holding an instance of the C language type
-@code{smtp_etrn_node_t}, it references an @etrn{} node.
+@code{smtp_etrn_node_t}, it references an @etrn{} node associated to a
+session.
 
 When instances of this type are used as arguments to functions: this
 documentation identifies them as @var{etrn-node}.
 
-Instances of type @code{smtp-etrn-node} never own the the underlying
-@etrn{} node structure; when these instances are garbage collected or
-when @func{smtp-destroy-session} is applied to the session owning the
+Instances of type @code{smtp-etrn-node} never own the underlying @etrn{}
+node structure; when these instances are garbage collected or when
+@func{smtp-destroy-session} is applied to the session owning the
 associated message: the @etrn{} node is closed, all the associated data
 is finalised; any error is ignored in this procedure.
 @end deftp
@@ -880,12 +899,16 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} smtp-etrn-node @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?}.
+@deffnx {Validation Clause} false-or-smtp-etrn-node @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?}; the
+second clause also accepts @false{}.
 @end deffn
 
 
 @deffn {Validation Clause} smtp-etrn-node/alive @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-etrn-node?/alive}.
+@deffnx {Validation Clause} false-or-smtp-etrn-node/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate
+@func{smtp-etrn-node?/alive}; the second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -971,12 +994,16 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} auth-context @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{auth-context?}.
+@deffnx {Validation Clause} false-or-auth-context @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{auth-context?}; the
+second clause also accepts @false{}.
 @end deffn
 
 
 @deffn {Validation Clause} auth-context/alive @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{auth-context?/alive}.
+@deffnx {Validation Clause} false-or-auth-context/alive @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{auth-context?/alive};
+the second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -1046,7 +1073,9 @@ The following bindings are meant to be used along the library
 
 
 @deffn {Validation Clause} smtp-status @var{obj}
-Succeed if @var{obj} satisfies the predicate @func{smtp-status?}.
+@deffnx {Validation Clause} false-or-smtp-status @var{obj}
+Succeed if @var{obj} satisfies the predicate @func{smtp-status?}; the
+second clause also accepts @false{}.
 @end deffn
 
 @c page
@@ -1088,7 +1117,8 @@ error occurs: return @false{}.
 
 @defun smtp-destroy-session @var{session}
 Finalise the @var{session} releasing all the associated resources;
-return unspecified values.
+return unspecified values.  @smtp{} @auth{} and @gsasl{} contexts are
+automatically unregistered from @var{session}.
 @end defun
 
 
