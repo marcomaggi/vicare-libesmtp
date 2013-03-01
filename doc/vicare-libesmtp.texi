@@ -1444,7 +1444,7 @@ an @asciiz{} string: a Scheme string, a Scheme bytevector, a
 
 @defun smtp-enumerate-recipients @var{message} @var{c-callback}
 For each @code{smtp_recipient_t} in the @code{smtp_message_t} referenced
-by @var{message}: call the @var{c-callback} function.  If successrul
+by @var{message}: call the @var{c-callback} function.  If successful
 return @true{}, else return @false{}.
 
 @var{c-callback} must be the return value of a call to
