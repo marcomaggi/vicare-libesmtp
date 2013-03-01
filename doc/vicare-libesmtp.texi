@@ -1789,7 +1789,24 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-auth-set-context
+@defun smtp-auth-set-context @var{session} @var{auth-context}
+Enable or disable @smtp{} @auth{} for @var{session}.  If successful
+return @true{}, else return @false{}.
+
+If @var{auth-context} is @false{}: @auth{} is disabled and the previous
+@auth{} context, if any, is unregistered from @var{session}.  Else
+@var{auth-context} must be an instance of @code{auth-context}.
+@end defun
+
+
+@defun smtp-gsasl-set-context @var{session} @var{gsasl-context}
+Enable or disable @smtp{} @auth{} for @var{session}.  If successful
+return @true{}, else return @false{}.
+
+If @var{gsasl-context} is @false{}: @auth{} is disabled and the previous
+@auth{} context, if any, is unregistered from @var{session}.  Else
+@var{gsasl-context} must be a pointer object referencing a @code{Gsasl}
+data structure.
 @end defun
 
 @c page
@@ -1801,15 +1818,73 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-starttls-enable
+@defun smtp-starttls-enable @var{session} @var{how}
+Enable or disable @smtp{} @code{STARTTLS} for @var{session}.  If
+successful return @true{}, else return @false{}.
+
+@var{how} must be an exact integer representing one of the
+@code{Starttls_} constants.
 @end defun
 
 
-@defun smtp-starttls-set-ctx
+@defun smtp-starttls-set-ctx @var{session} @var{ssl-context}
+Register an OpenSSL context in @var{session}.  If successful return
+@true{}, else return @false{}.
+
+@var{ssl-context} must be a pointer object referencing a foreign data
+structure of type @code{SSL_CTX}.
 @end defun
 
 
-@defun smtp-starttls-set-password-cb
+@defun smtp-starttls-set-password-cb @var{c-callback}
+Register a single callback function to be used every time a password is
+requested for OpenSSL operations.  If successful return @true{}, else
+return @false{}.
+
+@var{c-callback} must be @cnull{} or the return value of a call to
+@func{make-smtp-starttls-passwordcb}.  Notice that this callback is
+handed to @cfunc{SSL_CTX_set_default_passwd_cb} provided by the OpenSSL
+library; @manpage{SSL_CTX_set_default_passwd_cb, set passwd callback for
+encrypted @acronym{PEM} file handling}.
+@end defun
+
+
+@defun make-smtp-starttls-passwordcb @var{user-scheme-callback}
+Wrap a user supplied Scheme function and return a pointer object
+referencing a callback function suitable to be used as
+@code{smtp_starttls_passwordcb_t} callback; the returned pointer must be
+released with a call to @func{free-c-callback} from @library{vicare
+ffi}.
+
+@var{user-scheme-callback} must accept @math{3} arguments:
+
+@enumerate
+@item
+A pointer object referencing a memory buffer.
+
+@item
+An exact integer, in the range of the C language type @code{signed int},
+representing the number of bytes available in the buffer.
+
+@item
+A boolean value: @true{} if the callback is used for reading/decryption,
+@false{} if the callback is used for writing/encryption.
+@end enumerate
+
+@var{user-scheme-callback} must return an exact integer, in the range of
+the C language type @code{signed int}, representing the actual length of
+the password.
+
+@var{user-scheme-callback} is wrapped in an internally generated Scheme
+function which does the following:
+
+@itemize
+@item
+Block and discard all the raised exceptions using @func{guard} from
+@library{vicare}; when an exception is catched: it is discarded and the
+callback returns @code{0} to the caller.  @var{user-scheme-callback}
+should take care of handling its own exceptions.
+@end itemize
 @end defun
 
 @c page
@@ -1821,7 +1896,18 @@ The following bindings are exported by the library @library{vicare mail
 libesmtp}.
 
 
-@defun smtp-deliverby-set-mode
+@defun smtp-deliverby-set-mode @var{message} @var{time} @var{by-mode} @var{trace}
+Enable the Deliver By extension for @var{message}.  If successful return
+@true{}, else return @false{}.
+
+@var{time} must be an exact integer, in the range of the C language type
+@code{signed long}.
+
+@var{by-mode} must be an exact integer representing one of the constants
+@code{By_}.
+
+@var{trace} must be an exact integer, in the range of the C language
+type @code{signed int}.
 @end defun
 
 @c page

@@ -676,8 +676,12 @@ ikrt_smtp_auth_set_context (ikptr s_session, ikptr s_auth_context, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_AUTH_SET_CONTEXT
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
-  auth_context_t	ctx = IK_LIBESMTP_AUTH_CONTEXT(s_auth_context);
+  auth_context_t	ctx;
   int			rv;
+  if (IK_FALSE == s_auth_context)
+    ctx = NULL;
+  else
+    ctx = IK_LIBESMTP_AUTH_CONTEXT(s_auth_context);
   rv = smtp_auth_set_context(sex, ctx);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
@@ -687,10 +691,14 @@ ikrt_smtp_auth_set_context (ikptr s_session, ikptr s_auth_context, ikpcb * pcb)
 ikptr
 ikrt_smtp_gsasl_set_context (ikptr s_session, ikptr s_gsasl_context, ikpcb * pcb)
 {
-#ifdef HAVE_SMTP_gsasl_SET_CONTEXT
+#ifdef HAVE_SMTP_GSASL_SET_CONTEXT
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
-  struct Gsasl *	ctx = IK_POINTER_DATA_VOIDP(s_gsasl_context);
+  struct Gsasl *	ctx;
   int			rv;
+  if (IK_FALSE == s_gsasl_context)
+    ctx = NULL;
+  else
+    ctx = IK_POINTER_DATA_VOIDP(s_gsasl_context);
   rv = smtp_gsasl_set_context(sex, ctx);
   return IK_BOOLEAN_FROM_INT(rv);
 #else

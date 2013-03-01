@@ -455,6 +455,34 @@
   (collect))
 
 
+(parametrise ((check-test-name		'auth)
+	      (struct-guardian-logger	#f))
+
+  (check
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-auth-set-context sex #f))
+    => #t)
+
+  #;(check
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-auth-set-context sex (null-pointer)))
+    => #t)
+
+;;; --------------------------------------------------------------------
+
+  (check
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-gsasl-set-context sex #f))
+    => #t)
+
+  (check
+      (let ((sex (esmtp.smtp-create-session)))
+	(esmtp.smtp-gsasl-set-context sex (null-pointer)))
+    => #t)
+
+  (collect))
+
+
 (parametrise ((check-test-name		'headers))
 
   (check

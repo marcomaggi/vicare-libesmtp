@@ -750,15 +750,15 @@
 (define (smtp-auth-set-context session auth-context)
   (define who 'smtp-auth-set-context)
   (with-arguments-validation (who)
-      ((smtp-session/alive	session)
-       (auth-context/alive	auth-context))
+      ((smtp-session/alive		session)
+       (false-or-auth-context/alive	auth-context))
     (capi.smtp-auth-set-context session auth-context)))
 
 (define (smtp-gsasl-set-context session gsasl-context)
   (define who 'smtp-gsasl-set-context)
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
-       (pointer			gsasl-context))
+       (pointer/false		gsasl-context))
     (capi.smtp-gsasl-set-context session gsasl-context)))
 
 
@@ -1066,22 +1066,6 @@
 		 (user-scheme-callback buf.ptr buf.len writing)
 		 (void)))))))
 
-(define make-smtp-starttls-passwordcb
-  ;; int (*smtp_starttls_passwordcb_t)
-  ;;		(char *buf,
-  ;;		 int buflen,
-  ;;		 int rwflag,
-  ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'signed-int
-					  '(pointer signed-int signed-int pointer))))
-    (lambda (user-scheme-callback)
-      (maker (lambda (buf.ptr buf.len rwflag custom-data)
-	       (guard (E (else
-			  #;(pretty-print E (current-error-port))
-			  (void)))
-		 (user-scheme-callback buf.ptr buf.len (if rwflag #t #f))
-		 (void)))))))
-
 (define make-smtp-etrn-enumerate-nodecb
   ;; void (*smtp_etrn_enumerate_nodecb_t)
   ;;		(smtp_etrn_node_t node,
@@ -1111,7 +1095,7 @@
       (maker (lambda (request-pointer result-opinter fields custom-data)
 	       (guard (E (else
 			  #;(pretty-print E (current-error-port))
-			  (void)))
+			  0))
 		 (user-scheme-callback )))))))
 
 (define make-auth-response
@@ -1126,7 +1110,7 @@
       (maker (lambda (context-pointer challenge length interact custom-data)
 	       (guard (E (else
 			  #;(pretty-print E (current-error-port))
-			  (void)))
+			  (null-pointer)))
 		 (user-scheme-callback )))))))
 
 (define make-auth-recode
@@ -1142,10 +1126,27 @@
       (maker (lambda (context-pointer dst.ptr.ptr dst.len.ptr src.ptr src.len)
 	       (guard (E (else
 			  #;(pretty-print E (current-error-port))
-			  (void)))
+			  0))
 		 (user-scheme-callback context-pointer
 				       dst.ptr.ptr dst.len.ptr
 				       src.ptr src.len)))))))
+
+;;; --------------------------------------------------------------------
+
+(define make-smtp-starttls-passwordcb
+  ;; int (*smtp_starttls_passwordcb_t)
+  ;;		(char *buf,
+  ;;		 int buflen,
+  ;;		 int rwflag,
+  ;;		 void *arg);
+  (let ((maker (ffi.make-c-callback-maker 'signed-int
+					  '(pointer signed-int signed-int pointer))))
+    (lambda (user-scheme-callback)
+      (maker (lambda (buf.ptr buf.len rwflag custom-data)
+	       (guard (E (else
+			  #;(pretty-print E (current-error-port))
+			  0))
+		 (user-scheme-callback buf.ptr buf.len (if rwflag #t #f))))))))
 
 
 ;;;; constant to symbol conversion
