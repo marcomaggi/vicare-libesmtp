@@ -323,6 +323,12 @@ Revised^6 Report on the algorithmic language Scheme
 @end macro
 
 @c ------------------------------------------------------------
+
+@macro GenCStringsRef{}
+@vicareref{cbuffers strings, Introduction to generalised C strings}
+@end macro
+
+@c ------------------------------------------------------------
 @c RNRS document macros.
 @c ------------------------------------------------------------
 

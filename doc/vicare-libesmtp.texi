@@ -1135,9 +1135,8 @@ Set @var{local-hostname} as local hostname for @var{session}; if
 successful return @true{}, else return @false{}.
 
 The optional @var{local-hostname} must be @false{} or a general C buffer
-argument holding an @asciiz{} string: a Scheme string, a Scheme
-bytevector, a @code{memory-block} instance, a pointer object.  When
-@false{} or not given: @cnull{} is handed to the @libesmtp{} function.
+argument holding an @asciiz{} string; when @false{} or not given:
+@cnull{} is handed to the @libesmtp{} function.  @GenCStringsRef{}
 @end defun
 
 
@@ -1146,8 +1145,7 @@ Set @var{remote-server} as remote server specification for
 @var{session}; if successful return @true{}, else return @false{}.
 
 @var{local-hostname} must be a general C buffer argument holding an
-@asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+@asciiz{} string.  @GenCStringsRef{}
 @end defun
 
 
@@ -1353,9 +1351,8 @@ Set the reverse path mailbox for @var{message}; this mailbox is the
 sender address.  If successful return @true{}, else return @false{}.
 
 The optional @var{mailbox} must be @false{} or a general C buffer
-argument holding an @asciiz{} string: a Scheme string, a Scheme
-bytevector, a @code{memory-block} instance, a pointer object.  When
-@false{} or not given: @cnull{} is handed to the @libesmtp{} function.
+argument holding an @asciiz{} string; when @false{} or not given:
+@cnull{} is handed to the @libesmtp{} function.  @GenCStringsRef{}
 @end defun
 
 @c ------------------------------------------------------------
@@ -1418,8 +1415,7 @@ Set the message from a general C buffer.  If successful return @true{},
 otherwise return @false{}.
 
 @var{string} must be a general C buffer argument holding an @asciiz{}
-string: a Scheme string, a Scheme bytevector, a @code{memory-block}
-instance, a pointer object.
+string; @GenCStringsRef{}
 @end defun
 
 @c page
@@ -1437,8 +1433,7 @@ server.  If successful: return a new instance of @code{smtp-recipient};
 else return @false{}.
 
 The optional @var{mailbox} must be a general C buffer argument holding
-an @asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+an @asciiz{} string; @GenCStringsRef{}
 @end defun
 
 
@@ -1536,14 +1531,14 @@ language type @code{signed long}; internally this value is converted to
 
 @item Message-Id
 Requires @vari{value} to be a general C buffer holding an @asciiz{}
-string: a Scheme string, a Scheme bytevector, a @code{memory-block}
-instance, a pointer object.  @varii{value} is ignored.
+string; @vicareref{cbuffers strings, Introduction to generalised C
+strings}.  @varii{value} is ignored.
 
 @item From
 @itemx Disposition-Notification-To
 Require both @vari{value} and @varii{value} to be a general C buffer
-holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+holding an @asciiz{} string; @vicareref{cbuffers strings, Introduction
+to generalised C strings}.
 
 @item To
 @itemx Cc
@@ -1551,14 +1546,14 @@ holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
 @itemx Reply-To
 @itemx Sender
 Require both @vari{value} and @varii{value} to be a general C buffer
-holding an @asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+holding an @asciiz{} string; @vicareref{cbuffers strings, Introduction
+to generalised C strings}.
 @end table
 
 If @var{header-name} is not specially recognised by @libesmtp{},
-@vari{value} must be a general C buffer holding an @asciiz{} string: a
-Scheme string, a Scheme bytevector, a @code{memory-block} instance, a
-pointer object; @varii{value} is ignored.
+@vari{value} must be a general C buffer holding an @asciiz{} string;
+@vicareref{cbuffers strings, Introduction to generalised C strings}.
+@varii{value} is ignored.
 @end defun
 
 
@@ -1567,8 +1562,8 @@ Select options for message header processing.  If successful return
 @true{}, else return @false{}.
 
 @var{header-name} must be a general C buffer holding an @asciiz{}
-string: a Scheme string, a Scheme bytevector, a @code{memory-block}
-instance, a pointer object.
+string; @vicareref{cbuffers strings, Introduction to generalised C
+strings}.
 
 @var{option} must be one of the constants: @code{Hdr_OVERRIDE},
 @code{Hdr_PROHIBIT}.
@@ -1938,8 +1933,8 @@ the message that caused it to be generated.  If successful return
 @true{}, else return @false{}.
 
 @var{envelope-identifier} must be a general C buffer holding an
-@asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+@asciiz{} string; @vicareref{cbuffers strings, Introduction to
+generalised C strings}.
 @end defun
 
 
@@ -1959,8 +1954,8 @@ Set the @acronym{DSN} @code{ORCPT} option.  If successful return
 @true{}, else return @false{}.
 
 @var{address-type} and @var{address} must be general C buffers holding
-an @asciiz{} string: a Scheme string, a Scheme bytevector, a
-@code{memory-block} instance, a pointer object.
+an @asciiz{} string; @vicareref{cbuffers strings, Introduction to
+generalised C strings}.
 @end defun
 
 @c page
@@ -2010,9 +2005,8 @@ libesmtp}.
 Add an @code{ETRN} node to the @smtp{} session.  If successful return an
 instance of @code{smtp-etrn-node}, else return @false{}.
 
-@var{node} must be a general C buffer holding an @asciiz{} string: a
-Scheme string, a Scheme bytevector, a @code{memory-block} instance, a
-pointer object.
+@var{node} must be a general C buffer holding an @asciiz{} string;
+@vicareref{cbuffers strings, Introduction to generalised C strings}.
 @end defun
 
 

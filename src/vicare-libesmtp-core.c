@@ -173,8 +173,8 @@ ikrt_smtp_set_hostname (ikptr s_session, ikptr s_local_hostname, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_HOSTNAME
   smtp_session_t	sex   = IK_LIBESMTP_SESSION(s_session);
-  char *	hname = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_local_hostname);
-  int		rv;
+  char *		hname = IK_GENERALISED_C_STRING_OR_FALSE(s_local_hostname);
+  int			rv;
   rv = smtp_set_hostname(sex, hname);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
@@ -186,8 +186,8 @@ ikrt_smtp_set_server (ikptr s_session, ikptr s_remote_server, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_SERVER
   smtp_session_t	sex   = IK_LIBESMTP_SESSION(s_session);
-  char *	server = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_remote_server);
-  int		rv;
+  char *		server = IK_GENERALISED_C_STRING(s_remote_server);
+  int			rv;
   rv = smtp_set_server(sex, server);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
@@ -292,8 +292,8 @@ ikrt_smtp_set_reverse_path (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_REVERSE_PATH
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK_OR_FALSE(s_mailbox);
-  int		rv;
+  char *		mailbox = IK_GENERALISED_C_STRING_OR_FALSE(s_mailbox);
+  int			rv;
   rv = smtp_set_reverse_path(msg, mailbox);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
@@ -333,7 +333,7 @@ ikrt_smtp_set_message_str (ikptr s_message, ikptr s_string, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_SET_MESSAGECB
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *		str = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_string);
+  char *		str = IK_GENERALISED_C_STRING(s_string);
   int			rv;
   /* fprintf(stderr, "%s: message string: \"%s\"\n", __func__, str); */
   /* "smtp_set_message_str()" is a C preprocessor macro!!! */
@@ -411,8 +411,8 @@ ikptr
 ikrt_smtp_add_recipient (ikptr s_message, ikptr s_mailbox, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_ADD_RECIPIENT
-  smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *		mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_mailbox);
+  smtp_message_t	msg     = IK_LIBESMTP_MESSAGE(s_message);
+  char *		mailbox = IK_GENERALISED_C_STRING(s_mailbox);
   smtp_recipient_t	rec;
   rec = smtp_add_recipient(msg, mailbox);
   return (rec)? ika_pointer_alloc(pcb, (long)rec) : IK_FALSE;
@@ -509,7 +509,7 @@ ikrt_smtp_set_header (ikptr s_message,
 {
 #ifdef HAVE_SMTP_SET_HEADER
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *	header_name = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_header_name);
+  char *	header_name = IK_GENERALISED_C_STRING(s_header_name);
   int		rv;
   /* fprintf(stderr, "%s: header name: %s\n", __func__, header_name); */
   if (0 == strcmp(header_name, "Date"))
@@ -519,14 +519,14 @@ ikrt_smtp_set_header (ikptr s_message,
     }
   else if (0 == strcmp(header_name, "Message-Id"))
     {
-      char *	value = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      char *	value = IK_GENERALISED_C_STRING(s_value_1);
       rv = smtp_set_header(msg, header_name, value);
     }
   else if ((0 == strcmp(header_name, "From")) ||
 	   (0 == strcmp(header_name, "Disposition-Notification-To")))
     {
-      char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
-      char *	mailbox = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
+      char *	phrase  = IK_GENERALISED_C_STRING(s_value_1);
+      char *	mailbox = IK_GENERALISED_C_STRING(s_value_2);
       rv = smtp_set_header(msg, header_name, phrase, mailbox);
     }
   else if ((0 == strcmp(header_name, "To"))		||
@@ -535,13 +535,13 @@ ikrt_smtp_set_header (ikptr s_message,
 	   (0 == strcmp(header_name, "Reply-To"))	||
 	   (0 == strcmp(header_name, "Sender")))
     {
-      char *	phrase  = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
-      char *	address = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_2);
+      char *	phrase  = IK_GENERALISED_C_STRING(s_value_1);
+      char *	address = IK_GENERALISED_C_STRING(s_value_2);
       rv = smtp_set_header(msg, header_name, phrase, address);
     }
   else
     {
-      char *	value = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_value_1);
+      char *	value = IK_GENERALISED_C_STRING(s_value_1);
       rv = smtp_set_header(msg, header_name, value);
     }
   return IK_BOOLEAN_FROM_INT(rv);
@@ -556,7 +556,7 @@ ikrt_smtp_set_header_option (ikptr s_message,
 {
 #ifdef HAVE_SMTP_SET_HEADER_OPTION
   smtp_message_t	msg = IK_LIBESMTP_MESSAGE(s_message);
-  char *	header_name = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_header_name);
+  char *	header_name = IK_GENERALISED_C_STRING(s_header_name);
   enum header_option	option = ik_integer_to_int(s_option);
   int			rv;
   rv = smtp_set_header_option(msg, header_name, option);
@@ -796,7 +796,7 @@ ikrt_smtp_dsn_set_envid (ikptr s_message, ikptr s_envid, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_DSN_SET_ENVID
   smtp_message_t	msg   = IK_LIBESMTP_MESSAGE(s_message);
-  const char *		envid = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_envid);
+  const char *		envid = IK_GENERALISED_C_STRING(s_envid);
   int			rv;
   rv = smtp_dsn_set_envid(msg, envid);
   return IK_BOOLEAN_FROM_INT(rv);
@@ -822,10 +822,8 @@ ikrt_smtp_dsn_set_orcpt (ikptr s_recipient, ikptr s_address_type, ikptr s_addres
 {
 #ifdef HAVE_SMTP_DSN_SET_ORCPT
   smtp_recipient_t	rec   = IK_LIBESMTP_RECIPIENT(s_recipient);
-  const char *		address_type = \
-    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_address_type);
-  const char *		address      = \
-    IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_address);
+  const char *		address_type = IK_GENERALISED_C_STRING(s_address_type);
+  const char *		address      = IK_GENERALISED_C_STRING(s_address);
   int			rv;
   rv = smtp_dsn_set_orcpt(rec, address_type, address);
   return IK_BOOLEAN_FROM_INT(rv);
@@ -883,7 +881,7 @@ ikrt_smtp_etrn_add_node (ikptr s_session, ikptr s_option, ikptr s_node, ikpcb * 
 #ifdef HAVE_SMTP_ETRN_ADD_NODE
   smtp_session_t	sex    = IK_LIBESMTP_SESSION(s_session);
   int			option = ik_integer_to_int(s_option);
-  const char *		node   = IK_CHARP_FROM_BYTEVECTOR_OR_POINTER_OR_MBLOCK(s_node);
+  const char *		node   = IK_GENERALISED_C_STRING(s_node);
   smtp_etrn_node_t	rv;
   rv = smtp_etrn_add_node(sex, option, node);
   return (rv)? ika_pointer_alloc(pcb, (long)rv) : IK_FALSE;

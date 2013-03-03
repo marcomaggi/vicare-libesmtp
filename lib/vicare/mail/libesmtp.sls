@@ -369,10 +369,10 @@
     ;;
     (define who 'smtp-set-hostname)
     (with-arguments-validation (who)
-	((smtp-session/alive	session))
+	((smtp-session/alive		session)
+	 (general-c-string/false	local-hostname))
       (with-general-c-strings/false
 	  ((hname		local-hostname))
-	(string-to-bytevector string->ascii)
 	(capi.smtp-set-hostname session hname))))))
 
 (define (smtp-set-server session remote-server)
@@ -381,10 +381,10 @@
   ;;
   (define who 'smtp-set-server)
   (with-arguments-validation (who)
-      ((smtp-session/alive	session))
+      ((smtp-session/alive	session)
+       (general-c-string	remote-server))
     (with-general-c-strings
 	((rserver	remote-server))
-      (string-to-bytevector string->ascii)
       (capi.smtp-set-server session rserver))))
 
 (define (smtp-set-timeout session which value)
@@ -467,10 +467,10 @@
     ;;
     (define who 'smtp-set-reverse-path)
     (with-arguments-validation (who)
-	((smtp-message/alive	message))
+	((smtp-message/alive		message)
+	 (general-c-string/false	mailbox))
       (with-general-c-strings/false
 	  ((mbox		mailbox))
-	(string-to-bytevector string->ascii)
 	(capi.smtp-set-reverse-path message mbox))))))
 
 ;;; --------------------------------------------------------------------
@@ -498,10 +498,10 @@
   ;;
   (define who 'smtp-set-message-str)
   (with-arguments-validation (who)
-      ((smtp-message/alive	message))
+      ((smtp-message/alive	message)
+       (general-c-string/false	string))
     (with-general-c-strings/false
 	((string.ascii		string))
-      (string-to-bytevector string->ascii)
       (capi.smtp-set-message-str message string.ascii))))
 
 ;;; --------------------------------------------------------------------
@@ -571,33 +571,41 @@
 	       ((signed-long	value1))
 	     (capi.smtp-set-header message header.bv value1 #f)))
 	  (("Message-Id")
-	   (with-general-c-strings
-	       ((value		value1))
-	     (string-to-bytevector string->ascii)
-	     (capi.smtp-set-header message header.bv value #f)))
+	   (with-arguments-validation (who)
+	       ((general-c-string	value1))
+	     (with-general-c-strings
+		 ((value		value1))
+	       (capi.smtp-set-header message header.bv value #f))))
 	  (("From" "Disposition-Notification-To")
-	   (with-general-c-strings
-	       ((phrase		value1)
-		(mailbox	value2))
-	     (string-to-bytevector string->ascii)
-	     (capi.smtp-set-header message header.bv phrase mailbox)))
+	   (with-arguments-validation (who)
+	       ((general-c-string	value1)
+		(general-c-string	value2))
+	     (with-general-c-strings
+		 ((phrase		value1)
+		  (mailbox	value2))
+	       (capi.smtp-set-header message header.bv phrase mailbox))))
 	  (("To" "Cc" "Bcc" "Reply-To" "Sender")
-	   (with-general-c-strings
-	       ((phrase		value1)
-		(address	value2))
-	     (string-to-bytevector string->ascii)
-	     (capi.smtp-set-header message header.bv phrase address)))
+	   (with-arguments-validation (who)
+	       ((general-c-string	value1)
+		(general-c-string	value2))
+	     (with-general-c-strings
+		 ((phrase	value1)
+		  (address	value2))
+	       (capi.smtp-set-header message header.bv phrase address))))
 	  (else
-	   (with-general-c-strings
-	       ((value		value1))
-	     (string-to-bytevector string->ascii)
-	     (capi.smtp-set-header message header.bv value #f)))
+	   (with-arguments-validation (who)
+	       ((general-c-string	value1))
+	     (with-general-c-strings
+		 ((value		value1))
+	       (string-to-bytevector string->ascii)
+	       (capi.smtp-set-header message header.bv value #f))))
 	  ))))))
 
 (define (smtp-set-header-option message header option)
   (define who 'smtp-set-header-option)
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
+       (general-c-string	header)
        (signed-int		option))
     (with-general-c-strings
 	((header.c	header))
@@ -619,10 +627,10 @@
   ;;
   (define who 'smtp-add-recipient)
   (with-arguments-validation (who)
-      ((smtp-message/alive	message))
+      ((smtp-message/alive	message)
+       (general-c-string	mailbox))
     (with-general-c-strings
 	((mbox		mailbox))
-      (string-to-bytevector string->ascii)
       (let ((rv (capi.smtp-add-recipient message mbox)))
 	(and rv (make-smtp-recipient/not-owner rv message))))))
 
@@ -810,10 +818,10 @@
 (define (smtp-dsn-set-envid message envelope-identifier)
   (define who 'smtp-dsn-set-envid)
   (with-arguments-validation (who)
-      ((smtp-message/alive	message))
+      ((smtp-message/alive	message)
+       (general-c-string	envelope-identifier))
     (with-general-c-strings
 	((envid		envelope-identifier))
-      (string-to-bytevector string->ascii)
       (capi.smtp-dsn-set-envid message envid))))
 
 (define (smtp-dsn-set-notify recipient flags)
@@ -826,11 +834,12 @@
 (define (smtp-dsn-set-orcpt recipient address-type address)
   (define who 'smtp-dsn-set-orcpt)
   (with-arguments-validation (who)
-      ((smtp-recipient/alive	recipient))
+      ((smtp-recipient/alive	recipient)
+       (general-c-string	address-type)
+       (general-c-string	address))
     (with-general-c-strings
 	((address-type^		address-type)
 	 (address^		address))
-      (string-to-bytevector string->ascii)
       (capi.smtp-dsn-set-orcpt recipient address-type^ address^))))
 
 
@@ -860,10 +869,10 @@
   (define who 'smtp-etrn-add-node)
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
-       (signed-int		option))
+       (signed-int		option)
+       (general-c-string	node))
     (with-general-c-strings
 	((node^		node))
-      (string-to-bytevector string->ascii)
       (let ((rv (capi.smtp-etrn-add-node session option node^)))
 	(and rv (make-smtp-etrn-node/not-owner rv session))))))
 
