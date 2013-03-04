@@ -591,8 +591,8 @@ the @code{smtp_session_t} it represents is open; otherwise return
 @end defun
 
 
-@defun smtp-session-destructor @var{session}
-@defunx set-smtp-session-destructor! @var{session} @var{func}
+@defun smtp-session-custom-destructor @var{session}
+@defunx set-smtp-session-custom-destructor! @var{session} @var{func}
 Retrieve or set a destructor function associated to the @var{session}.
 
 Whenever the @var{session} is closed, either explicitly with
@@ -605,7 +605,7 @@ associated to @var{session}; if we do:
 
 @example
 (define session ...)
-(set-smtp-session-destructor! session
+(set-smtp-session-custom-destructor! session
   (let ((state (make-some-data-struct)))
     (case-lambda
       ((sex)
@@ -613,7 +613,7 @@ associated to @var{session}; if we do:
       (()
        state))))
 
-(let ((state ((smtp-session-destructor session))))
+(let ((state ((smtp-session-custom-destructor session))))
   (do-something-with session state))
 @end example
 
@@ -682,8 +682,8 @@ the @code{smtp_message_t} it represents is open; otherwise return
 @end defun
 
 
-@defun smtp-message-destructor @var{message}
-@defunx set-smtp-message-destructor! @var{message} @var{func}
+@defun smtp-message-custom-destructor @var{message}
+@defunx set-smtp-message-custom-destructor! @var{message} @var{func}
 Retrieve or set a destructor function associated to the @var{message}.
 
 Whenever the @var{message} is finalised: @var{func} is applied to
@@ -694,7 +694,7 @@ associated to @var{message}; if we do:
 
 @example
 (define connection ...)
-(set-smtp-message-destructor! connection
+(set-smtp-message-custom-destructor! connection
   (let ((state (make-some-data-struct)))
     (case-lambda
       ((conn)
@@ -702,7 +702,7 @@ associated to @var{message}; if we do:
       (()
        state))))
 
-(let ((state ((smtp-message-destructor connection))))
+(let ((state ((smtp-message-custom-destructor connection))))
   (do-something-with connection state))
 @end example
 
@@ -771,8 +771,8 @@ the @code{smtp_recipient_t} it represents is open; otherwise return
 @end defun
 
 
-@defun smtp-recipient-destructor @var{recipient}
-@defunx set-smtp-recipient-destructor! @var{recipient} @var{func}
+@defun smtp-recipient-custom-destructor @var{recipient}
+@defunx set-smtp-recipient-custom-destructor! @var{recipient} @var{func}
 Retrieve or set a destructor function associated to the @var{recipient}.
 
 Whenever the @var{recipient} is finalised: @var{func} is applied to
@@ -784,7 +784,7 @@ associated to @var{recipient}; if we do:
 
 @example
 (define connection ...)
-(set-smtp-recipient-destructor! connection
+(set-smtp-recipient-custom-destructor! connection
   (let ((state (make-some-data-struct)))
     (case-lambda
       ((conn)
@@ -792,7 +792,7 @@ associated to @var{recipient}; if we do:
       (()
        state))))
 
-(let ((state ((smtp-recipient-destructor connection))))
+(let ((state ((smtp-recipient-custom-destructor connection))))
   (do-something-with connection state))
 @end example
 
@@ -861,8 +861,8 @@ the @code{smtp_etrn_node_t} it represents is open; otherwise return
 @end defun
 
 
-@defun smtp-etrn-node-destructor @var{etrn-node}
-@defunx set-smtp-etrn-node-destructor! @var{etrn-node} @var{func}
+@defun smtp-etrn-node-custom-destructor @var{etrn-node}
+@defunx set-smtp-etrn-node-custom-destructor! @var{etrn-node} @var{func}
 Retrieve or set a destructor function associated to the @var{etrn-node}.
 
 Whenever the @var{etrn-node} is finalised: @var{func} is applied to
@@ -874,7 +874,7 @@ associated to @var{etrn-node}; if we do:
 
 @example
 (define connection ...)
-(set-smtp-etrn-node-destructor! connection
+(set-smtp-etrn-node-custom-destructor! connection
   (let ((state (make-some-data-struct)))
     (case-lambda
       ((conn)
@@ -882,7 +882,7 @@ associated to @var{etrn-node}; if we do:
       (()
        state))))
 
-(let ((state ((smtp-etrn-node-destructor connection))))
+(let ((state ((smtp-etrn-node-custom-destructor connection))))
   (do-something-with connection state))
 @end example
 
@@ -957,8 +957,8 @@ the @code{auth_context_t} it represents is open; otherwise return
 @end defun
 
 
-@defun auth-context-destructor @var{auth-ctx}
-@defunx set-auth-context-destructor! @var{auth-ctx} @var{func}
+@defun auth-context-custom-destructor @var{auth-ctx}
+@defunx set-auth-context-custom-destructor! @var{auth-ctx} @var{func}
 Retrieve or set a destructor function associated to the @var{auth-ctx}.
 
 Whenever the @var{auth-ctx} is finalised: @var{func} is applied to
@@ -969,7 +969,7 @@ associated to @var{auth-ctx}; if we do:
 
 @example
 (define connection ...)
-(set-auth-context-destructor! connection
+(set-auth-context-custom-destructor! connection
   (let ((state (make-some-data-struct)))
     (case-lambda
       ((conn)
@@ -977,7 +977,7 @@ associated to @var{auth-ctx}; if we do:
       (()
        state))))
 
-(let ((state ((auth-context-destructor connection))))
+(let ((state ((auth-context-custom-destructor connection))))
   (do-something-with connection state))
 @end example
 
