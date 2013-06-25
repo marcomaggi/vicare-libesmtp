@@ -137,11 +137,10 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
   if (sex) {
     int		rv;
-    ikptr	sk;
     /* Hypothesis: at  some future time,  closing the session  may cause
        invocation   of  Scheme   callbacks,  so   we  save   the  Scheme
        continuation.  (Marco Maggi; Thu Feb 14, 2013) */
-    sk = ik_enter_c_function(pcb);
+    ik_enter_c_function(pcb);
     {
 #ifdef HAVE_SMTP_GSASL_SET_CONTEXT
       smtp_gsasl_set_context(sex, NULL);
@@ -151,7 +150,7 @@ ikrt_smtp_destroy_session (ikptr s_session, ikpcb * pcb)
 #endif
       rv = smtp_destroy_session(sex);
     }
-    ik_leave_c_function(pcb, sk);
+    ik_leave_c_function(pcb);
     /* *NOTE* We cannot set the pointer field of S_SESSION to NULL here:
        we are assuming  that a callback may be called  by the destructor
        function; this  means the garbage  collectory may have  moved the
@@ -240,13 +239,12 @@ ikrt_smtp_start_session (ikptr s_session, ikpcb * pcb)
 {
 #ifdef HAVE_SMTP_START_SESSION
   smtp_session_t	sex = IK_LIBESMTP_SESSION(s_session);
-  ikptr			sk;
   int			rv;
-  sk = ik_enter_c_function(pcb);
+  ik_enter_c_function(pcb);
   {
     rv = smtp_start_session(sex);
   }
-  ik_leave_c_function(pcb, sk);
+  ik_leave_c_function(pcb);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
@@ -276,12 +274,11 @@ ikrt_smtp_enumerate_messages (ikptr s_session, ikptr s_callback, ikpcb * pcb)
 #ifdef HAVE_SMTP_ENUMERATE_MESSAGES
   smtp_session_t		sex = IK_LIBESMTP_SESSION(s_session);
   smtp_enumerate_messagecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
-  ikptr				sk;
-  sk = ik_enter_c_function(pcb);
+  ik_enter_c_function(pcb);
   {
     smtp_enumerate_messages(sex, cb, NULL);
   }
-  ik_leave_c_function(pcb, sk);
+  ik_leave_c_function(pcb);
   return IK_VOID;
 #else
   feature_failure(__func__);
@@ -427,12 +424,11 @@ ikrt_smtp_enumerate_recipients (ikptr s_message, ikptr s_callback, ikpcb * pcb)
   smtp_message_t		msg = IK_LIBESMTP_MESSAGE(s_message);
   smtp_enumerate_recipientcb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
   int				rv;
-  ikptr				sk;
-  sk = ik_enter_c_function(pcb);
+  ik_enter_c_function(pcb);
   {
     rv = smtp_enumerate_recipients(msg, cb, NULL);
   }
-  ik_leave_c_function(pcb, sk);
+  ik_leave_c_function(pcb);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);
@@ -895,13 +891,12 @@ ikrt_smtp_etrn_enumerate_nodes (ikptr s_session, ikptr s_callback, ikpcb * pcb)
 #ifdef HAVE_SMTP_ETRN_ENUMERATE_NODES
   smtp_session_t		sex = IK_LIBESMTP_SESSION(s_session);
   smtp_etrn_enumerate_nodecb_t	cb  = IK_POINTER_DATA_VOIDP(s_callback);
-  ikptr				sk;
   int				rv;
-  sk = ik_enter_c_function(pcb);
+  ik_enter_c_function(pcb);
   {
     rv = smtp_etrn_enumerate_nodes(sex, cb, NULL);
   }
-  ik_leave_c_function(pcb, sk);
+  ik_leave_c_function(pcb);
   return IK_BOOLEAN_FROM_INT(rv);
 #else
   feature_failure(__func__);

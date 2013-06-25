@@ -29,7 +29,8 @@
 (import (rnrs)
   (only (vicare language-extensions)
 	pretty-print
-	fprintf)
+	fprintf
+	unwind-protect)
   (prefix (vicare posix)
 	  px.)
   (prefix (vicare mail libesmtp)
@@ -37,9 +38,7 @@
   (prefix (vicare mail libesmtp constants)
 	  esmtp.)
   (prefix (vicare ffi)
-	  ffi.)
-  (only (vicare syntactic-extensions)
-	unwind-protect))
+	  ffi.))
 
 
 ;;;; helpers

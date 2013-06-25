@@ -17,6 +17,8 @@ nobase_nodist_libvicare2_DATA = \
 # nobase_dist_libvicare_DATA	+= nausicaa/mail/libesmtp.vicare.sls
 # endif
 
+VICARE_LIB_INFIX	= mail/libesmtp
+
 include $(top_srcdir)/meta/makefiles/lib.am
 
 ### end of file

@@ -143,7 +143,7 @@
 
     AUTH_PLUGIN_PLAIN
     AUTH_PLUGIN_EXTERNAL)
-  (import (rename (only (vicare syntactic-extensions)
+  (import (rename (only (vicare)
 			define-inline-constant)
 		  (define-inline-constant	defc)))
 

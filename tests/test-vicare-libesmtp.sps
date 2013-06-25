@@ -87,14 +87,14 @@
   (check
       (let ((sex (esmtp.smtp-create-session)))
 	(esmtp.smtp-destroy-session sex))
-    => (void))
+    => #t)
 
   (check
       (let ((sex (esmtp.smtp-create-session)))
 	(esmtp.smtp-destroy-session sex)
 	(esmtp.smtp-destroy-session sex)
 	(esmtp.smtp-destroy-session sex))
-    => (void))
+    => #f)
 
   (check
       (let ((sex (esmtp.smtp-create-session)))
