@@ -1,4 +1,4 @@
-Subject: [announce] Vicare/libESMTP revision 0.1d1
+Subject: [announce] Vicare/libESMTP revision 0.2d0
 
 			    Vicare/libESMTP
 			    ===============
@@ -29,10 +29,10 @@ tested libESMTP version 1.0.7rc1; the libESMTP library is available at:
 	      <http://www.stafford.uklinux.net/libesmtp/>
 
 
-Notes for revision 0.1d1
+Notes for revision 0.2d0
 ------------------------
 
-* This release needs Vicare Scheme at least version 0.2d21.
+* Updated to and dependent on Vicare Scheme 0.3.
 
 
 Notes for revision 0.1d0

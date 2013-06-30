@@ -2,7 +2,7 @@ dnl @configure_input@
 dnl
 
 AC_PREREQ([2.68])
-AC_INIT([Vicare/libESMTP],[0.1d1],[marco.maggi-ipsu@poste.it],
+AC_INIT([Vicare/libESMTP],[0.2d0],[marco.maggi-ipsu@poste.it],
   [vicare-libesmtp],[http://marcomaggi.github.com/vicare.html])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_MACRO_DIR([autotools])
@@ -27,6 +27,7 @@ VICARE_SCHEME
 
 VICARE_OPTION_DEBUGGING_MODE
 VICARE_OPTION_NAUSICAA([no])
+AM_CONDITIONAL([WANT_NAUSICAA],[test x$vicare_with_nausicaa = xyes])
 
 AM_CONDITIONAL([WANT_VICARE_DEBUG],[test x$VICARE_DEBUG = xyes])
 AM_COND_IF([WANT_VICARE_DEBUG],[AS_VAR_SET(VFLAGS,"$VFLAGS -g")])
