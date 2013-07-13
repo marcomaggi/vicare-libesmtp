@@ -138,11 +138,15 @@ The documentation of Vicare/libESMTP is available online:
 
 the latest version of this package can be downloaded from:
 
-  <http://code.google.com/p/vicare-scheme/downloads/list>
+ <https://sourceforge.net/projects/vicare-libesmtp/files/>
 
 development takes place at:
 
       <http://github.com/marcomaggi/vicare-libesmtp/>
+
+and as backup at:
+
+    <https://sourceforge.net/projects/vicare-libesmtp/>
 
 the home page of the Vicare project is at:
 

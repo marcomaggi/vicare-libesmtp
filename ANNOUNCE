@@ -13,7 +13,7 @@ it provides bindings for the libESMTP C language library.
 
   The latest version of this package can be downloaded from:
 
-	<http://code.google.com/p/vicare-scheme/downloads/list>
+       <https://sourceforge.net/projects/vicare-libesmtp/files/>
 
 the home page of the Vicare project is at:
 
@@ -22,6 +22,10 @@ the home page of the Vicare project is at:
 development takes place at:
 
 	    <http://github.com/marcomaggi/vicare-libesmtp/>
+
+and as backup at:
+
+	  <https://sourceforge.net/projects/vicare-libesmtp/>
 
   The last  time the author  bothered to  update this paragraph,  he had
 tested libESMTP version 1.0.7rc1; the libESMTP library is available at:

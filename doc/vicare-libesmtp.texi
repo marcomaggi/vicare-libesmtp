@@ -7,27 +7,6 @@
 @include version.texi
 @include macros.texi
 
-@macro libesmtpref{NODE, TITLE}
-@xref{\NODE\,\TITLE\,\TITLE\,libesmtp}
-@end macro
-
-
-@macro libesmtp{}
-libESMTP
-@end macro
-
-@macro etrn{}
-@acronym{ETRN}
-@end macro
-
-@macro auth{}
-@acronym{AUTH}
-@end macro
-
-@macro gsasl{}
-@acronym{GSASL}
-@end macro
-
 @c page
 @c ------------------------------------------------------------
 @c Values.
@@ -56,9 +35,38 @@ libESMTP
 @c list of copyright years.
 @set COPYRIGHT_YEARS            2013
 
+@c ------------------------------------------------------------
 
-@set LIBESMTP_VERSION           1.0.7rc1
-@set LIBESMTP_URL               @url{http:/@//@/www.stafford.uklinux.net/@/libesmtp/@/}
+@set FOREIGN_PACKAGE            @libesmtp{}
+@set FOREIGN_VERSION            1.0.7rc1
+@set FOREIGN_URL                @url{http:/@//@/www.stafford.uklinux.net/@/libesmtp/@/}
+@set FOREIGN_SCHEME_LIB         @library{vicare category libesmtp}
+@set GITHUB_URL                 @url{http://github.com/marcomaggi/vicare-libesmtp}
+@set SOURCEFORGE_URL            @url{https://sourceforge.net/projects/vicare-libesmtp/}
+@set DOWNLOAD_URL               @url{https://sourceforge.net/projects/vicare-libesmtp/files/}
+@set DOCUMENTATION_URL          @url{http://marcomaggi.github.com/docs/vicare-libesmtp.html}
+
+@macro libesmtpref{NODE, TITLE}
+@xref{\NODE\,\TITLE\,\TITLE\,libesmtp}
+@end macro
+
+@c ------------------------------------------------------------
+
+@macro libesmtp{}
+libESMTP
+@end macro
+
+@macro etrn{}
+@acronym{ETRN}
+@end macro
+
+@macro auth{}
+@acronym{AUTH}
+@end macro
+
+@macro gsasl{}
+@acronym{GSASL}
+@end macro
 
 @c page
 @c ------------------------------------------------------------
@@ -74,17 +82,22 @@ compliant Scheme implementation; it provides bindings for the
 The package is distributed under the terms of the @gnu{} General Public
 License (@gpl{}) and can be downloaded from:
 
-@center @url{http://code.google.com/p/vicare-scheme/downloads/list}
+@center @value{DOWNLOAD_URL}
 
 @noindent
 development takes place at:
 
-@center @url{http://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
+@center @value{GITHUB_URL}
 
 @noindent
-@libesmtp{} is available at:
+and as backup at:
 
-@center @value{LIBESMTP_URL}
+@center @value{SOURCEFORGE_URL}
+
+@noindent
+@value{FOREIGN_PACKAGE} is available at:
+
+@center @value{FOREIGN_URL}
 
 @noindent
 Copyright @copyright{} @value{COPYRIGHT_YEARS} by @value{AUTHOR} @value{AUTHOR_EMAIL}
@@ -170,10 +183,10 @@ language and Scheme language libraries for Vicare Scheme; it provides
 bindings for the @libesmtp{} C language library.
 
 The last time the author bothered to update this paragraph, he had
-tested @libesmtp{} version @value{LIBESMTP_VERSION}; the @libesmtp{}
+tested @libesmtp{} version @value{FOREIGN_VERSION}; the @libesmtp{}
 library is available at:
 
-@center @value{LIBESMTP_URL}
+@center @value{FOREIGN_URL}
 
 The package installs a C language library implementing wrapper C
 functions for the C language @libesmtp{} library; on top of this, the
@@ -2176,17 +2189,22 @@ libesmtp}.
 
 The documentation of @value{PACKAGE} is available online:
 
-@center @url{http://marcomaggi.github.com/docs/vicare-libesmtp.html}
+@center @value{DOCUMENTATION_URL}
 
 @noindent
 the latest version of this package can be downloaded from:
 
-@center @url{http://code.google.com/p/vicare-scheme/downloads/list}
+@center @value{DOWNLOAD_URL}
 
 @noindent
 development takes place at:
 
-@center @url{http://github.com/marcomaggi/vicare-libesmtp/}
+@center @value{GITHUB_URL}
+
+@noindent
+and as backup at:
+
+@center @value{SOURCEFORGE_URL}
 
 @noindent
 the home page of the Vicare project is at:
@@ -2199,9 +2217,9 @@ the home page of the Nausicaa project is at:
 @center @url{http://marcomaggi.github.com/nausicaa.html}
 
 @noindent
-@libesmtp{} can be found here:
+@value{FOREIGN_PACKAGE} can be found here:
 
-@center @value{LIBESMTP_URL}
+@center @value{FOREIGN_URL}
 
 @c page
 @node concept index
