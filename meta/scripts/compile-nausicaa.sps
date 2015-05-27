@@ -1,8 +1,8 @@
 ;;; -*- coding: utf-8-unix -*-
 ;;;
-;;;Part of: Vicare/Libesmtp
-;;;Contents: compile script for Nausicaa libraries
-;;;Date: Thu Feb 21, 2013
+;;;Part of: Vicare/Template
+;;;Contents: compile script for Nausicaa
+;;;Date: Sat Jan 21, 2012
 ;;;
 ;;;Abstract
 ;;;
@@ -26,8 +26,7 @@
 
 #!r6rs
 (import
-    ;;No Nausicaa library for now.
-    (only (rnrs))
+    (only (nausicaa category template))
   )
 
 ;;; end of file

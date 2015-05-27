@@ -8,7 +8,7 @@
 ;;;
 ;;;
 ;;;
-;;;Copyright (C) 2013 Marco Maggi <marco.maggi-ipsu@poste.it>
+;;;Copyright (C) 2013, 2015 Marco Maggi <marco.maggi-ipsu@poste.it>
 ;;;
 ;;;This program is free software:  you can redistribute it and/or modify
 ;;;it under the terms of the  GNU General Public License as published by
@@ -26,8 +26,8 @@
 
 
 #!vicare
-#!(load-shared-library "vicare-libesmtp")
-(library (vicare mail libesmtp)
+(library (vicare email libesmtp)
+  (foreign-library "vicare-libesmtp")
   (export
 
     ;; version numbers and strings
@@ -212,8 +212,8 @@
     auth-set-external-id
     )
   (import (vicare)
-    (vicare mail libesmtp constants)
-    (prefix (vicare mail libesmtp unsafe-capi) capi.)
+    (vicare email libesmtp constants)
+    (prefix (vicare email libesmtp unsafe-capi) capi.)
     (vicare arguments validation)
     (vicare arguments general-c-buffers)
     (vicare language-extensions syntaxes)

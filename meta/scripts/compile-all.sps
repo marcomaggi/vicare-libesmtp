@@ -1,8 +1,8 @@
 ;;; -*- coding: utf-8-unix -*-
 ;;;
-;;;Part of: Vicare/Libesmtp
+;;;Part of: Vicare/Template
 ;;;Contents: compile script
-;;;Date: Thu Feb 14, 2013
+;;;Date: Sat Jan 21, 2012
 ;;;
 ;;;Abstract
 ;;;
@@ -26,8 +26,8 @@
 
 #!r6rs
 (import
-    (only (vicare mail libesmtp))
-  (only (vicare mail libesmtp features))
+    (only (vicare category template))
+  (only (vicare category template features))
   )
 
 ;;; end of file

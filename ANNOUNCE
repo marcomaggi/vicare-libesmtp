@@ -1,4 +1,4 @@
-Subject: [announce] Vicare/libESMTP revision 0.2d1
+Subject: [announce] Vicare/libESMTP revision 0.4d0
 
 			    Vicare/libESMTP
 			    ===============
@@ -13,11 +13,11 @@ it provides bindings for the libESMTP C language library.
 
   The latest version of this package can be downloaded from:
 
-       <https://sourceforge.net/projects/vicare-libesmtp/files/>
+      <https://bitbucket.org/marcomaggi/vicare-libesmtp/downloads>
 
 the home page of the Vicare project is at:
 
-               <http://marcomaggi.github.com/vicare.html>
+	       <http://marcomaggi.github.io/vicare.html>
 
 development takes place at:
 
@@ -25,7 +25,7 @@ development takes place at:
 
 and as backup at:
 
-	  <https://sourceforge.net/projects/vicare-libesmtp/>
+	  <https://bitbucket.org/marcomaggi/vicare-libesmtp/>
 
   The last  time the author  bothered to  update this paragraph,  he had
 tested libESMTP version 1.0.7rc1; the libESMTP library is available at:
@@ -33,10 +33,10 @@ tested libESMTP version 1.0.7rc1; the libESMTP library is available at:
 	      <http://www.stafford.uklinux.net/libesmtp/>
 
 
-Notes for revision 0.2d1
+Notes for revision 0.4d0
 ------------------------
 
-*
+* Started support for Vicare Scheme 0.4.
 
 
 Notes for revision 0.2d0

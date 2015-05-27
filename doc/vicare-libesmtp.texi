@@ -33,7 +33,7 @@
 
 @c To be used as @value{COPYRIGHT_YEARS} whenever we need to include the
 @c list of copyright years.
-@set COPYRIGHT_YEARS            2013
+@set COPYRIGHT_YEARS            2013, 2015
 
 @c ------------------------------------------------------------
 
@@ -41,10 +41,11 @@
 @set FOREIGN_VERSION            1.0.7rc1
 @set FOREIGN_URL                @url{http:/@//@/www.stafford.uklinux.net/@/libesmtp/@/}
 @set FOREIGN_SCHEME_LIB         @library{vicare category libesmtp}
-@set GITHUB_URL                 @url{http://github.com/marcomaggi/vicare-libesmtp}
-@set SOURCEFORGE_URL            @url{https://sourceforge.net/projects/vicare-libesmtp/}
-@set DOWNLOAD_URL               @url{https://sourceforge.net/projects/vicare-libesmtp/files/}
-@set DOCUMENTATION_URL          @url{http://marcomaggi.github.com/docs/vicare-libesmtp.html}
+@set GITHUB_URL                 @url{http://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
+@set BITBUCKET_URL              @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}/}
+@set DOWNLOAD_URL               @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}/downloads/}
+@set DOCUMENTATION_URL          @url{http://marcomaggi.github.com/docs/@value{PACKAGE_NICKNAME}.html}
+@set VICARE_HOMEPAGE_URL        @url{http://marcomaggi.github.io/vicare.html}
 
 @macro libesmtpref{NODE, TITLE}
 @xref{\NODE\,\TITLE\,\TITLE\,libesmtp}
@@ -92,7 +93,7 @@ development takes place at:
 @noindent
 and as backup at:
 
-@center @value{SOURCEFORGE_URL}
+@center @value{BITBUCKET_URL}
 
 @noindent
 @value{FOREIGN_PACKAGE} is available at:
@@ -190,25 +191,25 @@ library is available at:
 
 The package installs a C language library implementing wrapper C
 functions for the C language @libesmtp{} library; on top of this, the
-Scheme library @library{vicare mail libesmtp} exports one binding for
+Scheme library @library{vicare email libesmtp} exports one binding for
 each @libesmtp{} public function; additionally the library
-@library{vicare mail libesmtp constants} exports one binding for each
+@library{vicare email libesmtp constants} exports one binding for each
 constant value defined in the C language header @file{libesmtp.h}.
 
 The following Scheme libraries are installed:
 
 @table @library
-@item vicare mail libesmtp
-@cindex Library @library{vicare mail libesmtp}
-@cindex @library{vicare mail libesmtp}, library
+@item vicare email libesmtp
+@cindex Library @library{vicare email libesmtp}
+@cindex @library{vicare email libesmtp}, library
 It exports one binding for each @libesmtp{} public function.  All the
 Scheme function names are directly derived from the C function names by
 replacing underscore characters @samp{_} with dash characters @samp{-};
 so @cfunc{smtp_version} becomes @func{smtp-version}.
 
-@item vicare mail libesmtp unsafe-capi
-@cindex Library @library{vicare mail libesmtp unsafe-capi}
-@cindex @library{vicare mail libesmtp unsafe-capi}, library
+@item vicare email libesmtp unsafe-capi
+@cindex Library @library{vicare email libesmtp unsafe-capi}
+@cindex @library{vicare email libesmtp unsafe-capi}, library
 It exports one syntax binding for each @libesmtp{} public function.  All
 the Scheme syntax names are directly derived from the C function names
 by replacing underscore characters @samp{_} with dash characters
@@ -218,37 +219,19 @@ These syntaxes expand to a direct call to the C language wrapper
 functions in the @value{PACKAGE} library; they are not meant to be
 called in normal usage of the package.
 
-@item vicare mail libesmtp constants
-@cindex Library @library{vicare mail libesmtp constants}
-@cindex @library{vicare mail libesmtp constants}, library
+@item vicare email libesmtp constants
+@cindex Library @library{vicare email libesmtp constants}
+@cindex @library{vicare email libesmtp constants}, library
 It exports one binding for each constant value defined in the C language
 header @file{libesmtp.h}.
 
-@item vicare mail libesmtp features
-@cindex Library @library{vicare mail libesmtp features}
-@cindex @library{vicare mail libesmtp features}, library
+@item vicare email libesmtp features
+@cindex Library @library{vicare email libesmtp features}
+@cindex @library{vicare email libesmtp features}, library
 It exports one identifier syntax binding for each @code{HAVE_} constant
 defined by the @command{configure} script, expanding to @true{} or
 @false{}.
 @end table
-
-Scheme libraries are installed under the directory:
-
-@center @file{$(libdir)/vicare-scheme}
-
-After installation, under the directory @code{$libexecdir/$PACKAGE}, a
-script @file{compile-all.sps} can be executed to precompile the
-installed libraries; for example:
-
-@example
-$ sudo vicare \
-   --fasl-directory /var/cache/vicare-scheme \
-   --compile-dependencies \
-      /usr/local/libexec/vicare-libesmtp/compile-all.sps
-@end example
-
-This document contains only a brief description of the functions: refer
-to the @libesmtp{}'s documentation for details.
 
 @c page
 @node version
@@ -288,8 +271,8 @@ returned.
 @chapter Plain programming interface
 
 
-@cindex Library @library{vicare mail libesmtp}
-@cindex @library{vicare mail libesmtp}, library
+@cindex Library @library{vicare email libesmtp}
+@cindex @library{vicare email libesmtp}, library
 
 
 @menu
@@ -334,11 +317,9 @@ The following program sends a message with no frills; make use of
   (only (vicare language-extensions)
         pretty-print
         fprintf)
-  (prefix (vicare mail libesmtp) esmtp.)
-  (prefix (vicare mail libesmtp constants) esmtp.)
-  (prefix (vicare ffi) ffi.)
-  (only (vicare syntactic-extensions)
-        unwind-protect))
+  (prefix (vicare email libesmtp) esmtp.)
+  (prefix (vicare email libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.))
 
 (define local-hostname
   "localhost")
@@ -390,11 +371,9 @@ The following program sends a message with no frills; make use of
   (only (vicare language-extensions)
         pretty-print
         fprintf)
-  (prefix (vicare mail libesmtp) esmtp.)
-  (prefix (vicare mail libesmtp constants) esmtp.)
-  (prefix (vicare ffi) ffi.)
-  (only (vicare syntactic-extensions)
-        unwind-protect))
+  (prefix (vicare email libesmtp) esmtp.)
+  (prefix (vicare email libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.))
 
 (define local-hostname
   "localhost")
@@ -477,11 +456,9 @@ make use of @func{smtp-set-message-str} to feed the message to
   (only (vicare language-extensions)
         pretty-print
         fprintf)
-  (prefix (vicare mail libesmtp) esmtp.)
-  (prefix (vicare mail libesmtp constants) esmtp.)
-  (prefix (vicare ffi) ffi.)
-  (only (vicare syntactic-extensions)
-        unwind-protect))
+  (prefix (vicare email libesmtp) esmtp.)
+  (prefix (vicare email libesmtp constants) esmtp.)
+  (prefix (vicare ffi) ffi.))
 
 (define local-hostname
   "localhost")
@@ -2204,17 +2181,12 @@ development takes place at:
 @noindent
 and as backup at:
 
-@center @value{SOURCEFORGE_URL}
+@center @value{BITBUCKET_URL}
 
 @noindent
 the home page of the Vicare project is at:
 
-@center @url{http://marcomaggi.github.com/vicare.html}
-
-@noindent
-the home page of the Nausicaa project is at:
-
-@center @url{http://marcomaggi.github.com/nausicaa.html}
+@center @value{VICARE_HOMEPAGE_URL}
 
 @noindent
 @value{FOREIGN_PACKAGE} can be found here:
