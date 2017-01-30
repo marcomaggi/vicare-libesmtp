@@ -8,7 +8,7 @@
 ;;;
 ;;;
 ;;;
-;;;Copyright (C) 2013, 2015 Marco Maggi <marco.maggi-ipsu@poste.it>
+;;;Copyright (C) 2013, 2015, 2017 Marco Maggi <marco.maggi-ipsu@poste.it>
 ;;;
 ;;;This program is free software:  you can redistribute it and/or modify
 ;;;it under the terms of the  GNU General Public License as published by
@@ -27,6 +27,7 @@
 
 #!vicare
 (library (vicare email libesmtp)
+  (options typed-language)
   (foreign-library "vicare-libesmtp")
   (export
 
@@ -211,18 +212,16 @@
     auth-decode
     auth-set-external-id
     )
-  (import (vicare)
-    (vicare email libesmtp constants)
-    (prefix (vicare email libesmtp unsafe-capi) capi.)
+  (import (vicare (0 4 2017 1 (>= 10)))
+    (prefix (vicare system structs) structs::)
+    (prefix (vicare email libesmtp unsafe-capi) capi::)
     (vicare arguments validation)
     (vicare arguments general-c-buffers)
     (vicare language-extensions syntaxes)
     (vicare unsafe operations)
-    (prefix (vicare ffi)
-	    ffi.)
-    (prefix (vicare ffi foreign-pointer-wrapper)
-	    ffi.)
-    #;(prefix (vicare words) words.))
+    (prefix (vicare ffi) ffi::)
+    (prefix (vicare ffi foreign-pointer-wrapper) ffi::)
+    (vicare email libesmtp constants))
 
 
 ;;;; arguments validation
@@ -243,67 +242,67 @@
 ;;;; version functions
 
 (define (vicare-libesmtp-version-interface-current)
-  (capi.vicare-libesmtp-version-interface-current))
+  (capi::vicare-libesmtp-version-interface-current))
 
 (define (vicare-libesmtp-version-interface-revision)
-  (capi.vicare-libesmtp-version-interface-revision))
+  (capi::vicare-libesmtp-version-interface-revision))
 
 (define (vicare-libesmtp-version-interface-age)
-  (capi.vicare-libesmtp-version-interface-age))
+  (capi::vicare-libesmtp-version-interface-age))
 
 (define (vicare-libesmtp-version)
-  (ascii->string (capi.vicare-libesmtp-version)))
+  (ascii->string (capi::vicare-libesmtp-version)))
 
 ;;; --------------------------------------------------------------------
 
 (define (smtp-version)
   (define who 'smtp-version)
-  (let ((rv (capi.smtp-version)))
+  (let ((rv (capi::smtp-version)))
     (and rv (ascii->string rv))))
 
 
 ;;;; library errors
 
 (define (smtp-errno)
-  (capi.smtp-errno))
+  (capi::smtp-errno))
 
 (define (smtp-strerror code)
   (define who 'smtp-strerror)
   (with-arguments-validation (who)
       ((signed-int	code))
-    (let ((rv (capi.smtp-strerror code)))
+    (let ((rv (capi::smtp-strerror code)))
       (and rv (ascii->string rv)))))
 
 
 ;;;; data structures
 
-(ffi.define-foreign-pointer-wrapper smtp-session
-  (ffi.foreign-destructor	capi.smtp-destroy-session)
-  (ffi.collector-struct-type	#f)
-  (ffi.collected-struct-type	smtp-message)
-  (ffi.collected-struct-type	smtp-etrn-node))
+(ffi::define-foreign-pointer-wrapper smtp-session
+  (ffi::foreign-destructor	capi::smtp-destroy-session)
+  (ffi::collector-struct-type	#f)
+  (ffi::collected-struct-type	smtp-message)
+  (ffi::collected-struct-type	smtp-etrn-node))
 
-(ffi.define-foreign-pointer-wrapper smtp-message
-  (ffi.foreign-destructor	#f)
-  (ffi.collector-struct-type	smtp-session)
-  (ffi.collected-struct-type	smtp-recipient))
+(ffi::define-foreign-pointer-wrapper smtp-message
+  (ffi::foreign-destructor	#f)
+  (ffi::collector-struct-type	smtp-session)
+  (ffi::collected-struct-type	smtp-recipient))
 
-(ffi.define-foreign-pointer-wrapper smtp-recipient
-  (ffi.foreign-destructor	#f)
-  (ffi.collector-struct-type	smtp-message))
+(ffi::define-foreign-pointer-wrapper smtp-recipient
+  (ffi::foreign-destructor	#f)
+  (ffi::collector-struct-type	smtp-message))
 
-(ffi.define-foreign-pointer-wrapper smtp-etrn-node
-  (ffi.foreign-destructor	#f)
-  (ffi.collector-struct-type	smtp-session))
+(ffi::define-foreign-pointer-wrapper smtp-etrn-node
+  (ffi::foreign-destructor	#f)
+  (ffi::collector-struct-type	smtp-session))
 
-(ffi.define-foreign-pointer-wrapper auth-context
-  (ffi.foreign-destructor	capi.auth-destroy-context)
-  (ffi.collector-struct-type	#f))
+(ffi::define-foreign-pointer-wrapper auth-context
+  (ffi::foreign-destructor	capi::auth-destroy-context)
+  (ffi::collector-struct-type	#f))
 
 
 ;;;; data structures: status
 
-(define-struct smtp-status
+(structs::define-struct smtp-status
   (code
 		;Exact  integer in  the  range of  the  C language  type
 		;"signed int"; SMTP protocol status code.
@@ -330,7 +329,7 @@
   (%display "]"))
 
 (module ()
-  (set-rtd-printer! (type-descriptor smtp-status) %struct-smtp-status-printer))
+  (structs::set-struct-type-printer! (type-descriptor smtp-status) %struct-smtp-status-printer))
 
 (define (%make-smtp-status/empty)
   (make-smtp-status #f #f #f #f #f))
@@ -339,7 +338,7 @@
 ;;;; session management
 
 (define (smtp-create-session)
-  (let ((rv (capi.smtp-create-session)))
+  (let ((rv (capi::smtp-create-session)))
     (and rv (make-smtp-session/owner rv))))
 
 (define (smtp-destroy-session session)
@@ -354,7 +353,7 @@
   (define who 'smtp-start-session)
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
-    (capi.smtp-start-session session)))
+    (capi::smtp-start-session session)))
 
 ;;; --------------------------------------------------------------------
 
@@ -372,7 +371,7 @@
 	 (general-c-string/false	local-hostname))
       (with-general-c-strings/false
 	  ((hname		local-hostname))
-	(capi.smtp-set-hostname session hname))))))
+	(capi::smtp-set-hostname session hname))))))
 
 (define (smtp-set-server session remote-server)
   ;;Set  REMOTE-SERVER as  remote server  specification for  SESSION; if
@@ -384,7 +383,7 @@
        (general-c-string	remote-server))
     (with-general-c-strings
 	((rserver	remote-server))
-      (capi.smtp-set-server session rserver))))
+      (capi::smtp-set-server session rserver))))
 
 (define (smtp-set-timeout session which value)
   (define who 'smtp-set-timeout)
@@ -392,7 +391,7 @@
       ((smtp-session/alive	session)
        (signed-int		which)
        (signed-long		value))
-    (capi.smtp-set-timeout session which value)))
+    (capi::smtp-set-timeout session which value)))
 
 (define (smtp-set-eventcb session c-callback)
   ;;Register a callback to notify the application about events.
@@ -401,7 +400,7 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			c-callback))
-    (capi.smtp-set-eventcb session c-callback)))
+    (capi::smtp-set-eventcb session c-callback)))
 
 (define (smtp-set-monitorcb session c-callback headers)
   ;;Set a callback for tracing the SMTP protocol session.
@@ -410,7 +409,7 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			c-callback))
-    (capi.smtp-set-monitorcb session c-callback headers)))
+    (capi::smtp-set-monitorcb session c-callback headers)))
 
 
 ;;;; message management
@@ -422,7 +421,7 @@
   (define who 'smtp-add-message)
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
-    (let ((rv (capi.smtp-add-message session)))
+    (let ((rv (capi::smtp-add-message session)))
       (and rv (make-smtp-message/not-owner rv session)))))
 
 ;;; --------------------------------------------------------------------
@@ -438,7 +437,7 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			c-callback))
-    (capi.smtp-enumerate-messages session c-callback)))
+    (capi::smtp-enumerate-messages session c-callback)))
 
 (define (smtp-enumerate-messages* session scheme-callback)
   ;;Apply SCHEME-CALLBACK to each  "smtp-message" registered in SESSION;
@@ -452,7 +451,8 @@
       ((smtp-session/alive	session)
        (procedure		scheme-callback))
     (vector-for-each scheme-callback
-      ($smtp-session-vector-of-collected-smtp-message session))))
+      ($smtp-session-vector-of-collected-smtp-message session))
+    (void)))
 
 ;;; --------------------------------------------------------------------
 
@@ -470,7 +470,7 @@
 	 (general-c-string/false	mailbox))
       (with-general-c-strings/false
 	  ((mbox		mailbox))
-	(capi.smtp-set-reverse-path message mbox))))))
+	(capi::smtp-set-reverse-path message mbox))))))
 
 ;;; --------------------------------------------------------------------
 
@@ -481,7 +481,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (pointer			c-callback))
-    (capi.smtp-set-messagecb message c-callback)))
+    (capi::smtp-set-messagecb message c-callback)))
 
 (define (smtp-set-message-fp message file-pointer)
   ;;Select a "FILE *" from which the message will be read.
@@ -490,7 +490,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (pointer			file-pointer))
-    (capi.smtp-set-message-fp message file-pointer)))
+    (capi::smtp-set-message-fp message file-pointer)))
 
 (define (smtp-set-message-str message string)
   ;;Set the message from a general C buffer.
@@ -501,7 +501,7 @@
        (general-c-string/false	string))
     (with-general-c-strings/false
 	((string.ascii		string))
-      (capi.smtp-set-message-str message string.ascii))))
+      (capi::smtp-set-message-str message string.ascii))))
 
 ;;; --------------------------------------------------------------------
 
@@ -513,7 +513,7 @@
   (define who 'smtp-message-transfer-status)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (let ((rv (capi.smtp-message-transfer-status message (%make-smtp-status/empty))))
+    (let ((rv (capi::smtp-message-transfer-status message (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -528,7 +528,7 @@
   (define who 'smtp-reverse-path-status)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (let ((rv (capi.smtp-reverse-path-status message (%make-smtp-status/empty))))
+    (let ((rv (capi::smtp-reverse-path-status message (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -546,7 +546,7 @@
   (define who 'smtp-message-reset-status)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (capi.smtp-message-reset-status message)))
+    (capi::smtp-message-reset-status message)))
 
 
 ;;;; headers management
@@ -564,17 +564,17 @@
 	((smtp-message/alive	message)
 	 (string		header))
       (let ((header.bv (string->ascii header)))
-	(case-strings header
+	(case header
 	  (("Date")
 	   (with-arguments-validation (who)
 	       ((signed-long	value1))
-	     (capi.smtp-set-header message header.bv value1 #f)))
+	     (capi::smtp-set-header message header.bv value1 #f)))
 	  (("Message-Id")
 	   (with-arguments-validation (who)
 	       ((general-c-string	value1))
 	     (with-general-c-strings
 		 ((value		value1))
-	       (capi.smtp-set-header message header.bv value #f))))
+	       (capi::smtp-set-header message header.bv value #f))))
 	  (("From" "Disposition-Notification-To")
 	   (with-arguments-validation (who)
 	       ((general-c-string	value1)
@@ -582,7 +582,7 @@
 	     (with-general-c-strings
 		 ((phrase		value1)
 		  (mailbox	value2))
-	       (capi.smtp-set-header message header.bv phrase mailbox))))
+	       (capi::smtp-set-header message header.bv phrase mailbox))))
 	  (("To" "Cc" "Bcc" "Reply-To" "Sender")
 	   (with-arguments-validation (who)
 	       ((general-c-string	value1)
@@ -590,14 +590,14 @@
 	     (with-general-c-strings
 		 ((phrase	value1)
 		  (address	value2))
-	       (capi.smtp-set-header message header.bv phrase address))))
+	       (capi::smtp-set-header message header.bv phrase address))))
 	  (else
 	   (with-arguments-validation (who)
 	       ((general-c-string	value1))
 	     (with-general-c-strings
 		 ((value		value1))
 	       (string-to-bytevector string->ascii)
-	       (capi.smtp-set-header message header.bv value #f))))
+	       (capi::smtp-set-header message header.bv value #f))))
 	  ))))))
 
 (define (smtp-set-header-option message header option)
@@ -609,13 +609,13 @@
     (with-general-c-strings
 	((header.c	header))
       (string-to-bytevector string->ascii)
-      (capi.smtp-set-header-option message header.c option))))
+      (capi::smtp-set-header-option message header.c option))))
 
 (define (smtp-set-resent-headers message onoff)
   (define who 'smtp-set-resent-headers)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (capi.smtp-set-resent-headers message onoff)))
+    (capi::smtp-set-resent-headers message onoff)))
 
 
 ;;;; recipient management
@@ -630,7 +630,7 @@
        (general-c-string	mailbox))
     (with-general-c-strings
 	((mbox		mailbox))
-      (let ((rv (capi.smtp-add-recipient message mbox)))
+      (let ((rv (capi::smtp-add-recipient message mbox)))
 	(and rv (make-smtp-recipient/not-owner rv message))))))
 
 ;;; --------------------------------------------------------------------
@@ -646,7 +646,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (pointer			c-callback))
-    (capi.smtp-enumerate-recipients message c-callback)))
+    (capi::smtp-enumerate-recipients message c-callback)))
 
 (define (smtp-enumerate-recipients* message scheme-callback)
   ;;Apply  SCHEME-CALLBACK   to  each  "smtp-recipient"   registered  in
@@ -661,13 +661,14 @@
       ((smtp-message/alive	message)
        (procedure		scheme-callback))
     (vector-for-each scheme-callback
-      ($smtp-message-vector-of-collected-smtp-recipient message))))
+      ($smtp-message-vector-of-collected-smtp-recipient message))
+    (void)))
 
 (define (smtp-option-require-all-recipients session onoff)
   (define who 'smtp-option-require-all-recipients)
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
-    (capi.smtp-option-require-all-recipients session onoff)))
+    (capi::smtp-option-require-all-recipients session onoff)))
 
 ;;; --------------------------------------------------------------------
 
@@ -679,7 +680,7 @@
   (define who 'smtp-recipient-status)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient))
-    (let ((rv (capi.smtp-recipient-status recipient (%make-smtp-status/empty))))
+    (let ((rv (capi::smtp-recipient-status recipient (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -694,7 +695,7 @@
   (define who 'smtp-recipient-check-complete)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient))
-    (capi.smtp-recipient-check-complete recipient)))
+    (capi::smtp-recipient-check-complete recipient)))
 
 (define (smtp-recipient-reset-status recipient)
   ;;Reset  the  recipient status  to  the  state  it would  have  before
@@ -704,7 +705,7 @@
   (define who 'smtp-recipient-reset-status)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient))
-    (capi.smtp-recipient-reset-status recipient)))
+    (capi::smtp-recipient-reset-status recipient)))
 
 
 ;;;; application data
@@ -714,13 +715,13 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			data-pointer))
-    (capi.smtp-set-application-data session data-pointer)))
+    (capi::smtp-set-application-data session data-pointer)))
 
 (define (smtp-get-application-data session)
   (define who 'smtp-get-application-data)
   (with-arguments-validation (who)
       ((smtp-session/alive	session))
-    (capi.smtp-get-application-data session)))
+    (capi::smtp-get-application-data session)))
 
 ;;; --------------------------------------------------------------------
 
@@ -729,13 +730,13 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (pointer			data-pointer))
-    (capi.smtp-message-set-application-data message data-pointer)))
+    (capi::smtp-message-set-application-data message data-pointer)))
 
 (define (smtp-message-get-application-data message)
   (define who 'smtp-message-get-application-data)
   (with-arguments-validation (who)
       ((smtp-message/alive	message))
-    (capi.smtp-message-get-application-data message)))
+    (capi::smtp-message-get-application-data message)))
 
 ;;; --------------------------------------------------------------------
 
@@ -744,13 +745,13 @@
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient)
        (pointer			data-pointer))
-    (capi.smtp-recipient-set-application-data recipient data-pointer)))
+    (capi::smtp-recipient-set-application-data recipient data-pointer)))
 
 (define (smtp-recipient-get-application-data recipient)
   (define who 'smtp-recipient-get-application-data)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient))
-    (capi.smtp-recipient-get-application-data recipient)))
+    (capi::smtp-recipient-get-application-data recipient)))
 
 
 ;;;; SMTP authentication extension
@@ -760,14 +761,14 @@
   (with-arguments-validation (who)
       ((smtp-session/alive		session)
        (false-or-auth-context/alive	auth-context))
-    (capi.smtp-auth-set-context session auth-context)))
+    (capi::smtp-auth-set-context session auth-context)))
 
 (define (smtp-gsasl-set-context session gsasl-context)
   (define who 'smtp-gsasl-set-context)
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer/false		gsasl-context))
-    (capi.smtp-gsasl-set-context session gsasl-context)))
+    (capi::smtp-gsasl-set-context session gsasl-context)))
 
 
 ;;;; SMTP StartTLS extension
@@ -777,20 +778,20 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (signed-int		how))
-    (capi.smtp-starttls-enable session how)))
+    (capi::smtp-starttls-enable session how)))
 
 (define (smtp-starttls-set-ctx session ssl-context)
   (define who 'smtp-starttls-set-ctx)
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			ssl-context))
-    (capi.smtp-starttls-set-ctx session ssl-context)))
+    (capi::smtp-starttls-set-ctx session ssl-context)))
 
 (define (smtp-starttls-set-password-cb c-callback)
   (define who 'smtp-starttls-set-password-cb)
   (with-arguments-validation (who)
       ((pointer		c-callback))
-    (capi.smtp-starttls-set-password-cb c-callback)))
+    (capi::smtp-starttls-set-password-cb c-callback)))
 
 
 ;;;; SMTP Deliver By extension
@@ -802,7 +803,7 @@
        (signed-long		time)
        (signed-int		by-mode)
        (signed-int		trace))
-    (capi.smtp-deliverby-set-mode message time by-mode trace)))
+    (capi::smtp-deliverby-set-mode message time by-mode trace)))
 
 
 ;;;; SMTP Deliver Status Notification extension
@@ -812,7 +813,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (signed-int		flags))
-    (capi.smtp-dsn-set-ret message flags)))
+    (capi::smtp-dsn-set-ret message flags)))
 
 (define (smtp-dsn-set-envid message envelope-identifier)
   (define who 'smtp-dsn-set-envid)
@@ -821,14 +822,14 @@
        (general-c-string	envelope-identifier))
     (with-general-c-strings
 	((envid		envelope-identifier))
-      (capi.smtp-dsn-set-envid message envid))))
+      (capi::smtp-dsn-set-envid message envid))))
 
 (define (smtp-dsn-set-notify recipient flags)
   (define who 'smtp-dsn-set-notify)
   (with-arguments-validation (who)
       ((smtp-recipient/alive	recipient)
        (signed-int		flags))
-    (capi.smtp-dsn-set-notify recipient flags)))
+    (capi::smtp-dsn-set-notify recipient flags)))
 
 (define (smtp-dsn-set-orcpt recipient address-type address)
   (define who 'smtp-dsn-set-orcpt)
@@ -839,7 +840,7 @@
     (with-general-c-strings
 	((address-type^		address-type)
 	 (address^		address))
-      (capi.smtp-dsn-set-orcpt recipient address-type^ address^))))
+      (capi::smtp-dsn-set-orcpt recipient address-type^ address^))))
 
 
 ;;;; SMTP Size extension
@@ -849,7 +850,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (unsigned-long		size))
-    (capi.smtp-size-set-estimate message size)))
+    (capi::smtp-size-set-estimate message size)))
 
 
 ;;;; SMTP 8bit-MIME Transport extension
@@ -859,7 +860,7 @@
   (with-arguments-validation (who)
       ((smtp-message/alive	message)
        (signed-int		body))
-    (capi.smtp-8bitmime-set-body message body)))
+    (capi::smtp-8bitmime-set-body message body)))
 
 
 ;;;; SMTP Remote Message Queue Starting (ETRN) extension
@@ -872,7 +873,7 @@
        (general-c-string	node))
     (with-general-c-strings
 	((node^		node))
-      (let ((rv (capi.smtp-etrn-add-node session option node^)))
+      (let ((rv (capi::smtp-etrn-add-node session option node^)))
 	(and rv (make-smtp-etrn-node/not-owner rv session))))))
 
 (define (smtp-etrn-enumerate-nodes session c-callback)
@@ -880,7 +881,7 @@
   (with-arguments-validation (who)
       ((smtp-session/alive	session)
        (pointer			c-callback))
-    (capi.smtp-etrn-enumerate-nodes session c-callback)))
+    (capi::smtp-etrn-enumerate-nodes session c-callback)))
 
 (define (smtp-etrn-enumerate-nodes* session scheme-callback)
   (define who 'smtp-etrn-enumerate-nodes*)
@@ -894,7 +895,7 @@
   (define who 'smtp-etrn-node-status)
   (with-arguments-validation (who)
       ((smtp-etrn-node/alive	etrn-node))
-    (let ((rv (capi.smtp-etrn-node-status etrn-node (%make-smtp-status/empty))))
+    (let ((rv (capi::smtp-etrn-node-status etrn-node (%make-smtp-status/empty))))
       (and rv
 	   (let ((text ($smtp-status-text rv)))
 	     ($set-smtp-status-text! rv (if text
@@ -907,13 +908,13 @@
   (with-arguments-validation (who)
       ((smtp-etrn-node/alive	etrn-node)
        (pointer			data-pointer))
-    (capi.smtp-etrn-set-application-data etrn-node data-pointer)))
+    (capi::smtp-etrn-set-application-data etrn-node data-pointer)))
 
 (define (smtp-etrn-get-application-data etrn-node)
   (define who 'smtp-etrn-get-application-data)
   (with-arguments-validation (who)
       ((smtp-etrn-node/alive	etrn-node))
-    (capi.smtp-etrn-get-application-data etrn-node)))
+    (capi::smtp-etrn-get-application-data etrn-node)))
 
 
 ;;;; AUTH module
@@ -922,19 +923,19 @@
   (define who 'auth-client-init)
   (with-arguments-validation (who)
       ()
-    (capi.auth-client-init)))
+    (capi::auth-client-init)))
 
 (define (auth-client-exit)
   (define who 'auth-client-exit)
   (with-arguments-validation (who)
       ()
-    (capi.auth-client-exit)))
+    (capi::auth-client-exit)))
 
 (define (auth-create-context)
   (define who 'auth-create-context)
   (with-arguments-validation (who)
       ()
-    (capi.auth-create-context)))
+    (capi::auth-create-context)))
 
 (define (auth-destroy-context auth-ctx)
   (define who 'auth-destroy-context)
@@ -946,67 +947,67 @@
   (define who 'auth-set-mechanism-flags)
   (with-arguments-validation (who)
       ()
-    (capi.auth-set-mechanism-flags)))
+    (capi::auth-set-mechanism-flags)))
 
 (define (auth-set-mechanism-ssf)
   (define who 'auth-set-mechanism-ssf)
   (with-arguments-validation (who)
       ()
-    (capi.auth-set-mechanism-ssf)))
+    (capi::auth-set-mechanism-ssf)))
 
 (define (auth-set-interact-cb)
   (define who 'auth-set-interact-cb)
   (with-arguments-validation (who)
       ()
-    (capi.auth-set-interact-cb)))
+    (capi::auth-set-interact-cb)))
 
 (define (auth-client-enabled)
   (define who 'auth-client-enabled)
   (with-arguments-validation (who)
       ()
-    (capi.auth-client-enabled)))
+    (capi::auth-client-enabled)))
 
 (define (auth-set-mechanism)
   (define who 'auth-set-mechanism)
   (with-arguments-validation (who)
       ()
-    (capi.auth-set-mechanism)))
+    (capi::auth-set-mechanism)))
 
 (define (auth-mechanism-name)
   (define who 'auth-mechanism-name)
   (with-arguments-validation (who)
       ()
-    (capi.auth-mechanism-name)))
+    (capi::auth-mechanism-name)))
 
 (define (auth-response)
   (define who 'auth-response)
   (with-arguments-validation (who)
       ()
-    (capi.auth-response)))
+    (capi::auth-response)))
 
 (define (auth-get-ssf)
   (define who 'auth-get-ssf)
   (with-arguments-validation (who)
       ()
-    (capi.auth-get-ssf)))
+    (capi::auth-get-ssf)))
 
 (define (auth-encode)
   (define who 'auth-encode)
   (with-arguments-validation (who)
       ()
-    (capi.auth-encode)))
+    (capi::auth-encode)))
 
 (define (auth-decode)
   (define who 'auth-decode)
   (with-arguments-validation (who)
       ()
-    (capi.auth-decode)))
+    (capi::auth-decode)))
 
 (define (auth-set-external-id)
   (define who 'auth-set-external-id)
   (with-arguments-validation (who)
       ()
-    (capi.auth-set-external-id)))
+    (capi::auth-set-external-id)))
 
 
 ;;;; callback makers
@@ -1015,7 +1016,7 @@
   ;; void (*smtp_enumerate_messagecb_t)
   ;;		(smtp_message_t message,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'void '(pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (message-pointer custom-data)
 	       (guard (E (else
@@ -1029,7 +1030,7 @@
   ;;		(smtp_recipient_t recipient,
   ;;		 const char *mailbox,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer pointer pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'void '(pointer pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (recipient-pointer mailbox custom-data)
 	       (guard (E (else
@@ -1044,7 +1045,7 @@
   ;;		(void **ctx,
   ;;		 int *len,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'pointer '(pointer pointer pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'pointer '(pointer pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (optional-buffer-pointer len-pointer unused-custom-data)
 	       (guard (E (else
@@ -1058,7 +1059,7 @@
   ;;		 int event_no,
   ;;		 void *arg,
   ;;		 ...);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'void '(pointer signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (session-pointer event-no custom-data)
 	       (guard (E (else
@@ -1074,7 +1075,7 @@
   ;;		 int buflen,
   ;;		 int writing,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int signed-int pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'void '(pointer signed-int signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (buf.ptr buf.len writing custom-data)
 	       (guard (E (else
@@ -1089,7 +1090,7 @@
   ;;		 int option,
   ;;		 const char *domain,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'void '(pointer signed-int pointer pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'void '(pointer signed-int pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (node-pointer option domain custom-data)
 	       (guard (E (else
@@ -1108,7 +1109,7 @@
   ;;		 char **result,
   ;;		 int fields,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'signed-int
+  (let ((maker (ffi::make-c-callback-maker 'signed-int
 					  '(pointer pointer signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (request-pointer result-opinter fields custom-data)
@@ -1124,7 +1125,7 @@
   ;;		 int *len,
   ;;		 auth_interact_t interact,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'pointer '(pointer pointer pointer pointer pointer))))
+  (let ((maker (ffi::make-c-callback-maker 'pointer '(pointer pointer pointer pointer pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (context-pointer challenge length interact custom-data)
 	       (guard (E (else
@@ -1139,7 +1140,7 @@
   ;;		 int *dstlen,
   ;;		 const char *srcbuf,
   ;;		 int srclen);
-  (let ((maker (ffi.make-c-callback-maker 'signed-int
+  (let ((maker (ffi::make-c-callback-maker 'signed-int
 					  '(pointer pointer pointer pointer signed-int))))
     (lambda (user-scheme-callback)
       (maker (lambda (context-pointer dst.ptr.ptr dst.len.ptr src.ptr src.len)
@@ -1158,7 +1159,7 @@
   ;;		 int buflen,
   ;;		 int rwflag,
   ;;		 void *arg);
-  (let ((maker (ffi.make-c-callback-maker 'signed-int
+  (let ((maker (ffi::make-c-callback-maker 'signed-int
 					  '(pointer signed-int signed-int pointer))))
     (lambda (user-scheme-callback)
       (maker (lambda (buf.ptr buf.len rwflag custom-data)
@@ -1285,5 +1286,5 @@
 ;;; end of file
 ;; Local Variables:
 ;; eval: (put '%struct-destructor-application 'scheme-indent-function 1)
-;; eval: (put 'ffi.define-foreign-pointer-wrapper 'scheme-indent-function 1)
+;; eval: (put 'ffi::define-foreign-pointer-wrapper 'scheme-indent-function 1)
 ;; End:

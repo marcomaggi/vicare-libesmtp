@@ -33,14 +33,14 @@
 
 @c To be used as @value{COPYRIGHT_YEARS} whenever we need to include the
 @c list of copyright years.
-@set COPYRIGHT_YEARS            2013, 2015
+@set COPYRIGHT_YEARS            2013, 2015, 2017
 
 @c ------------------------------------------------------------
 
 @set FOREIGN_PACKAGE            @libesmtp{}
 @set FOREIGN_VERSION            1.0.7rc1
 @set FOREIGN_URL                @url{http:/@//@/www.stafford.uklinux.net/@/libesmtp/@/}
-@set FOREIGN_SCHEME_LIB         @library{vicare category libesmtp}
+@set FOREIGN_SCHEME_LIB         @library{vicare email libesmtp}
 @set GITHUB_URL                 @url{http://github.com/marcomaggi/@value{PACKAGE_NICKNAME}}
 @set BITBUCKET_URL              @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}/}
 @set DOWNLOAD_URL               @url{https://bitbucket.org/marcomaggi/@value{PACKAGE_NICKNAME}/downloads/}
@@ -198,8 +198,8 @@ constant value defined in the C language header @file{libesmtp.h}.
 
 The following Scheme libraries are installed:
 
-@table @library
-@item vicare email libesmtp
+@table @asis
+@item @library{vicare email libesmtp}
 @cindex Library @library{vicare email libesmtp}
 @cindex @library{vicare email libesmtp}, library
 It exports one binding for each @libesmtp{} public function.  All the
@@ -207,7 +207,7 @@ Scheme function names are directly derived from the C function names by
 replacing underscore characters @samp{_} with dash characters @samp{-};
 so @cfunc{smtp_version} becomes @func{smtp-version}.
 
-@item vicare email libesmtp unsafe-capi
+@item @library{vicare email libesmtp unsafe-capi}
 @cindex Library @library{vicare email libesmtp unsafe-capi}
 @cindex @library{vicare email libesmtp unsafe-capi}, library
 It exports one syntax binding for each @libesmtp{} public function.  All
@@ -219,13 +219,13 @@ These syntaxes expand to a direct call to the C language wrapper
 functions in the @value{PACKAGE} library; they are not meant to be
 called in normal usage of the package.
 
-@item vicare email libesmtp constants
+@item @library{vicare email libesmtp constants}
 @cindex Library @library{vicare email libesmtp constants}
 @cindex @library{vicare email libesmtp constants}, library
 It exports one binding for each constant value defined in the C language
 header @file{libesmtp.h}.
 
-@item vicare email libesmtp features
+@item @library{vicare email libesmtp features}
 @cindex Library @library{vicare email libesmtp features}
 @cindex @library{vicare email libesmtp features}, library
 It exports one identifier syntax binding for each @code{HAVE_} constant
@@ -243,7 +243,7 @@ The installed C library follows version numbering as established by the
 @gnu{} Libtool @xref{Libtool versioning, interface, Libtool's versioning
 system, libtool, Shared library support for @gnu{}}.
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -532,7 +532,7 @@ make use of @func{smtp-set-message-str} to feed the message to
 @subsection Session data structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -637,7 +637,7 @@ the second clause also accepts @false{}.
 @subsection Message data structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -726,7 +726,7 @@ the second clause also accepts @false{}.
 @subsection Recipient data structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -816,7 +816,7 @@ Succeed if @var{obj} satisfies the predicate
 @subsection @etrn{} node data structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -906,7 +906,7 @@ Succeed if @var{obj} satisfies the predicate
 @subsection @auth{} context structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1001,7 +1001,7 @@ the second clause also accepts @false{}.
 @subsection Status data structures
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1073,7 +1073,7 @@ second clause also accepts @false{}.
 @section Library errors
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1095,7 +1095,7 @@ representing the error description.  If an error occurs: return
 @section Session management
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1270,7 +1270,7 @@ exceptions.
 @section Message management
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1413,7 +1413,7 @@ string; @GenCStringsRef{}
 @section Recipient management
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1500,7 +1500,7 @@ will not fail.
 @section Headers management
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1570,7 +1570,7 @@ variation.  If successful return @true{}, else return @false{}.
 @section Session results
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 @c ------------------------------------------------------------
@@ -1628,7 +1628,7 @@ session.  If successful return @true{}, otherwise return @false{}.
 @section Converting constants to symbols
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1708,7 +1708,7 @@ constants, return the corresponding symbol.
 @section Application data
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1770,7 +1770,7 @@ Return a pointer object referencing the application data associated to
 @subsection AUTH extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1801,7 +1801,7 @@ If @var{auth-context} is @false{}: @auth{} is disabled and the previous
 @subsection StartTLS extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1879,7 +1879,7 @@ should take care of handling its own exceptions.
 @subsection Deliver By extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1902,7 +1902,7 @@ type @code{signed int}.
 @subsection Deliver Status Notification extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1953,7 +1953,7 @@ generalised C strings}.
 @subsection Size extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1970,7 +1970,7 @@ successful return @true{}, else return @false{}.
 @subsection 8bit-MIME Transport extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -1987,7 +1987,7 @@ Specify the body type.  If successful return @true{}, else return
 @subsection Remote Message Queue Starting (@etrn{}) extension
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 
@@ -2085,7 +2085,7 @@ Return the data pointer associated to an @etrn{} node structure.
 @section @auth{} module
 
 
-The following bindings are exported by the library @library{vicare mail
+The following bindings are exported by the library @library{vicare email
 libesmtp}.
 
 

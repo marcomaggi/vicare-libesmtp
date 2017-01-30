@@ -44,8 +44,6 @@
      (vicare email libesmtp unsafe-capi)
      (vicare email libesmtp constants)
      (vicare email libesmtp features))
-    ;; ((WANT_NAUSICAA)
-    ;;  (nausicaa email libesmtp))
     ))
 
 ;;; end of file

@@ -8,7 +8,7 @@
 ;;;
 ;;;
 ;;;
-;;;Copyright (C) 2013 Marco Maggi <marco.maggi-ipsu@poste.it>
+;;;Copyright (C) 2013, 2017 Marco Maggi <marco.maggi-ipsu@poste.it>
 ;;;
 ;;;This program is free software:  you can redistribute it and/or modify
 ;;;it under the terms of the  GNU General Public License as published by
@@ -26,13 +26,14 @@
 
 
 #!r6rs
-(import (vicare)
-  (prefix (vicare mail libesmtp)
-	  esmtp.)
-  (prefix (vicare mail libesmtp constants)
-	  esmtp.)
-  (prefix (vicare ffi) ffi.)
-  (vicare checks))
+(program (test-vicare-libesmtp)
+  (options typed-language)
+  (import (vicare)
+    (prefix (vicare system structs) structs::)
+    (prefix (vicare email libesmtp) esmtp.)
+    (prefix (vicare email libesmtp constants) esmtp.)
+    (prefix (vicare ffi) ffi.)
+    (vicare checks))
 
 (check-set-mode! 'report-failed)
 (check-display "*** testing Vicare Libesmtp bindings\n")
@@ -70,7 +71,7 @@
 
 
 (parametrise ((check-test-name		'session)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       ;;This will be destroyed by the garbage collector.
@@ -161,7 +162,7 @@
 
 
 (parametrise ((check-test-name		'message)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       ;;This will be destroyed by the garbage collector.
@@ -182,7 +183,7 @@
 		       (add-result msg)))))
 	 (esmtp.smtp-enumerate-messages sex cb)))
     (=> (lambda (result expected)
-	  (and (equal? (void) (car result))
+	  (and (void-object? (car result))
 	       (let ((msgs (cadr result)))
 		 (and (= 2 (length msgs))
 		      (for-all esmtp.smtp-message? msgs))))))
@@ -199,7 +200,7 @@
 		      (add-result msg))))
 	 (esmtp.smtp-enumerate-messages* sex cb)))
     (=> (lambda (result expected)
-	  (and (equal? (void) (car result))
+	  (and (void-object? (car result))
 	       (let ((msgs (cadr result)))
 		 (and (= 2 (length msgs))
 		      (for-all esmtp.smtp-message? msgs))))))
@@ -256,7 +257,7 @@
 
 
 (parametrise ((check-test-name		'recipient)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       ;;This will be destroyed by the garbage collector.
@@ -300,7 +301,7 @@
 		      (add-result rec))))
 	 (esmtp.smtp-enumerate-recipients* msg cb)))
     (=> (lambda (result expected)
-	  (and (equal? (void) (car result))
+	  (and (void-object? (car result))
 	       (let ((recs (cadr result)))
 		 (and (= 2 (length recs))
 		      (for-all esmtp.smtp-recipient? recs))))))
@@ -331,7 +332,7 @@
 
 
 (parametrise ((check-test-name		'headers)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       (let* ((sex (esmtp.smtp-create-session))
@@ -425,7 +426,7 @@
 
 
 (parametrise ((check-test-name		'data)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       (let ((sex (esmtp.smtp-create-session)))
@@ -456,7 +457,7 @@
 
 
 (parametrise ((check-test-name		'auth)
-	      (struct-guardian-logger	#f))
+	      (structs::struct-guardian-logger	#f))
 
   (check
       (let ((sex (esmtp.smtp-create-session)))
@@ -539,5 +540,7 @@
 ;;;; done
 
 (check-report)
+
+#| end of program |# )
 
 ;;; end of file

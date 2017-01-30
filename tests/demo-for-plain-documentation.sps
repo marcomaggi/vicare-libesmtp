@@ -8,7 +8,7 @@
 ;;;
 ;;;
 ;;;
-;;;Copyright (C) 2013 Marco Maggi <marco.maggi-ipsu@poste.it>
+;;;Copyright (C) 2013, 2017 Marco Maggi <marco.maggi-ipsu@poste.it>
 ;;;
 ;;;This program is free software:  you can redistribute it and/or modify
 ;;;it under the terms of the  GNU General Public License as published by
@@ -33,9 +33,9 @@
 	unwind-protect)
   (prefix (vicare posix)
 	  px.)
-  (prefix (vicare mail libesmtp)
+  (prefix (vicare email libesmtp)
 	  esmtp.)
-  (prefix (vicare mail libesmtp constants)
+  (prefix (vicare email libesmtp constants)
 	  esmtp.)
   (prefix (vicare ffi)
 	  ffi.))

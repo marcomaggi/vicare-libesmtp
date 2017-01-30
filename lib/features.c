@@ -7,7 +7,7 @@
 
 
 
-  Copyright (C) 2013 Marco Maggi <marco.maggi-ipsu@poste.it>
+  Copyright (C) 2013, 2017 Marco Maggi <marco.maggi-ipsu@poste.it>
 
   This program is  free software: you can redistribute  it and/or modify
   it under the  terms of the GNU General Public  License as published by
@@ -62,7 +62,7 @@ main (int argc, const char *const argv[])
 \n\
 \n\
 #!r6rs\n\
-(library (vicare mail libesmtp features)\n\
+(library (vicare email libesmtp features)\n\
   (export\n\
     HAVE_SMTP_VERSION\n\
     HAVE_SMTP_CREATE_SESSION\n\

@@ -86,6 +86,7 @@ VICARE_BUILD_DEPS	= \
 .PHONY: dependencies
 
 dependencies: lib/vicare/email/libesmtp/features.vicare.sls
+	$(MKDIR_P) $(fasldir)
 	$(VICARE_BUILD_DEPS) $(slsdir)/libraries.scm >$(slsdir)/dependencies.make
 
 # NOTE This  INCLUDE directive is  processed by Automake.   To specify
@@ -108,13 +109,7 @@ clean-fasl:
 VICARE_LIBESMTP_PLAIN_TESTS		= \
 	tests/test-vicare-libesmtp.sps
 
-# VICARE_LIBESMTP_NAU_TESTS		= \
-# 	tests/test-nausicaa-libesmtp.sps
-
 TESTS	= $(VICARE_LIBESMTP_PLAIN_TESTS)
-# if WANT_NAUSICAA
-# TESTS	+= $(VICARE_LIBESMTP_NAU_TESTS)
-# endif
 
 EXTRA_DIST += \
 	$(VICARE_LIBESMTP_PLAIN_TESTS)		\
